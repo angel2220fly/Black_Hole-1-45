@@ -326,7 +326,7 @@ class compression:
                                 	
                                 	Reapeats+=1                               
 	                                size_before=len(I8)
-	                                
+	                                long_F = len(I8)
 	
 	                                if I8[long_F-8]!="00000000":
 	                                    I8+="00000000"
