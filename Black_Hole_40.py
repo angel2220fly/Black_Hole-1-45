@@ -318,8 +318,8 @@ class compression:
                                 if Circle_times == 0:
 
                                     SINFO = INFO
-                                import random
-                                R = random.randint(1, 31)
+                              
+                                R = int(input("Please, enter number of reapeats? "))
 
 
                                 if I8[long_F-8]!="00000000":
