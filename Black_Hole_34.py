@@ -318,104 +318,85 @@ class compression:
                                 if Circle_times == 0:
 
                                     SINFO = INFO
-                                    
-                                Size=0
-                                Reapeats=1
 
-                                while Size!=1: 
-                                	
-                                	Reapeats+=1                               
-	                                size_before=len(I8)
-	                                
-	
-	                                if I8[long_F-8]!="00000000":
-	                                    I8+="00000000"
-	                                else:
-	                                	I8+="11111111"
-	
-	                                while block < long_F+8:
-	
-	                                    IF = I8[block : block + 8]
-	
-	                                    if FC == 0:
-	
-	                                        IF1 = I8[block + 8 : block + 16]
-	
-	                                    W4 += IF
-	
-	                                    block += 8
-	
-	                                    if IF1 == IF:
-	
-	                                        # print(IF1)
-	
-	                                        # print(IF2)
-	
-	                                        FC += 1
-	
-	                                        # print(FC)
-	
-	                                        if FC == 1:
-	
-	                                            W = block - 8
-	
-	                                    if IF1 != IF:
-	
-	                                        if FC < Reapeats:
-	
-	                                            FC = 0
-	
-	                                        if Z7 == 0:
-	
-	                                            if FC >= Reapeats:
-	
-	                                                Z7 = 1
-	
-	                                                CZ = 1
-	
-	                                                W1 = block - 16
-	
-	                                                Sw1 = format(W//8, '01b')
-	
-	                                                Sw3 = format(len(Sw1), '05b')
-	
-	                                                # print(FC)
-	
-	                                                Sw2 = format(FC, '01b')
-	
-	                                                Sw4 = format(len(Sw2), '05b')
-	
-	                                                W3 += "0" + IF1 + Sw3 + Sw1 + Sw4 + Sw2
-	
-	                                                W4 = W4[:W] + W4[W1:]
-	
-	                                                FC = 0
-	
-	                                if CZ == 0:
-	
-	                                    W5 = W3 + "1"
-	
-	                                elif CZ == 1:
-	
-	                                    W5 = W3
-	
-	                                W4 = W5 + W4
-	
-	                                INFO = W4
-	                                long_F = len(INFO)
-	                                INFO=INFO[:long_F-8]
-	                                
-	                                size_after=len(INFO)
-	                                if size_after<=size_before:
-	                                	INFO_size=""
-	                                	INFO_size=INFO
-	                                if Reapeats>65536:
-	                                	Size=1
-	                                	
-                                
+                                if I8[long_F-8]!="00000000":
+                                    I8+="00000000"
+                                else:
+                                	I8+="11111111"
+
+                                while block < long_F+8:
+
+                                    IF = I8[block : block + 8]
+
+                                    if FC == 0:
+
+                                        IF1 = I8[block + 8 : block + 16]
+
+                                    W4 += IF
+
+                                    block += 8
+
+                                    if IF1 == IF:
+
+                                        # print(IF1)
+
+                                        # print(IF2)
+
+                                        FC += 1
+
+                                        # print(FC)
+
+                                        if FC == 1:
+
+                                            W = block - 8
+
+                                    if IF1 != IF:
+
+                                        if FC < 3:
+
+                                            FC = 0
+
+                                        if Z7 == 0:
+
+                                            if FC >= 3:
+
+                                                Z7 = 1
+
+                                                CZ = 1
+
+                                                W1 = block - 16
+
+                                                Sw1 = format(W//8, '01b')
+
+                                                Sw3 = format(len(Sw1), '05b')
+
+                                                # print(FC)
+
+                                                Sw2 = format(FC, '01b')
+
+                                                Sw4 = format(len(Sw2), '05b')
+
+                                                W3 += "0" + IF1 + Sw3 + Sw1 + Sw4 + Sw2
+
+                                                W4 = W4[:W] + W4[W1:]
+
+                                                FC = 0
+
+                                if CZ == 0:
+
+                                    W5 = W3 + "1"
+
+                                elif CZ == 1:
+
+                                    W5 = W3
+
+                                W4 = W5 + W4
+
+                                INFO = W4
+                                long_F = len(INFO)
+                                INFO=INFO[:long_F-8]
 
                                 # print(len(INFO))
-                                INFO=INFO_size
 
                                 while Find != 1:
 
