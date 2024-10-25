@@ -55,7 +55,7 @@ def decompress_rle_8bit(input_filename, output_filename):
     print("Decompression completed.")
 
 if __name__ == "__main__":
-    print("Black_Hole_47.py Crated: by Jurijus Pacslovas")
+    print("Black_Hole_47.py Crated: by Jurijus Pacalovas")
     action = input("Choose action (1=Compress, 2=Decompress): ")
     input_file = input("Enter input file name: ")
     long_output_file=len(input_file)
