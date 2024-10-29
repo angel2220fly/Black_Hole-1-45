@@ -256,9 +256,15 @@ class compression:
                                             num = int(
                                                 T8, 2
                                             )  # Convert binary to decimal
-                                            num = num - 349
-                                            if num <= -1:
-                                                num = (2**24) - 1
+                                            
+                                            if num<=348 or num>=2**23:
+                                                 num=num
+                                                
+                                    
+                                            elif num>=349:
+                                            	num = num - 349
+                                        
+                                            	
                                             num_c = num
                                             # num check
                                             # print(f"Converted binary {T8} to decimal: {num}")
@@ -983,18 +989,21 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
-                                                                if find_c_v==1:
-                                                                	count_number=count_number+384
-                                                                count_number += (
-                                                                    349
-                                                                )
-                                                                if (
-                                                                    count_number
-                                                                    >= 2**24
-                                                                ):
-                                                                    count_number = (
-                                                                        0
-                                                                    )
+                                                                
+                                                                	
+
+                                                                if count_number<=348 or count_number<=2**23:
+                                                                	count_number=count_number
+
+                                                                elif count_number>=349:
+                                                                	count_number=count_number+349
+                                                                
+                                                                		                                               	
+                                                                		                                               	
+                                                                
+                                                                	
+                                                                	
+
 
                                                                 IFC = format(
                                                                     count_number,
