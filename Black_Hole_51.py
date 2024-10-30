@@ -1000,7 +1000,11 @@ class compression:
                                                                 
                                                                 		                                               	
                                                                 		                                               	
-                                                                
+                                                                if find_c_v==1:
+                                                                	count_number=count_number+384
+                                                                count_number += (
+                                                                    1
+                                                                )
                                                                 	
                                                                 	
 
