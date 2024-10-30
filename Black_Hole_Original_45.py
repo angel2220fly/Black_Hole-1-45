@@ -8,10 +8,10 @@ import sys
 # @Author Jurijus Pacalovas
 # Get the name of the current script
 
-if os.path.basename(sys.argv[0]) != "Black_Hole_Original_45.py":
-    sys.exit("This is not 'Black_Hole_Original_45.py'.")
+if os.path.basename(sys.argv[0]) != "Black_Hole_51.py":
+    sys.exit("This is not 'Black_Hole_51.py'.")
 
-print("The script 'Black_Hole_Original_45.py' is currently running.")
+print("The script 'Black_Hole_51.py' is currently running.")
 
 
 class compression:
@@ -256,9 +256,11 @@ class compression:
                                             num = int(
                                                 T8, 2
                                             )  # Convert binary to decimal
-                                            num = num - 1
-                                            if num == -1:
-                                                num = (2**24) - 1
+                                            if num<=389 or num>=(2**24)-390:
+                                                                	num=num
+                                                                	
+                                            elif num>389:
+                                                                	num=num-389
                                             num_c = num
                                             # num check
                                             # print(f"Converted binary {T8} to decimal: {num}")
@@ -985,16 +987,13 @@ class compression:
                                                                 )
                                                                 if find_c_v==1:
                                                                 	count_number=count_number+384
-                                                                count_number += (
-                                                                    1
-                                                                )
-                                                                if (
-                                                                    count_number
-                                                                    == 2**24
-                                                                ):
-                                                                    count_number = (
-                                                                        0
-                                                                    )
+
+                                                                if count_number<=389 or count_number>=(2**24)-390:
+                                                                	count_number=count_number
+                                                                	
+                                                                elif count_number>389:
+                                                                	count_number=count_number+389                                                           
+
 
                                                                 IFC = format(
                                                                     count_number,
