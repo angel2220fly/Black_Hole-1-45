@@ -534,7 +534,7 @@ class compression:
                                                                 	IFC="1"+ T8
 
                                                                 # print(binary_representation_before)
-                                                                elif count_number+384==num_c:
+                                                                elif count_number+384==num_c and num_c<2**15:
                                                                 	count_number=count_number+384
                                                                 
 
@@ -546,6 +546,19 @@ class compression:
 	                                                                    + length_tree_after
 	
 	                                                                )
+	                                                                
+                                                                elif count_number+256==num_c and num_c>=2**15:
+                                                                	count_number=count_number+256
+                                                                
+
+	                                                                IFC = (
+	                                                                    "0"+"0"
+	                                                                    + length_tree_after2
+	                                                                    + binary_representation
+	                                                                    + binary_representation_before_long1
+	                                                                    + length_tree_after
+	
+	                                                                )	                                                                
                                                                 elif count_number==num_c:
                                                                 
                                                                 
@@ -592,7 +605,7 @@ class compression:
                                                                     == 3
                                                                 ):
                                                                     T10 += IFC
-                                                                    print(IFC)
+                                                                    #print(IFC)
                                                                 else:
                                                                     
                                                                     num2 = int(
@@ -994,8 +1007,11 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
-                                                                if find_c_v==1:
+                                                                if find_c_v==1 and count_number<2**15:
                                                                 	count_number=count_number+384
+                                                                	
+                                                                elif find_c_v==1 and count_number>=2**15:
+                                                                	count_number=count_number+256                                                           
 
                                                                 if count_number<=389 or count_number>=(2**24)-390:
                                                                 	count_number=count_number
