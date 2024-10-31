@@ -485,7 +485,9 @@ class compression:
                                                                     - 1
                                                                 )
                                                                 # print(length_tree)
-                                                                # print(count_number)
+                                                                #print(count_number)
+                                                                #print(num_c)
+                                                                #256
 
                                                                 # print(times_after)#long after
 
@@ -556,9 +558,7 @@ class compression:
                                                                     + length_tree_after
 
                                                                 )
-                                                                elif count_number+480==num_c:
-                                                                	count_number=count_number+480
-                                                                	
+                                                                
                                                                 
                                                              
                                                                 else:
@@ -592,7 +592,7 @@ class compression:
                                                                     == 3
                                                                 ):
                                                                     T10 += IFC
-                                                                    #print(IFC)
+                                                                    print(IFC)
                                                                 else:
                                                                     
                                                                     num2 = int(
