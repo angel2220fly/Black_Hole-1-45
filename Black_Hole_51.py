@@ -368,11 +368,26 @@ class compression:
                                             finish1 = 0
                                             times = 0
                                             if num_c>384:
-                                            	count_number = num_c-385
+                                            	count_number = num_c-384
+                                            	c1=0
                                             else:
                                             	count_number=0
+                                            	c1=4
                                             while finish1 != 1:
                                                 num = count_number
+                                                c1+=1
+                                                if c1==1:
+                                                	count_number = num_c-385
+                                                if c1==2:
+                                                		count_number = num_c-384
+                                               
+                                                if c1==3:
+                                                		count_number = num_c-255
+                                                if c1==4:
+                                                		count_number = num_c-256                                                   		                                            		
+                                                if c1==5:
+                                                		count_number = num_c-1                                                  		
+
                                                 #print(num)
                                                 binary_representation_before = (
                                                     len(format(num, "01b"))
