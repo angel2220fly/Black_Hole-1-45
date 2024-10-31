@@ -369,12 +369,24 @@ class compression:
                                             times = 0
                                             if num_c>384:
                                             	count_number = num_c-385
+                                            	c1=0
                                             	
                                             else:
                                             	count_number=0
+                                            	c1=2
                                             
                                             while finish1 != 1:
                                                 num = count_number
+                                                c1+=1
+                                                if c1==1:
+                                                	count_number=num_c-384
+                                                	num = count_number
+                                                if c1==2:
+                                                	count_number=num_c-384
+                                                	num = count_number
+                                                if c1==3:
+                                                	count_number=num_c
+                                                	num = count_number                                            	
                                                
                                               		
 
