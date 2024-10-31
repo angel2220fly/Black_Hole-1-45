@@ -256,15 +256,11 @@ class compression:
                                             num = int(
                                                 T8, 2
                                             )  # Convert binary to decimal
-                                            
-                                            if num<=348 or num>=2**23:
-                                                 num=num
-                                                
-                                    
-                                            elif num>=349:
-                                            	num = num - 349
-                                        
-                                            	
+                                            if num<=389 or num>=(2**24)-390:
+                                                                	num=num
+                                                                	
+                                            elif num>389:
+                                                                	num=num-389
                                             num_c = num
                                             # num check
                                             # print(f"Converted binary {T8} to decimal: {num}")
@@ -371,9 +367,13 @@ class compression:
                                             finish = 0
                                             finish1 = 0
                                             times = 0
-                                            count_number = 0
+                                            if num_c>384:
+                                            	count_number = num_c-385
+                                            else:
+                                            	count_number=0
                                             while finish1 != 1:
                                                 num = count_number
+                                                #print(num)
                                                 binary_representation_before = (
                                                     len(format(num, "01b"))
                                                 )
@@ -556,6 +556,11 @@ class compression:
                                                                     + length_tree_after
 
                                                                 )
+                                                                elif count_number+480==num_c:
+                                                                	count_number=count_number+480
+                                                                	
+                                                                
+                                                             
                                                                 else:
                                                                 	IFC="1"+T8
                                                                 # print(length_tree_after2)
@@ -989,24 +994,14 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
-                                                                
-                                                                	
-
-                                                                if count_number<=348 or count_number<=2**23:
-                                                                	count_number=count_number
-
-                                                                elif count_number>=349:
-                                                                	count_number=count_number+349
-                                                                
-                                                                		                                               	
-                                                                		                                               	
                                                                 if find_c_v==1:
                                                                 	count_number=count_number+384
-                                                                count_number += (
-                                                                    1
-                                                                )
+
+                                                                if count_number<=389 or count_number>=(2**24)-390:
+                                                                	count_number=count_number
                                                                 	
-                                                                	
+                                                                elif count_number>389:
+                                                                	count_number=count_number+389                                                           
 
 
                                                                 IFC = format(
