@@ -644,7 +644,7 @@ class compression:
                                     if (
                                         long_one_time <= 256
                                         and times_compress >= 0
-                                        or times_compress == Compress_Times_1
+                                        or times_compress == Compress_Times_1-1
                                     ):
                                         stop_compress = 1
                                         Compress_file = 1
