@@ -569,11 +569,7 @@ class compression:
                                                                     + length_tree_after
 
                                                                 )
-                                                                elif count_number==(2**24)-1:
-                                                                
-                                                                
 
-                                                                    IFC ="01111111111111111111111"
 
                                                                 
                                                                 
@@ -1016,8 +1012,7 @@ class compression:
                                                                 	
                                                                 elif find_c_v==1 and count_number>=(2**16)-1:
                                                                 	count_number=count_number+256                                                           
-                                                                elif find_c_v==1 and count_number==(2**24)-1:
-                                                                	                                                          IFC="  11111111111111111111111"
+
                                                                 	                                                          
                                                                 	                                                          
 
