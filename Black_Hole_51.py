@@ -256,11 +256,7 @@ class compression:
                                             num = int(
                                                 T8, 2
                                             )  # Convert binary to decimal
-                                            if num<=389 or num>=(2**24)-390:
-                                                                	num=num
-                                                                	
-                                            elif num>389:
-                                                                	num=num-389
+
                                             num_c = num
                                             # num check
                                             # print(f"Converted binary {T8} to decimal: {num}")
@@ -1029,12 +1025,7 @@ class compression:
                                                                 	
                                                                 elif find_c_v==1 and count_number>=2**15:
                                                                 	count_number=count_number+256                                                           
-
-                                                                if count_number<=389 or count_number>=(2**24)-390:
-                                                                	count_number=count_number
-                                                                	
-                                                                elif count_number>389:
-                                                                	count_number=count_number+389                                                           
+                                                           
 
 
                                                                 IFC = format(
