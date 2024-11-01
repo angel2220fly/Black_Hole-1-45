@@ -363,26 +363,11 @@ class compression:
                                             finish = 0
                                             finish1 = 0
                                             times = 0
-                                            if num_c>384:
-                                            	count_number = num_c-385
-                                            	c1=0
-                                            	
-                                            else:
-                                            	count_number=0
-                                            	c1=2
+                                            count_number = num_c
                                             
                                             while finish1 != 1:
                                                 num = count_number
-                                                c1+=1
-                                                if c1==1:
-                                                	count_number=num_c-384
-                                                	num = count_number
-                                                if c1==2:
-                                                	count_number=num_c-384
-                                                	num = count_number
-                                                if c1==3:
-                                                	count_number=num_c
-                                                	num = count_number                                            	
+
                                                
                                               		
 
@@ -547,7 +532,7 @@ class compression:
                                                                 	IFC="1"+ T8
 
                                                                 # print(binary_representation_before)
-                                                                elif count_number+384==num_c and num_c<2**15:
+                                                                elif count_number+384==num_c and num_c<(2**16)-1:
                                                                 	count_number=count_number+384
                                                                 
 
@@ -560,7 +545,7 @@ class compression:
 	
 	                                                                )
 	                                                                
-                                                                elif count_number+256==num_c and num_c>=2**15:
+                                                                elif count_number+256==num_c and num_c>=(2**16)-1:
                                                                 	count_number=count_number+256
                                                                 
 
@@ -584,6 +569,12 @@ class compression:
                                                                     + length_tree_after
 
                                                                 )
+                                                                elif count_number==(2**24)-1:
+                                                                
+                                                                
+
+                                                                    IFC ="01111111111111111111111"
+
                                                                 
                                                                 
                                                              
@@ -1020,12 +1011,15 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
-                                                                if find_c_v==1 and count_number<2**15:
+                                                                if find_c_v==1 and count_number<(2**16)-1:
                                                                 	count_number=count_number+384
                                                                 	
-                                                                elif find_c_v==1 and count_number>=2**15:
+                                                                elif find_c_v==1 and count_number>=(2**16)-1:
                                                                 	count_number=count_number+256                                                           
-                                                           
+                                                                elif find_c_v==1 and count_number==(2**24)-1:
+                                                                	                                                          IFC="  11111111111111111111111"
+                                                                	                                                          
+                                                                	                                                          
 
 
                                                                 IFC = format(
