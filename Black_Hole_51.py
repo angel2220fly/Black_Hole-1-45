@@ -108,7 +108,7 @@ class compression:
 
                 File_information6_Times2 = 0
 
-                File_information5_23 = ""
+                File_information5_24 = ""
 
                 INFO18 = ""
 
@@ -241,16 +241,16 @@ class compression:
                                     c_c = 0
                                     while block < long_F:
                                         times_c_c = 0
-                                        T8 = Transform[block : block + 24]
+                                        T8 = Transform[block : block + 25]
                                         c_c = 0
                                         c_c1 = 0
-                                        block += 24
+                                        block += 25
 
-                                        if len(T8) != 24:
+                                        if len(T8) != 25:
 
                                             T10 += "1" + T8  # left bits
 
-                                        elif len(T8) == 24:
+                                        elif len(T8) == 25:
 
                                             # Convert the binary string T8 to a decimal integer
                                             num = int(
@@ -465,7 +465,7 @@ class compression:
                                                                 and times_after
                                                                 == times
                                                                 and Bif1 == Bif2
-                                                                and Bi == Bi3 or num>2**24
+                                                                and Bi == Bi3 or num>2**25
                                                             ):
                                                                 finish1 = 1
                                                                 # print("binary_representation_before_long")
@@ -528,16 +528,16 @@ class compression:
                                                                     length_tree_after1,
                                                                     "03b",
                                                                 )
-                                                                if count_number>2**24:
+                                                                if count_number>2**25:
                                                                 	IFC="1"+ T8
 
                                                                 # print(binary_representation_before)
-                                                                elif count_number+384==num_c and num_c<(2**16)-1:
+                                                                elif count_number+384==num_c:
                                                                 	count_number=count_number+384
                                                                 
 
 	                                                                IFC = (
-	                                                                    "0"+"0"
+	                                                                    "0"+"00"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
 	                                                                    + binary_representation_before_long1
@@ -545,12 +545,12 @@ class compression:
 	
 	                                                                )
 	                                                                
-                                                                elif count_number+256==num_c and num_c>=(2**16)-1:
+                                                                elif count_number+256==num_c:
                                                                 	count_number=count_number+256
                                                                 
 
 	                                                                IFC = (
-	                                                                    "0"+"0"
+	                                                                    "0"+"01"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
 	                                                                    + binary_representation_before_long1
@@ -562,7 +562,7 @@ class compression:
                                                                 
 
                                                                     IFC = (
-                                                                    "0"+"1"
+                                                                    "0"+"10"
                                                                     + length_tree_after2
                                                                     + binary_representation
                                                                     + binary_representation_before_long1
@@ -584,7 +584,7 @@ class compression:
                                                                 # print(count_number)
                                                                 if (
                                                                     len(IFC)
-                                                                    <= 23
+                                                                    <= 24
                                                                     and num_c
                                                                     == count_number
                                                                     and len(
@@ -612,7 +612,7 @@ class compression:
                                                                     T8, 2)
                                                                     IFC = format(
                                                                         num2,
-                                                                        "024b",)
+                                                                        "025b",)
                                                                     T10 += (
                                                                         
                                                                         	"1"+IFC)         
@@ -824,14 +824,14 @@ class compression:
                                     block = 0
                                     TUPLE = ""
                                     while block < long_F:
-                                        take_c_or_l = INFO[block : block + 23]
+                                        take_c_or_l = INFO[block : block + 24]
                                         long_l = len(take_c_or_l)
                                         # print(long_l)
                                         if INFO[block : block + 1] == "1":
                                             block += 1
-                                            T8 = INFO[block : block + 24]
+                                            T8 = INFO[block : block + 25]
                                             TUPLE += T8
-                                            block += 24
+                                            block += 25
 
                                         elif INFO[block : block + 1] == "0":
 
@@ -851,11 +851,13 @@ class compression:
                                             # print(binary_representation_before_long)#long after
 
                                             # print(binary_to_number_number_after)#binary represation
-                                            if INFO[block:block+1]=="1":
-                                            	find_c_v=0
-                                            else:
+                                            if INFO[block:block+2]=="00":
                                             	find_c_v=1
-                                            block+=1
+                                            elif INFO[block:block+2]=="01":
+                                            	find_c_v=2
+                                            else:
+                                            	find_c_v=0
+                                            block+=2
                                             
                                             Bif1 = int(
                                                 (INFO[block : block + 3]), 2
@@ -901,6 +903,7 @@ class compression:
                                             count_number = 0
                                             while finish1 != 1:
                                                 num = count_number
+                                                #print(num)
                                                 binary_representation_before = (
                                                     len(format(num, "01b"))
                                                 )
@@ -1007,10 +1010,10 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
-                                                                if find_c_v==1 and count_number<(2**16)-1:
+                                                                if find_c_v==1:
                                                                 	count_number=count_number+384
                                                                 	
-                                                                elif find_c_v==1 and count_number>=(2**16)-1:
+                                                                elif find_c_v==2:
                                                                 	count_number=count_number+256                                                           
 
                                                                 	                                                          
@@ -1019,7 +1022,7 @@ class compression:
 
                                                                 IFC = format(
                                                                     count_number,
-                                                                    "024b",
+                                                                    "025b",
                                                                 )
                                                                 TUPLE += IFC
 
