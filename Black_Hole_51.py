@@ -477,7 +477,7 @@ class compression:
                                                                 # print(length_tree_after)
                                                                 # print("binary_to_number_number_after")
                                                                 # print(binary_to_number_number_after)
-                                                                # print("count_number")
+                                                                #print(count_number)
                                                                 count_number = (
                                                                     count_number
                                                                     - 1
@@ -537,7 +537,7 @@ class compression:
                                                                 
 
 	                                                                IFC = (
-	                                                                    "0"+"00"
+	                                                                    "0"+"0"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
 	                                                                    + binary_representation_before_long1
@@ -550,7 +550,7 @@ class compression:
                                                                 
 
 	                                                                IFC = (
-	                                                                    "0"+"01"
+	                                                                    "0"+"10"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
 	                                                                    + binary_representation_before_long1
@@ -562,7 +562,7 @@ class compression:
                                                                 
 
                                                                     IFC = (
-                                                                    "0"+"10"
+                                                                    "0"+"11"
                                                                     + length_tree_after2
                                                                     + binary_representation
                                                                     + binary_representation_before_long1
@@ -851,13 +851,15 @@ class compression:
                                             # print(binary_representation_before_long)#long after
 
                                             # print(binary_to_number_number_after)#binary represation
-                                            if INFO[block:block+2]=="00":
+                                            if INFO[block:block+1]=="0":
                                             	find_c_v=1
-                                            elif INFO[block:block+2]=="01":
+                                            	block+=1
+                                            elif INFO[block:block+2]=="10":
                                             	find_c_v=2
-                                            else:
+                                            	block+=2
+                                            elif INFO[block:block+2]=="11":
                                             	find_c_v=0
-                                            block+=2
+                                            	block+=2
                                             
                                             Bif1 = int(
                                                 (INFO[block : block + 3]), 2
