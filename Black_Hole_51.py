@@ -364,7 +364,7 @@ class compression:
                                             finish = 0
                                             finish1 = 0
                                             times = 0
-                                            count_number = num_c
+                                            count_number = num_c-384
                                             
                                             while finish1 != 1:
                                                 num = count_number
