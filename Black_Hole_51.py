@@ -12,7 +12,7 @@ if os.path.basename(sys.argv[0]) != "Black_Hole_51.py":
     sys.exit("This is not 'Black_Hole_51.py'.")
 
 print("The script 'Black_Hole_51.py' is currently running.")
-print("Must be 16 of Ram and Quantum Computer. ")
+print("Must be 8 GBs of Ram, 64 bits and Quantum Computer. ")
 
 
 class compression:
@@ -535,9 +535,7 @@ class compression:
                                                                 # print(binary_representation_before)
                                                                 elif count_number+384==num_c:
                                                                 	count_number=count_number+384
-                                                                
-
-	                                                                IFC = (
+                                                                	IFC = (
 	                                                                    "0"+"0"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
@@ -548,9 +546,7 @@ class compression:
 	                                                                
                                                                 elif count_number+256==num_c:
                                                                 	count_number=count_number+256
-                                                                
-
-	                                                                IFC = (
+                                                                	IFC = (
 	                                                                    "0"+"10"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
