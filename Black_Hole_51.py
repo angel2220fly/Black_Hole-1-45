@@ -259,6 +259,7 @@ class compression:
                                             )  # Convert binary to decimal
 
                                             num_c = num
+                                            #print(num)
                                             # num check
                                             # print(f"Converted binary {T8} to decimal: {num}")
                                             # Initial calculation
@@ -484,8 +485,9 @@ class compression:
                                                                     - 1
                                                                 )
                                                                 # print(length_tree)
-                                                                #print(count_number)
-                                                                #print(num_c)
+                                                              
+                                                          
+                                                 
                                                                 #256
 
                                                                 # print(times_after)#long after
@@ -536,13 +538,26 @@ class compression:
                                                                 elif count_number+384==num_c:
                                                                 	count_number=count_number+384
                                                                 	IFC = (
-	                                                                    "0"+"0"
+	                                                                    "0"+"00"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
 	                                                                    + binary_representation_before_long1
 	                                                                    + length_tree_after
 	
 	                                                                )
+	                                                                
+                                                                elif count_number+896==num_c:
+                                                                	count_number=count_number+896
+                                                                	IFC = (
+	                                                                    "0"+"01"
+	                                                                    + length_tree_after2
+	                                                                    + binary_representation
+	                                                                    + binary_representation_before_long1
+	                                                                    + length_tree_after
+	
+	                                                                )
+	                                                                
+	                                                                
 	                                                                
                                                                 elif count_number+256==num_c:
                                                                 	count_number=count_number+256
@@ -848,9 +863,12 @@ class compression:
                                             # print(binary_representation_before_long)#long after
 
                                             # print(binary_to_number_number_after)#binary represation
-                                            if INFO[block:block+1]=="0":
+                                            if INFO[block:block+2]=="00":
                                             	find_c_v=1
-                                            	block+=1
+                                            	block+=2
+                                            elif INFO[block:block+2]=="01":
+                                            	find_c_v=3
+                                            	block+=2                                           	
                                             elif INFO[block:block+2]=="10":
                                             	find_c_v=2
                                             	block+=2
@@ -1015,7 +1033,9 @@ class compression:
                                                                 elif find_c_v==2:
                                                                 	count_number=count_number+256                                                           
 
-                                                                	                                                          
+                                                                	
+                                                                elif find_c_v==3:
+                                                                	count_number=count_number+896                                                                       	                                                          
                                                                 	                                                          
 
 
