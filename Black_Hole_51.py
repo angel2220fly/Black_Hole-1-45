@@ -250,7 +250,7 @@ class compression:
                                         if len(T8) != 25:
 
                                             T10 += "11" + T8  # left bits
-                                            print(T8)
+                                            #print(T8)
 
                                         elif len(T8) == 25:
 
@@ -604,7 +604,7 @@ class compression:
                                                                 # print(length_tree_after)
                                                                 # print(binary_representation_before_long1)
                                                                 # print(binary_representation)
-                                                                print(len(IFC))
+                                                                #print(len(IFC))
                                                                 #print(num_c-count_number)
                                                                 if (
                                                                     len(IFC)
