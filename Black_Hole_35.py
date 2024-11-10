@@ -1246,6 +1246,8 @@ class compression:
                                                         f"Speed bits: {(long_11 * 8) / x3:.5f}"
                                                     )
 
+						    print("checker seccefully")
+
                                                     xs = str(xs)
 
                                                     return xs
