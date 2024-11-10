@@ -1202,6 +1202,7 @@ class compression:
                                                     print(
                                                         f"Speed bits: {speed_bits:.5f}"
                                                     )
+                                                    print("checker seccefully")
                                                     return str(elapsed_time)
 
 
