@@ -8,11 +8,10 @@ import sys
 # @Author Jurijus Pacalovas
 # Get the name of the current script
 
-if os.path.basename(sys.argv[0]) != "Black_Hole_Original_44.py":
-    sys.exit("This is not 'Black_Hole_Original_44.py'.")
+if os.path.basename(sys.argv[0]) != "Black_Hole_Original_45.py":
+    sys.exit("This is not 'Black_Hole_Original_45.py'.")
 
-print("The script 'Black_Hole_Original_44.py' is currently running.")
-print("Quabtum Computer")
+print("The script 'Black_Hole_Original_45.py' is currently running.")
 
 
 class compression:
@@ -453,6 +452,8 @@ class compression:
                                                                     1
                                                                 )
                                                                 finish = 2
+                                                                
+                                                            #print(num)
                                                             if (
                                                                 length_tree < 8
                                                                 and binary_representation_before
@@ -460,11 +461,9 @@ class compression:
                                                                 and times_after
                                                                 == times
                                                                 and Bif1 == Bif2
-                                                                and Bi == Bi3
-                                                                or num>2**24
+                                                                and Bi == Bi3 or num>2**24
                                                             ):
                                                                 finish1 = 1
-                                                                
                                                                 # print("binary_representation_before_long")
                                                                 # print(binary_representation_before_long)
                                                                 # print("times_after")
@@ -479,8 +478,6 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
-                                                                if count_number>2**24:
-                                                                	IFC="1"+T8
                                                                 # print(length_tree)
                                                                 # print(count_number)
 
@@ -493,55 +490,74 @@ class compression:
                                                                 # print(binary_to_number_number_after),#binary represation
                                                                 # print(length_tree_after)# after
                                                                 #
-                                                                else:
-	                                                                binary_representation = format(
-	                                                                    Bi3,
-	                                                                    "01b",
-	                                                                )
-	                                                                times_after = (
-	                                                                    times_after
-	                                                                    - 1
-	                                                                )
-	                                                                # print(binary_to_number)
-	                                                                binary_representation_before_long1 = format(
-	                                                                    times_after,
-	                                                                    "06b",
-	                                                                )
-	                                                                # print(binary_representation_before)
-	                                                                length_tree_after = format(
-	                                                                    binary_representation_before_long,
-	                                                                    "05b",
-	                                                                )
-	
-	                                                                length_tree_after1 = (
-	                                                                    Bif2
-	                                                                )
-	                                                                length_tree_after1 = (
-	                                                                    length_tree_after1
-	                                                                    - 1
-	                                                                )
-	                                                                length_tree_after2 = format(
-	                                                                    length_tree_after1,
-	                                                                    "03b",
-	                                                                )
-	
-	                                                                # print(binary_representation_before)
-	
+
+                                                                binary_representation = format(
+                                                                    Bi3,
+                                                                    "01b",
+                                                                )
+                                                                times_after = (
+                                                                    times_after
+                                                                    - 1
+                                                                )
+                                                                # print(binary_to_number)
+                                                                binary_representation_before_long1 = format(
+                                                                    times_after,
+                                                                    "05b",
+                                                                )
+                                                                #print(binary_representation_before_long1)
+                                                                # print(binary_representation_before)
+                                                                length_tree_after = format(
+                                                                    binary_representation_before_long,
+                                                                    "05b",
+                                                                )
+
+                                                                length_tree_after1 = (
+                                                                    Bif2
+                                                                )
+                                                                length_tree_after1 = (
+                                                                    length_tree_after1
+                                                                    - 1
+                                                                )
+                                                                length_tree_after2 = format(
+                                                                    length_tree_after1,
+                                                                    "03b",
+                                                                )
+                                                                if count_number>2**24:
+                                                                	IFC="1"+ T8
+
+                                                                # print(binary_representation_before)
+                                                                elif count_number+384==num_c:
+                                                                	count_number=count_number+384
+                                                                
+
 	                                                                IFC = (
-	                                                                    "0"
+	                                                                    "0"+"0"
 	                                                                    + length_tree_after2
 	                                                                    + binary_representation
 	                                                                    + binary_representation_before_long1
 	                                                                    + length_tree_after
 	
 	                                                                )
-	
-	                                                                # print(length_tree_after2)
-	                                                                # print(length_tree_after)
-	                                                                # print(binary_representation_before_long1)
-	                                                                # print(binary_representation)
-	                                                                # print(len(IFC))
-	                                                                # print(count_number)
+                                                                elif count_number==num_c:
+                                                                
+                                                                
+
+                                                                    IFC = (
+                                                                    "0"+"1"
+                                                                    + length_tree_after2
+                                                                    + binary_representation
+                                                                    + binary_representation_before_long1
+                                                                    + length_tree_after
+
+                                                                )
+                                                                else:
+                                                                	IFC="1"+T8
+                                                                # print(length_tree_after2)
+                                                                # print(length_tree_after)
+                                                                # print(binary_representation_before_long1)
+                                                                # print(binary_representation)
+                                                                # print(len(IFC))
+                                                                # print(count_number)
                                                                 if (
                                                                     len(IFC)
                                                                     <= 23
@@ -558,14 +574,14 @@ class compression:
                                                                     and len(
                                                                         binary_representation_before_long1
                                                                     )
-                                                                    == 6
+                                                                    == 5
                                                                     and len(
                                                                         length_tree_after2
                                                                     )
                                                                     == 3
                                                                 ):
                                                                     T10 += IFC
-                                                                    # print(IFC)
+                                                                    #print(IFC)
                                                                 else:
                                                                     
                                                                     num2 = int(
@@ -577,7 +593,7 @@ class compression:
                                                                         
                                                                         	"1"+IFC)         
                                               
-                                                                    
+                                                                   
 
                                     INFO = T10
                                     T8 = T10
@@ -811,6 +827,12 @@ class compression:
                                             # print(binary_representation_before_long)#long after
 
                                             # print(binary_to_number_number_after)#binary represation
+                                            if INFO[block:block+1]=="1":
+                                            	find_c_v=0
+                                            else:
+                                            	find_c_v=1
+                                            block+=1
+                                            
                                             Bif1 = int(
                                                 (INFO[block : block + 3]), 2
                                             )
@@ -828,12 +850,12 @@ class compression:
 
                                             block += read_b
                                             times_after = int(
-                                                (INFO[block : block + 6]), 2
+                                                (INFO[block : block + 5]), 2
                                             )
                                             times_after = times_after + 1
                                             # print(binary_representation_before_long)
 
-                                            block += 6
+                                            block += 5
 
                                             binary_representation_before_long = int(
                                                 (INFO[block : block + 5]), 2
@@ -961,6 +983,8 @@ class compression:
                                                                     count_number
                                                                     - 1
                                                                 )
+                                                                if find_c_v==1:
+                                                                	count_number=count_number+384
                                                                 count_number += (
                                                                     1
                                                                 )
