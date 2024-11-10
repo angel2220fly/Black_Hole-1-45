@@ -920,6 +920,7 @@ class compression:
                                     x2 = time()
                                     x3 = x2 - x
                                     print(f"Speed bits: {(long_11) / x3:.5f}")
+			            print("checker seccefully")
 
                                     xs = float(x3)
 
