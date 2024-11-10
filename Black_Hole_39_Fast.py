@@ -898,6 +898,7 @@ class compression:
                                         f2.write(jl)
                                     x3 = time() - x
                                     print(f"Speed bits: {long_11 / x3:.5f}")
+                                    print("checker seccefully")
                                     return str(float(x3))
 
                         if i == 2:
@@ -1215,6 +1216,7 @@ class compression:
                                                     print(
                                                         f"Speed bits: {speed_bits:.5f}"
                                                     )
+                                                    print("checker seccefully")
                                                     return str(elapsed_time)
 
 
