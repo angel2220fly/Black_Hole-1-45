@@ -12,7 +12,7 @@ if os.path.basename(sys.argv[0]) != "Black_Hole_51.py":
     sys.exit("This is not 'Black_Hole_51.py'.")
 
 print("The script 'Black_Hole_51.py' is currently running.")
-print("Must be 8 GBs of Ram, 64 bits and Quantum Computer 25 Qubits or more. ")
+print("Must be 8-16GBs of Ram it is depends size of file, but size of can be not more than 2**28 Bytes, 64 bits and Quantum Computer 25 Qubits or more. ")
 
 
 class compression:
