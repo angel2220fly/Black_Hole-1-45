@@ -174,7 +174,7 @@ class compression:
 
                 SpinS = 0
 
-                while END_working < 10:
+                while END_working < 11:
 
                     File_information6_Times3 = File_information6_Times3 + 1
 
@@ -366,13 +366,13 @@ class compression:
 
                                                 W1 = block - 16
 
-                                                Sw1 = format(W//8, '01b')
+                                                Sw1 = format(W//8, '1b')
 
                                                 Sw3 = format(len(Sw1), '05b')
 
                                                 # print(FC)
 
-                                                Sw2 = format(FC, '01b')
+                                                Sw2 = format(FC, '1b')
 
                                                 Sw4 = format(len(Sw2), '05b')
 
@@ -422,19 +422,19 @@ class compression:
 
                                         Counts = int(INFO_A, 2)
 
-                                        C = format(Counts, '01b')
+                                        C = format(Counts, '1b')
 
                                         C3 = En - len(C)
 
                                         # print(C1)
 
-                                        if (C3 >= 6 and En <= (2 ** (C3 - 4) - 1)) or INFO_A[:3] in {"011", "010"}:
+                                        if (C3 >= 6 and En <= (2 ** (C3 - 4) - 1)) or INFO_A[:3] in {"11", "11"}:
     
                                             # print(C3)
 
                                             Counts = int(INFO_A, 2)
 
-                                            C = format(Counts, '01b')
+                                            C = format(Counts, '1b')
 
                                             C4 = En - len(C)
 
@@ -446,13 +446,13 @@ class compression:
 
                                             if C3 != 1:
 
-                                                Z5 = "011" + C1 + C
+                                                Z5 = "11" + C1 + C
 
                                                 # print(Z5)
 
                                             if C3 == 1:
 
-                                                Z5 = "010" + INFO_A[2:]
+                                                Z5 = "11" + INFO_A[2:]
 
                                                 # print(Z5)
 
@@ -512,7 +512,7 @@ class compression:
                                             + " / "
                                         )
 
-                                        if len(input_string) > 100:
+                                        if len(input_string) > 110:
 
                                             smallest_longl_F_values = (
                                                 find_smallest_longl_F_values(
@@ -554,7 +554,7 @@ class compression:
 
                                     CL1 = format(longl, W)
 
-                                    CL2 = format(En, '015b')
+                                    CL2 = format(En, '15b')
 
                                     # print(N3)
 
@@ -747,13 +747,13 @@ class compression:
 
                                                             C9 = 0
 
-                                                            C10 = 0
+                                                            C11 = 0
 
                                                             Block_Check_Add = block
 
                                                             O = INFO[block : block + 3]
 
-                                                            if O == "010":
+                                                            if O == "11":
 
                                                                 block += 3
 
@@ -763,7 +763,7 @@ class compression:
                                                                     - 2
                                                                 ]
 
-                                                                C10 = 1
+                                                                C11 = 1
 
                                                                 C9 = 1
 
@@ -816,20 +816,20 @@ class compression:
                                                                     return elapsed_time
 
                                                                 ZEROS_ONES = (
-                                                                    "01" + ZEROS_ONES
+                                                                    "1" + ZEROS_ONES
                                                                 )
 
                                                                 ZEROS_ONE_1 = (
-                                                                    "01" + ZEROS_ONE_1
+                                                                    "1" + ZEROS_ONE_1
                                                                 )
 
                                                                 block += En - 2
 
-                                                            elif O == "011":
+                                                            elif O == "11":
 
                                                                 block += 3
 
-                                                                C10 = 1
+                                                                C11 = 1
 
                                                                 if En <= (8192 * 4) - 1:
 
@@ -894,7 +894,7 @@ class compression:
                                                                     block : block + En
                                                                 ]
 
-                                                                C10 = 1
+                                                                C11 = 1
 
                                                                 block += En
 
@@ -1213,8 +1213,8 @@ class compression:
                                     x3 = x2 - x
 
                                     print(f"Speed bits: {(long_11) / x3:.5f}")
+                                    print("checker seccefully")
 
-                                    print("checker seccesufully.")           
                                     xs = float(x3)
 
                                     xs = str(xs)
@@ -1345,7 +1345,7 @@ class compression:
 
                                             O = INFO[block : block + 3]
 
-                                            if O == "010":
+                                            if O == "11":
 
                                                 block += 3
 
@@ -1404,13 +1404,13 @@ class compression:
 
                                                     return elapsed_time
 
-                                                ZEROS_ONES = "01" + ZEROS_ONES
+                                                ZEROS_ONES = "1" + ZEROS_ONES
 
-                                                ZEROS_ONE_1 = "01" + ZEROS_ONE_1
+                                                ZEROS_ONE_1 = "1" + ZEROS_ONE_1
 
                                                 block += En - 2
 
-                                            elif O == "011":
+                                            elif O == "11":
 
                                                 block += 3
 
@@ -1709,13 +1709,7 @@ class compression:
                                                     print(
                                                         f"Speed bits: {(long_11 * 8) / x3:.5f}"
                                                     )
-
-
-                                                    print("checker secefully."
- 
-                                                    )
-
-
+                                                    print("Checker seccefully")
 
                                                     xs = str(xs)
 
