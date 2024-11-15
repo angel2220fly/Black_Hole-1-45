@@ -1,124 +1,109 @@
-# Function to count zeros in a sequence of numbers
-def count_zeros(sequence):
-    zero_count = sum(1 for number in sequence if number == 0)
-    return zero_count
-import paq
-#Author Jurijus Pacalovas
+from mpmath import mp
 
-# Function to compress binary data
-def compress_binary_data(data):
-    compressed_data = paq.compress(data)
-    return compressed_data
+# Author: Jurijus Pacalovas
 
-# Function to extract binary data
-def extract_binary_data(compressed_data):
-    extracted_data = paq.decompress(compressed_data)
-    return extracted_data
-
-# Function to read pi value from a text file
-def read_pi_value(file_name):
-    with open(file_name, 'r') as file:
-        pi_value = file.readline().strip()
+# Function to generate digits of pi after "3"
+def generate_pi_digits(digits):
+    if digits < 1:
+        raise ValueError("The number of digits must be at least 1.")
+    mp.dps = digits + 1  # Set the precision
+    pi_value = str(mp.pi)[2:]  # Remove the "3."
     return pi_value
 
-# Function to generate a sequence of numbers by incrementing pi
-def generate_pi_sequence(pi_value, start, end):
-    results = []
-    pi_value = float(pi_value)
-    for value in range(start, end + 1):
-        result = pi_value + value
-        results.append(result)
-    return results
+# Function to compress binary data using pi digits
+def compress_with_pi(data, pi_digits):
+    pi_sequence = [int(d) for d in pi_digits[:len(data)]]
+    compressed_data = bytes([b ^ p for b, p in zip(data, pi_sequence)])
+    return compressed_data
 
-# Function to generate a sequence of numbers from 5 to 2^20
-def generate_sequence_5_to_2_20():
-    start_range = 1
+# Function to extract binary data using pi digits
+def extract_with_pi(data, pi_digits):
+    # Reverse the compression process
+    return compress_with_pi(data, pi_digits)
 
-    end_range = 1875968
-    sequence = list(range(start_range, end_range + 1))
-    return sequence
+# Function to generate and save digits of pi to a file
+def generate_pi_and_save(digits, file_name):
+    pi_digits = generate_pi_digits(digits)
+    with open(file_name, 'w') as file:
+        file.write(pi_digits)
+    return pi_digits
 
-# Function to count zeros in a sequence of numbers
-def count_zeros(sequence):
-    zero_count = sum(1 for number in sequence if number == 0)
-    return zero_count
-
+# Main program loop
 while True:
-    print("Options:")
-    print("1. Compress")
-    print("2. Extract")
-    print("3. Generate Pi Sequence")
-    print("4. Generate Sequence 5 to 2GB")
-    print("5. Count Zeros in Sequence")
-    print("6. Quit")
+    print("\nOptions:")
+    print("1. Compress using Pi")
+    print("2. Extract using Pi")
+    print("3. Generate and Save Pi Digits")
+    print("4. Quit")
 
-    choice = input("Enter your choice (1/2/3/4/5/6): ")
+    choice = input("Enter your choice (1/2/3/4): ")
 
     if choice == '1':
         # Compression
-        input_file = input("Enter the input file name for compression: ")
-        output_file = input("Enter the output file for saving compressed data: ")
+        try:
+            input_file = input("Enter the input file name for compression: ")
+            pi_file = input("Enter the file name that contains pi digits: ")
+            output_file = input("Enter the output file for saving compressed data: ")
 
-        # Read binary data from the input file
-        with open(input_file, 'rb') as file:
-            binary_data = file.read()
+            # Read binary data from the input file
+            with open(input_file, 'rb') as file:
+                binary_data = file.read()
 
-        # Compress the binary data using paq
-        compressed_data = compress_binary_data(binary_data)
+            # Read pi digits from the pi file
+            with open(pi_file, 'r') as file:
+                pi_digits = file.read().strip()
 
-        # Save the compressed data to the specified output file
-        with open(output_file, 'wb') as file:
-            file.write(compressed_data)
+            # Compress the binary data using digits of pi
+            compressed_data = compress_with_pi(binary_data, pi_digits)
 
-        print("Compression complete.")
+            # Save the compressed data to the specified output file
+            with open(output_file, 'wb') as file:
+                file.write(compressed_data)
+
+            print(f"Compression complete. Saved to {output_file}.")
+        except Exception as e:
+            print(f"Error: {e}")
     
     elif choice == '2':
         # Extraction
-        input_file = input("Enter the input file name for extraction: ")
-        output_file = input("Enter the output file for saving extracted data: ")
+        try:
+            input_file = input("Enter the input file name for extraction: ")
+            pi_file = input("Enter the file name that contains pi digits: ")
+            output_file = input("Enter the output file for saving extracted data: ")
 
-        # Read the compressed data from the input file
-        with open(input_file, 'rb') as file:
-            compressed_data = file.read()
+            # Read the compressed data from the input file
+            with open(input_file, 'rb') as file:
+                compressed_data = file.read()
 
-        # Extract the data from the compressed data using paq
-        extracted_data = extract_binary_data(compressed_data)
+            # Read pi digits from the pi file
+            with open(pi_file, 'r') as file:
+                pi_digits = file.read().strip()
 
-        # Save the extracted data to the specified output file
-        with open(output_file, 'wb') as file:
-            file.write(extracted_data)
+            # Extract the data using digits of pi
+            extracted_data = extract_with_pi(compressed_data, pi_digits)
 
-        print("Extraction complete.")
+            # Save the extracted data to the specified output file
+            with open(output_file, 'wb') as file:
+                file.write(extracted_data)
+
+            print(f"Extraction complete. Saved to {output_file}.")
+        except Exception as e:
+            print(f"Error: {e}")
     
     elif choice == '3':
-        # Read pi value from a text file
-        pi_file = "PI_10M.txt"
-        pi_value = read_pi_value(pi_file)
-
-        # Generate a sequence of numbers by incrementing pi
-        start_range = 1
-        end_range =  1875968
-        results = generate_pi_sequence(pi_value, start_range, end_range)
-
-        # Print the list of results
-        for index, value in enumerate(results, start=start_range):
-            print(f"Result {index}: {value}")
+        # Generate and save pi digits
+        try:
+            digits = int(input("Enter the total number of digits to generate for pi (minimum 1): "))
+            file_name = input("Enter the file name to save the generated value of pi: ")
+            pi_data = generate_pi_and_save(digits, file_name)
+            print(f"Pi digits saved to {file_name}.")
+        except ValueError as e:
+            print(f"Error: {e}")
     
     elif choice == '4':
-        # Generate a sequence of numbers from 5 to 2^20
-        sequence_5_to_2_20 = generate_sequence_5_to_2_20()
-        print("Generated sequence from 5 to 2^20:")
-        print(sequence_5_to_2_20)
-
-    elif choice == '5':
-        # Count zeros in a sequence
-        sequence = list(map(int, input("Enter a sequence of numbers separated by spaces: ").split()))
-        zero_count = count_zeros(sequence)
-        print(f"Number of zeros in the sequence: {zero_count}")
-
-    elif choice == '6':
         # Quit the program
+        print("Exiting the program.")
         break
     
     else:
-        print("Invalid choice. Please enter 1, 2, 3, 4, 5, or 6.")
+        print("Invalid choice. Please enter 1, 2, 3, or 4.")
