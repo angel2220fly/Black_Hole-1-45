@@ -1,5 +1,7 @@
 # Black_Hole-1-45
 
+pi count
+
 Black hole 1.0.0.0 Quantum Compression Software for future technology
 
 Algorithm Jurijus Pacalovas
