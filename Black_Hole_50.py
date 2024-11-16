@@ -83,7 +83,7 @@ if __name__ == "__main__":
     if action == "1":
         output_file = input_file + ".b"
     elif action == "2":
-        output_file = os.path.splitext(input_file)[0] + "_decompressed"
+        output_file = os.path.splitext(input_file)[0] + ""
     else:
         print("Invalid option. Please select 1 or 2.")
         sys.exit()
