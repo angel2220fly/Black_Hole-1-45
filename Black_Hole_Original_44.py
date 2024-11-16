@@ -12,7 +12,7 @@ if os.path.basename(sys.argv[0]) != "Black_Hole_Original_44.py":
     sys.exit("This is not 'Black_Hole_Original_44.py'.")
 
 print("The script 'Black_Hole_Original_44.py' is currently running.")
-print("Quantum Computer 24 millions cubits")
+print("Quantum Computer 24 millions qubits")
 
 
 class compression:
