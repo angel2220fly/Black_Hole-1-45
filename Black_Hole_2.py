@@ -1,42 +1,21 @@
 import os
-
 from time import time
-
 import binascii
-
 import math
-
 import os.path
-
 import sys
-
-
-
 # @Author Jurijus Pacalovas
 
 # Get the name of the current script
-
-
 
 if os.path.basename(sys.argv[0]) != 'Black_Hole_2.py':
 
     sys.exit("This is not 'Black_Hole_2.py'.")
 
-
-
 print("The script 'Black_Hole_2.py' is currently running.")
 
-
-
-
-
 class compression:
-
-
-
     def cryptograpy_compression4(self):
-
-
 
         def process_file1(Extract1=0, File_information5_17="Ex", name="", x=0):
 
@@ -58,587 +37,229 @@ class compression:
 
                     return str(time() - x)
 
-
-
         def process_file(Extract1=0, File_information5_17="Ex", name="", x=0):
-
             if Extract1 == 1:
-
                 width_bits = (
-
                     "%0" + str((len(File_information5_17) // 8) * 2) + "x"
-
                 ) % int(File_information5_17, 2)
-
                 with open(name[:-2], "wb") as f2:
-
                     f2.write(binascii.unhexlify(width_bits))
-
                     return str(time() - x)
-
-
-
-
-
-
-
-
-
         def Count_adds(En, Row1, Row):
-
-
-
             Row += 1
-
-           
-
-
-
             if Row == (2**28) - 1:
-
                 Row = 0
-
-
-
             if En == (2**28) - 1:
-
                 En = 255
-
             En+=1
-
-
-
             return En, Row1, Row
-
-
-
         import re
-
-
-
         def find_smallest_longl_F_values(input_string):
-
-
-
             # Extract all 'En', 'En2', 'Row', and 'Longl_F' values
-
-
-
             pattern = r'En=(\d+), Longl_F=(\d+)'
-
-
-
             matches = re.findall(pattern, input_string)
-
-
-
             # Convert the extracted strings to tuples of integers
-
-
-
             longl_F_values = [(int(en), int(longl_f)) for en, longl_f in matches]
-
-
-
-            if longl_F_values:
-
-
-
+            if longl_F_values:                
                 # Find the smallest 'Longl_F' value and its corresponding variables
-
-
-
-                smallest_longl_F_values = min(longl_F_values, key=lambda x: x[1])
-
-
-
-                return smallest_longl_F_values
-
-
-
+                smallest_longl_F_values = min(longl_F_values, key=lambda x: x[1])                
+                return smallest_longl_F_values                
             else:
-
-
-
                 return None
-
-
-
         self.name = "Written: Jurijus pacalovas"
-
-
-
         N5 = 1
-
-
-
         if N5 == 1:
-
-
-
             Clear = ""
-
-
-
             name = input("What is name of file input? ")
-
-
-
             long_21 = len(name)
-
-
-
             name_f = name[long_21 - 2 :]
-
-
-
             if name_f == ".b":
-
-
-
                 i = 2
-
-
-
             else:
-
-
-
                 i = 1
-
-
-
             # print(i)
-
             if os.path.exists(name):
-
-
-
-                print('Path is exists!')
-
-
-
+                print('Path is exists!')                
             else:
-
-
-
                 print('Path is not exists!')
-
-
-
                 raise SystemExit
-
-
-
             x = 0
-
             C1 = 1
-
             x1 = 0
-
             x2 = 0
-
             x3 = 0
-
             X2 = 0
-
             C1 = 0
-
             C2 = 0
-
             C3 = 0
-
             C4 = 0
-
             ZEROS_ONE_1 = ""
-
             Circle_times = 0
-
             Circle_times2 = 1
-
             Circle_times3 = 0
-
             CB = -1
-
             x = time()
-
             File_information6_Times2_1 = 0
-
             name_2 = name
-
             Long_Change = len(name_2)
-
             compress_or_not_compress = 1
-
-
-
             File_information6_Times3 = 0
-
-
-
             if i == 2:
-
-
-
                 C = 1
-
-
-
             Long_Change = len(name_2)
-
             s = ""
-
             File_information5 = ""
-
             File_information5_2 = ""
-
             Clear = ""
-
             Translate_info_Decimal = ""
-
             D = 0
-
             long_name = len(name)
-
             with open(name, "rb") as binary_file:
-
-
-
                 data = binary_file.read()
-
                 s = str(data)
-
-
-
                 long_11 = len(data)
-
-
-
                 long_17 = len(data)
-
-
-
                 if long_17 == 0:
-
-
-
                     raise SystemExit
-
-
-
                 END_working = 0
-
-
-
                 File_information6_Times2 = 0
-
-
-
                 File_information5_23 = ""
-
-
-
                 INFO18 = ""
-
-
-
                 File_information5_29 = ""
-
-
-
                 SpinS = 0
-
-
-
                 while END_working < 10:
-
-
-
-                    File_information6_Times3 = File_information6_Times3 + 1
-
-
-
+                    File_information6_Times3 = File_information6_Times3 + 1                    
                     D = 1
-
-
-
                     if D == 1:
-
-
-
                         if File_information6_Times3 == 1:
-
-
-
                             INFO = bin(int(binascii.hexlify(data), 16))[
-
                                 2:
-
                             ]  # data to binary
-
-
-
                             long_1 = len(INFO)
-
-
-
                             long_11 = len(data)
-
-
-
                             count_bits = (long_11 * 8) - long_1
-
-
-
                             z = 0
-
-
-
                             if count_bits != 0:
-
-
-
                                 while z < count_bits:
-
-
-
                                     INFO = "0" + INFO
 
-
-
                                     z = z + 1
-
-
 
                             if File_information6_Times3 == 1:
 
-
-
                                 File_information5_2 = INFO
-
-
 
                             n = int(File_information5_2, 2)
 
-
-
                             width_bits = len(File_information5_2)
-
-
 
                             width_bits = (width_bits / 8) * 2
 
-
-
                             width_bits = str(width_bits)
-
-
 
                             width_bits = "%0" + width_bits + "x"
 
-
-
                             width_bits3 = binascii.unhexlify(width_bits % n)
-
-
 
                             width_bits2 = len(width_bits3)
 
-
-
                             data = width_bits3
 
-
-
                             long_15 = len(data)
-
-
-
+                            
                             INFO = bin(int(binascii.hexlify(data), 16))[2:]
-
-
 
                             long_1 = len(INFO)
 
-
-
                             long_11 = len(data)
-
-
 
                             count_bits = (long_11 * 8) - long_1
 
-
-
                             z = 0
-
-
 
                             if count_bits != 0:
 
-
-
                                 while z < count_bits:
-
-
 
                                     INFO = "0" + INFO
 
-
-
                                     z = z + 1
-
-
 
                             Check = INFO
 
-
-
                             File_information5_2 = INFO
 
-
-
                             Extact = File_information5_2
-
-
 
                             A = int(Extact, 2)
 
                         long_13 = len(File_information5_2)
 
-
-
                         long_12 = len(File_information5_2)
 
-
-
                         if i == 1:
-
-
 
                             if long_17 > (2**28) - 1 and i == 1:
 
-
-
                                 print("print file is too big!")
-
-
 
                                 raise SystemExit
 
-
-
                         if i == 1:
-
-
 
                             Ex = 1
 
-
-
                             if Ex == 1:
-
-
 
                                 Extract1 = 0
 
-
-
                                 Find = 0
-
-
 
                                 En = 3
 
-
-
                                 Ci = 1
-
-
 
                                 M1 = 0
 
-
-
                                 Row1 = 0
-
-
 
                                 input_string = ""
 
-
-
                                 C1 = ""
-
-
 
                                 Row = 0
 
-
-
                                 I8 = INFO
-
-
 
                                 W3 = ""
 
-
-
                                 W4 = ""
-
-
 
                                 block = 0
 
-
-
                                 IF1 = ""
-
-
 
                                 long_F = len(I8)
 
-
-
                                 # print(long_F)
-
-
 
                                 FC = 0
 
-
-
                                 IF2 = ""
-
-
 
                                 Z7 = 0
 
-
-
                                 CZ = 0
 
-
-
                                 if Circle_times == 0:
-
-
 
                                     SINFO = ""
 
-
-
                                     TUPLE = INFO
-
-
 
                                 if Circle_times == 0:
 
-
-
                                     SINFO = INFO
-
-
 
                                 if I8[long_F-8]!="00000000":
 
@@ -648,51 +269,19 @@ class compression:
 
                                 	I8+="11111111"
 
-
-
                                 while block < long_F+8:
-
-
-
                                     IF = I8[block : block + 8]
-
-
 
                                     if FC == 0:
 
-
-
                                         IF1 = I8[block + 8 : block + 16]
-
-
-
                                     W4 += IF
-
-
 
                                     block += 8
 
-
-
                                     if IF1 == IF:
 
-
-
-                                        # print(IF1)
-
-
-
-                                        # print(IF2)
-
-
-
                                         FC += 1
-
-
-
-                                        # print(FC)
-
-
 
                                         if FC == 1:
 
@@ -2877,252 +2466,127 @@ class compression:
 
                                                 ]
 
-
-
                                                 S = len(EB)
-
-
 
                                                 block += En - SiZeros_ones
 
-
-
                                                 Row1 = "0" + str(En) + "b"
-
-
-
                                                 if S > 0:
 
-
-
                                                     E = int(EB, 2)
-
-
-
+                                                    
                                                 else:
-
-
 
                                                     E = 0
 
-
-
                                                 ZEROS_ONES = format(E, Row1)
-
-
 
                                                 C = "0" + str(longl) + "b"
 
-
-
                                                 ZEROS_ONES = format(E, Row1)
-
-
 
                                                 ZEROS_ONE_1 = format(E, C)
 
-
-
                                             else:
-
-
 
                                                 EB = INFO[block : block + En]
 
-
-
                                                 block += En
 
-
-
                                                 Row1 = "0" + str(En) + "b"
-
-
 
                                                 E = int(EB, 2)
 
 
-
                                                 ZEROS_ONES = format(E, Row1)
-
-
 
                                                 C = "0" + str(longl) + "b"
 
-
-
                                                 ZEROS_ONES = format(E, Row1)
-
-
 
                                                 ZEROS_ONE_1 = format(E, C)
 
-
-
                                             Z2 = ZEROS_ONES
-
-
 
                                             # print(Z2)
 
-
-
                                             TUPLE += Z2
-
-
 
                                             # print(block)
 
-
-
                                             # print(long_F)
 
-
-
                                             if block >= long_F:
-
-
-
+                                                
                                                 Save = 1
-
-
 
                                                 # print(Save)
 
-
-
                                         # print(TUPLE)
-
-
 
                                         long_L = len(TUPLE)
 
-
-
                                         # print(long_L)
-
-
 
                                         if C9 == 0 and (long_L - En) >= 0:
 
-
-
                                             TUPLE = TUPLE[: long_L - En]
 
-
-
                                             TUPLE += ZEROS_ONE_1
-
-
 
                                         elif C9 == 1 and (long_L - (En-2)) >= 0:
 
-
-
                                             TUPLE = TUPLE[: long_L-(En-2)]
-
-
 
                                             TUPLE += ZEROS_ONE_1
 
-
-
                                         N3 = 1
-
-
 
                                         # print(N3)
 
-
-
                                         if N3 == 1:
-
-
 
                                             N3 = 1
 
-
-
                                             block = 0
 
-
-
                                             long_F = len(TUPLE)
-
-
 
                                             Z = TUPLE
 
-
-
                                             Z6 = ""
-
-
 
                                             Z7 = 0
 
-
-
                                             TUPLE1 = Z
-
-
 
                                             cut_b = 0
 
-
-
                                             long_F = len(TUPLE)
-
-
-
+                                            
                                             while block < long_F:
-
-
 
                                                 E = Z[block : block + 1]
 
-
-
                                                 if E == "0" and Z7 == 0:
-
-
 
                                                     cut_b = 1
 
-
-
                                                     block += 1
-
-
 
                                                     E2 = Z[block : block + 8]
 
-
-
                                                     block += 8
-
-
 
                                                     E3 = int(Z[block : block + 5], 2)
 
-
-
                                                     block += 5
-
-
 
                                                     S5 = Z[block : block + E3]
 
-
-
                                                     if len(S5) == 0:
 
-
-
                                                         Extract1 = 0
-
-
-
                                                         File_information5_17 = Ex
 
 
@@ -3143,15 +2607,9 @@ class compression:
 
                                                         return elapsed_time
 
-
-
                                                     E1 = int(Z[block : block + E3], 2)
 
-
-
                                                     block += E3
-
-
 
                                                     TUPLE4 = int(
 
@@ -3159,11 +2617,7 @@ class compression:
 
                                                     )
 
-
-
                                                     block += 5
-
-
 
                                                     E5 = int(
 
@@ -3171,205 +2625,90 @@ class compression:
 
                                                     )
 
-
-
                                                     block += TUPLE4
-
-
-
+                                                    
                                                     b = 0
-
-
 
                                                     E3 = ""
 
-
-
                                                     while b < E5 - 1:
-
-
 
                                                         E3 += E2
 
-
-
                                                         b += 1
 
-
-
                                                         # print(E2)
-
-
 
                                                     TUPLE1 = TUPLE1[block:]
 
                                                     E1*=8
 
-
-
                                                     TUPLE1 = (
 
                                                         TUPLE1[:E1] + E3 + TUPLE1[E1:]
-
                                                     )
-
-
-
+                                                    
                                                     block += long_F
-
-
-
+                                                    
                                                 elif E == "1" or Z7 == 1:
-
-
 
                                                     block += 1
 
-
-
                                                     Z7 = 1
-
-
 
                                                     if cut_b == 0:
 
-
-
                                                         TUPLE1 = TUPLE1[block:]
-
-
 
                                                         cut_b = 1
 
-
-
                                                         block += long_F
 
-
-
                                                         # print(block)
-
-
-
                                                 # print(block)
-
-
 
                                             # print(Long_PM1)
 
-
-
                                             TUPLE = TUPLE1
-
-
-
                                             # print(len(TUPLE))
-
-
 
                                             N3 = 1
 
-
-
                                             Circle_times += 1
-
-
 
                                             # print(Circle_times)
 
-
-
                                             INFO = TUPLE
-
-
-
                                             Extract1 = 0
-
-
-
                                             N3 = 0
-
-
-
                                             # print(len(TUPLE))
-
-
-
                                             # print(Circle_times4)
-
-
-
                                             if Circle_times == Circle_times4:
-
-
-
                                                 Extract1 = 1
-
-
-
                                                 N3 = 2
-
-
-
                                             if N3 == 2:
-
-
-
                                                 File_information5_17 = TUPLE
 
-
-
                                                 long_1 = len(File_information5_17)
-
-
-
                                                 add_bits = ""
-
-
-
                                                 count_bits = 8 - long_1 % 8
-
-
-
                                                 z = 0
-
-
-
                                                 if count_bits != 0:
-
-
-
                                                     while z < count_bits:
-
-
-
                                                         add_bits = "0" + add_bits
-
-
 
                                                         z = z + 1
 
-
-
                                                 File_information5_17 = (
-
                                                     File_information5_17
 
                                                 )
 
-
-
                                                 if Extract1 == 1:
-
-
 
                                                     L = len(File_information5_17)
 
-
-
                                                     n = int(File_information5_17, 2)
-
-
 
                                                     width_bits = len(
 
@@ -3377,102 +2716,36 @@ class compression:
 
                                                     )
 
-
-
                                                     width_bits = (width_bits // 8) * 2
 
-
-
                                                     width_bits = str(width_bits)
-
-
-
                                                     width_bits = "%0" + width_bits + "x"
-
-
-
                                                     width_bits3 = binascii.unhexlify(
-
                                                         width_bits % n
 
                                                     )
-
-
-
                                                     width_bits2 = len(width_bits3)
 
-
-
                                                     File_information5_2 = Clear
-
-
-
                                                     jl = width_bits3
-
-
 
                                                     long = len(name)
 
-
-
                                                     name2 = name[: long - 2]
-
-
-
                                                     with open(name2, "wb") as f2:
-
-
-
                                                         f2.write(width_bits3)
-
-
-
                                                     x2 = time()
-
-
-
                                                     x3 = x2 - x
-
-
-
                                                     xs = float(x3)
-
-
-
                                                     print(
 
                                                         f"Speed bits: {(long_11 * 8) / x3:.5f}"
 
                                                     )
-
-
-
-
-
                                                     print("checker secefully."
-
- 
-
                                                     )
-
-
-
-
-
-
-
                                                     xs = str(xs)
-
-
-
                                                     return xs
-
-
-
-
-
 d = compression()
-
 xw1 = d.cryptograpy_compression4()
-
 print(xw1)
