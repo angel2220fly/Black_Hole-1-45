@@ -1,3 +1,5 @@
+
+
 import os
 
 from time import time
@@ -1168,7 +1170,7 @@ class compression:
 
 
 
-                                        if len(TUPLE) <= long_11 or Circle_times == 255:
+                                        if len(TUPLE) <= long_11 or Circle_times == (2**24)-1:
 
 
 
@@ -1190,7 +1192,7 @@ class compression:
 
                                             or Circle_times > Circle_times2 + 1
 
-                                            or Circle_times == 255
+                                            or Circle_times == (2**24)-1
 
                                         ):
 
@@ -1208,7 +1210,8 @@ class compression:
 
 
 
-                                            SCircle_times = format(Circle_times2, '08b')
+                                            SCircle_times = format(Circle_times2, '01b')
+                                            SCircle_times_cut = format(len(SCircle_times), '08b')
 
 
 
@@ -1218,7 +1221,7 @@ class compression:
 
                                                 File_information5_17 = (
 
-                                                    "1" + SCircle_times + INFO
+                                                    "1" + SCircle_times_cut+SCircle_times + INFO
 
                                                 )
 
@@ -1230,7 +1233,7 @@ class compression:
 
                                                 File_information5_17 = (
 
-                                                    "1" + SCircle_times + INFOS
+                                                    "1" + SCircle_times_cut+SCircle_times + INFOS
 
                                                 )
 
@@ -1410,7 +1413,7 @@ class compression:
 
 
 
-                                                        Circle_times4 = int(INFO[:8], 2)
+                                                        Circle_times4_1 = int(INFO[:8], 2)
 
 
 
@@ -1419,6 +1422,16 @@ class compression:
 
 
                                                         INFO = INFO[8:]
+                                                        Circle_times4 = int(INFO[:Circle_times4_1], 2)
+
+
+
+                                                        # print(longl)
+
+
+
+                                                        INFO = INFO[Circle_times4_1:]                                                        
+                                                        
 
 
 
@@ -2604,15 +2617,24 @@ class compression:
 
 
 
-                                        Circle_times4 = int(INFO[:8], 2)
+                                                        Circle_times4_1 = int(INFO[:8], 2)
 
 
 
-                                        # print(Circle_times4)
+                                                        # print(Circle_times4)
 
 
 
-                                        INFO = INFO[8:]
+                                                        INFO = INFO[8:]
+                                                        Circle_times4 = int(INFO[:Circle_times4_1], 2)
+
+
+
+                                                        # print(longl)
+
+
+
+                                                        INFO = INFO[Circle_times4_1:]   
 
 
 
@@ -3455,4 +3477,4 @@ d = compression()
 
 xw1 = d.cryptograpy_compression4()
 
-print(xw1)
+print(xw1)
