@@ -78,7 +78,7 @@ class compression:
                 i = 2
             else:
                 i = 1
-                En_number=int(input("Point of the intresection 2-28? "))
+                En_number=int(input("Point(s) of the intresection(s) 2-28? "))
 
                 if En_number<2:
 
