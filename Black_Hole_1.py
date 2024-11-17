@@ -69,11 +69,7 @@ class compression:
         self.name = "Written: Jurijus pacalovas"
         N5 = 1
         if N5 == 1:
-            En_number=int(input("Point of the intresection 2-28? "))
-            if En_number<2:
-                En_number=2
-            if En_number>28:
-                En_number=28
+
             Clear = ""
             name = input("What is name of file input? ")
             long_21 = len(name)
@@ -82,6 +78,13 @@ class compression:
                 i = 2
             else:
                 i = 1
+                
+                En_number=int(input("Point of the intresection 2-28? "))
+                if En_number<2:
+                    En_number=2
+                if En_number>28:
+                    En_number=28
+                
             # print(i)
             if os.path.exists(name):
                 print('Path is exists!')                
