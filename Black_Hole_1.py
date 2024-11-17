@@ -1,5 +1,3 @@
-
-
 import os
 
 from time import time
@@ -3477,4 +3475,4 @@ d = compression()
 
 xw1 = d.cryptograpy_compression4()
 
-print(xw1)
+print(xw1)
