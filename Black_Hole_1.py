@@ -806,7 +806,7 @@ class compression:
 
 
                                             SCircle_times = format(Circle_times2, '01b')
-                                            SCircle_times_cut = format(len(SCircle_times), '08b')
+                                            SCircle_times_cut = format(len(SCircle_times), '05b')
 
 
 
@@ -1008,7 +1008,7 @@ class compression:
 
 
 
-                                                        Circle_times4_1 = int(INFO[:8], 2)
+                                                        Circle_times4_1 = int(INFO[:5], 2)
 
 
 
@@ -1016,7 +1016,7 @@ class compression:
 
 
 
-                                                        INFO = INFO[8:]
+                                                        INFO = INFO[5:]
                                                         Circle_times4 = int(INFO[:Circle_times4_1], 2)
 
 
@@ -2212,7 +2212,7 @@ class compression:
 
 
 
-                                                        Circle_times4_1 = int(INFO[:8], 2)
+                                                        Circle_times4_1 = int(INFO[:5], 2)
 
 
 
@@ -2220,7 +2220,7 @@ class compression:
 
 
 
-                                                        INFO = INFO[8:]
+                                                        INFO = INFO[5:]
                                                         Circle_times4 = int(INFO[:Circle_times4_1], 2)
 
 

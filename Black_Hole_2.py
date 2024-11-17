@@ -69,6 +69,7 @@ class compression:
         self.name = "Written: Jurijus pacalovas"
         N5 = 1
         if N5 == 1:
+            
             Clear = ""
             name = input("What is name of file input? ")
             long_21 = len(name)
