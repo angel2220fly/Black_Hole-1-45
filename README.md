@@ -17,7 +17,7 @@ Maximum k2=( 2^{(2^{(2^{(255 \times 8)})})} + 1)+ (infinity)
 
 Times compress 1-255
 
-From center to the top and save position. File Check that the size of the block same size or less or if 01 is 1 bit bigger and fractal manipulation of bits about 2^26 varations En 6-8191 Author: Jurijus Pacalovas Quantum Software
+From center to the top and save position. File Check that the size of the block same size or less or if 01 is 1 bit bigger and fractal manipulation of bits about 2^28 varations En 6-2**28 Author: Jurijus Pacalovas Quantum Software
 
 Algorithm Black_Hole_34 includes algorithms such as:
 
