@@ -173,10 +173,18 @@ class compression:
 
 
         if N5 == 1:
+ 
 
 
 
-            Clear = ""
+            Clear = ""    
+            
+            
+            En_number=int(input("Point of the intresection 2-28? "))
+            if En_number<2:
+                En_number=2
+            if En_number>28:
+                En_number=28
 
 
 
@@ -958,7 +966,7 @@ class compression:
 
 
 
-                                    if Find == 2 or Row == (2**28) - 2:
+                                    if Find == 2 or Row == (2**En_number) - 2:
 
 
 
@@ -970,7 +978,7 @@ class compression:
 
 
 
-                                    elif Row == (2**28) - 3 and Find == 3:
+                                    elif Row == (2**En_number) - 3 and Find == 3:
 
 
 
@@ -1185,12 +1193,12 @@ class compression:
 
 
                                         if (
-
                                             len(TUPLE) > long_11
 
                                             or Circle_times > Circle_times2 + 1
 
                                             or Circle_times == (2**24)-1
+
 
                                         ):
 
