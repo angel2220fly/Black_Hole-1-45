@@ -12,7 +12,7 @@ if os.path.basename(sys.argv[0]) != "Black_Hole_52.py":
     sys.exit("This is not 'Black_Hole_52.py'.")
 
 print("The script 'Black_Hole_52.py' is currently running.")
-print("Must be 8-16 GBs of Ram, 64 bits and Quantum Computer 2000 Qubits or more. ")
+print("Must be 8-16 GBs of Ram, 64 bits and Quantum Computer 26 Qubits or more. ")
 
 
 class compression:
@@ -368,7 +368,7 @@ class compression:
                                             times = 0
                                             count_number = 0
                                             from qiskit import QuantumCircuit
-                                            circuit = QuantumCircuit((2000))
+                                            circuit = QuantumCircuit(26)
                                             
                                             while finish1 != 1:
                                                 num = count_number
@@ -944,10 +944,11 @@ class compression:
 	                                            finish = 0
 	                                            finish1 = 0
 	                                            times = 0
+	                                            from qiskit import QuantumCircuit
+	                                            circuit = QuantumCircuit(26)
 	                                            count_number = 0
 	                                            while finish1 != 1:
-                                                    from qiskit import QuantumCircuit
-                                                    circuit = QuantumCircuit((2000))	                                                
+                                                        	                                                
 	                                                count_number=int(count_number)
 	                                                QuantumCircuit(count_number)
 	                                                num = count_number
