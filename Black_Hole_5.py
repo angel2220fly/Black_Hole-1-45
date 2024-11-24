@@ -77,6 +77,7 @@ class compression:
             C2 = 0
             C3 = 0
             C4 = 0
+            INFOS="l"
             ZEROS_ONE_1 = ""
             Circle_times = 0
             Circle_times2 = 1
@@ -338,7 +339,7 @@ class compression:
                                             Circle_times2 = Circle_times
                                         if (
                                             len(TUPLE) > long_11
-                                            and Circle_times > Circle_times2 + 2
+                                            and Circle_times > Circle_times2 + 2 and Circle_times>4
                                             or Circle_times == (2**24)-1
                                         ):
                                             N3 = 2
@@ -351,9 +352,14 @@ class compression:
                                                     "1" + SCircle_times_cut+SCircle_times + INFO
                                                 )
                                             if Circle_times != 1:
-                                                File_information5_17 = (
-                                                    "1" + SCircle_times_cut+SCircle_times + INFOS
-                                                )
+                                                if len(INFOS)!=0:
+                                                    File_information5_17 = (
+                                                        "1" + SCircle_times_cut+SCircle_times + INFOS
+                                                    )
+                                            if len(INFOS)==0:
+                                                    File_information5_17 = (
+                                                        "1" + SCircle_times_cut+SCircle_times + INFO
+                                                    )                                                    
                                             N4 = 2
                                             if N4 == 2:
                                                 long_1 = len(File_information5_17)
