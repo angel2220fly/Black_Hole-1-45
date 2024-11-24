@@ -77,7 +77,7 @@ class compression:
             C2 = 0
             C3 = 0
             C4 = 0
-            INFOS="l"
+            INFOS=""
             ZEROS_ONE_1 = ""
             Circle_times = 0
             Circle_times2 = 1
