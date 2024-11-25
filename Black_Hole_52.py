@@ -34,10 +34,10 @@ class compression:
 
             name = input("What is name of file input? ")
             
-            compress_extract = int(input("compress: 1 extract: 2? "))
-            if compress_extract==1:
+            compress_extract = input("compress: 1 extract: 2? ")
+            if compress_extract=="1":
                 i=1
-            elif compress_extract==2:
+            elif compress_extract=="2":
                 i=2
             else:
                 print("Incorrect letter select!")
@@ -46,8 +46,7 @@ class compression:
             long_21 = len(name)
 
             name_f = name[long_21 - 2 :]
-
-            if name_f == ".b":
+            if i ==2:
 
                 i = 2
 
