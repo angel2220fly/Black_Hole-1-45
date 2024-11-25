@@ -26,10 +26,22 @@ class compression:
         if N5 == 1:
 
             Clear = ""
+
+         
+            
             
 
 
             name = input("What is name of file input? ")
+            
+            compress_extract = int(input("compress: 1 extract: 2? "))
+            if compress_extract==1:
+                i=1
+            elif compress_extract==2:
+                i=2
+            else:
+                print("wrong letter select!")
+                raise SystemExit
 
             long_21 = len(name)
 
