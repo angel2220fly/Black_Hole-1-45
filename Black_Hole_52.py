@@ -40,7 +40,7 @@ class compression:
             elif compress_extract==2:
                 i=2
             else:
-                print("wrong letter select!")
+                print("Incorrect letter select!")
                 raise SystemExit
 
             long_21 = len(name)
