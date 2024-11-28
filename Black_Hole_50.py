@@ -408,6 +408,71 @@ class compression:
                                 INFO = W4
                                 long_F = len(INFO)
                                 INFO = INFO[: long_F - 8]
+                                Transform=INFO
+                                Shora_decode=1
+                                if Shora_decode==1:
+                                #Shora Encode
+                                    Transform="1"+Transform
+                                    T8 = INFO
+                                    Shora_decode=1
+                                    if Shora_decode==1:
+                                        # Input product
+                                            try:
+                                                product = int(Transform,2)
+                                                #print(product)
+                                                
+                                                if product <= 0:
+                                                    raise ValueError("Product must be a positive integer greater than 0.")
+                                                
+                                                # Step 1: Factorize the product into byte values (0-255)
+                                                factors = []
+                                                for i in range(2, 256):
+                                                    while product % i == 0:
+                                                        factors.append(i)
+                                                        product //= i
+                                                    if product == 1:
+                                                        break  # Exit early if fully factored
+                                            
+                                                # If product is still greater than 1 and less than 256, it should be a valid byte
+                                                if 1 < product < 256:
+                                                    factors.append(product)
+                                            
+                                                # Step 2: Print the results
+                                                #print(f"Input Product: {product}")
+                                                #print(f"Factors (decoded byte values): {factors}")
+                                            
+                                                # Step 3: Confirm the product
+                                                calculated_product = 1
+                                                for byte in factors:
+                                                    calculated_product *= byte
+                                                #print(f"Product of Byte Values: {calculated_product}")
+                                            
+                                                # Step 4: Decode the byte values into a message (if possible)
+                                                decoded_message = ''
+                                                for n in factors:
+                                                    if 32 <= n <= 126:  # Check if the byte corresponds to a printable ASCII character
+                                                        decoded_message += chr(n)
+                                                #print(f"Decoded Message (from byte values): {decoded_message}")
+                                            
+                                                # Step 5: Convert to Base 256 (Hexadecimal)
+                                                base256_message = ' '.join(format(num, 'x') for num in factors)
+                                                #print(f"Decoded Message in Base 256: {base256_message}")
+                                            
+                                                # Step 6: Convert to Binary (8 bits each)
+                                                binary_message = ''.join(format(num, '08b') for num in factors)
+                                                #print(f"Decoded Message in Binary (8 bits each): {binary_message}")
+                                            
+                                            except ValueError as e:
+                                                print(f"Error: {e}")
+                                      
+                                    
+                                    #print(binary_message)
+                                    T10=binary_message
+                                    INFO=T10
+                                    
+    
+                                                                                                 
+                               
 
                                 # print(len(INFO))
 
@@ -639,258 +704,209 @@ class compression:
                                                         block = 0
 
                                                         Save = 0
+                                                        #Shora Decode
+                                                        Transform=INFO
+                                                        print(INFO)
+                                                        shora=1
+                                                        if shora==1:
+                            
+                                                                    
+                                                                    # Input product
+                                                                        try:
+                                                                            product = int(Transform,2)
+                                                                            #print(product)
+                                                                            
+                                                                            if product <= 0:
+                                                                                raise ValueError("Product must be a positive integer greater than 0.")
+                                                                            
+                                                                            # Step 1: Factorize the product into byte values (0-255)
+                                                                            factors = []
+                                                                            for i in range(2, 256):
+                                                                                while product % i == 0:
+                                                                                    factors.append(i)
+                                                                                    product //= i
+                                                                                if product == 1:
+                                                                                    break  # Exit early if fully factored
+                                                                        
+                                                                            # If product is still greater than 1 and less than 256, it should be a valid byte
+                                                                            if 1 < product < 256:
+                                                                                factors.append(product)
+                                                                        
+                                                                            # Step 2: Print the results
+                                                                            #print(f"Input Product: {product}")
+                                                                            #print(f"Factors (decoded byte values): {factors}")
+                                                                        
+                                                                            # Step 3: Confirm the product
+                                                                            calculated_product = 1
+                                                                            for byte in factors:
+                                                                                calculated_product *= byte
+                                                                            #print(f"Product of Byte Values: {calculated_product}")
+                                                                        
+                                                                            # Step 4: Decode the byte values into a message (if possible)
+                                                                            decoded_message = ''
+                                                                            for n in factors:
+                                                                                if 32 <= n <= 126:  # Check if the byte corresponds to a printable ASCII character
+                                                                                    decoded_message += chr(n)
+                                                                            #print(f"Decoded Message (from byte values): {decoded_message}")
+                                                                        
+                                                                            # Step 5: Convert to Base 256 (Hexadecimal)
+                                                                            base256_message = ' '.join(format(num, 'x') for num in factors)
+                                                                            #print(f"Decoded Message in Base 256: {base256_message}")
+                                                                        
+                                                                            # Step 6: Convert to Binary (8 bits each)
+                                                                            binary_message = ''.join(format(num, '08b') for num in factors)
+                                                                            #print(f"Decoded Message in Binary (8 bits each): {binary_message}")
+                                                                        
+                                                                        except ValueError as e:
+                                                                            print(f"Error: {e}")
+                                      
+                                    
+                                    #print(binary_message)
+
+                                                        
+                                                        T10=binary_message
+                                                        TUPLE=T10
+                                                        TUPLE1 = TUPLE
+                                                        #print(T10)
+                                                        TUPLE1=TUPLE
+                                                        INFO=TUPLE
                                                         TUPLE=INFO
+                                                        Find=1
 
 
-
-                                                        N3 = 1
-
-                                                        # print(N3)
-
-                                                        if N3 == 1:
-
+                                                        Ci=1
+                                                        if Ci == 1:
+                        
                                                             N3 = 1
-
-                                                            block = 0
-
-                                                            long_F = len(TUPLE)
-
-                                                            Z = TUPLE
-
-                                                            Z6 = ""
-
-                                                            Z7 = 0
-
-                                                            TUPLE1 = Z
-
-                                                            cut_b = 0
-
-                                                            long_F = len(TUPLE)
-
-                                                            # print(len(TUPLE))
-
+                        
+                                                            
+                        
+                                                            # print(N3)
+                        
                                                             if N3 == 1:
-
-                                                                E = Z[
-                                                                    block : block
-                                                                    + 1
-                                                                ]
-
-                                                                if E == "0":
-
-                                                                    cut_b = 1
-
-                                                                    CB += 1
-
-                                                                    block += 1
-
-                                                                    E2 = Z[
-                                                                        block : block
-                                                                        + 8
-                                                                    ]
-
-                                                                    block += 8
-
-                                                                    E3 = int(
-                                                                        Z[
-                                                                            block : block
-                                                                            + 5
-                                                                        ],
-                                                                        2,
+                        
+                                                                # print(Long_PM1)
+                        
+                                                                N3 = 1
+                        
+                                                                Circle_times += 1
+                        
+                                                                # print(Circle_times)
+                        
+                                                                #print(len(TUPLE))
+                        
+                                                                #print(long_11)
+                        
+                                                                INFO = TUPLE
+                        
+                                                                if Circle_times == 1:
+                        
+                                                                    Circle_times2 = Circle_times
+                        
+                                                                    long_11 = long_11 * 8
+                        
+                                                                Extract1 = 0
+                        
+                                                                if (
+                                                                    len(TUPLE) <= long_11
+                                                                    or Circle_times == 255
+                                                                ):
+                        
+                                                                    long_11 = len(TUPLE)
+                        
+                                                                    INFOS = INFO
+                        
+                                                                    Circle_times2 = Circle_times
+                        
+                                                                if (
+                                                                    len(TUPLE) > long_11
+                                                                    or Circle_times > Circle_times2 + 1
+                                                                    or Circle_times == 255
+                                                                ):
+                        
+                                                                    N3 = 2
+                        
+                                                                    Extract1 = 1
+                        
+                                                                if N3 == 2:
+                        
+                                                                    SCircle_times = format(
+                                                                        Circle_times2, '08b'
                                                                     )
-
-                                                                    block += 5
-
-                                                                    S5 = Z[
-                                                                        block : block
-                                                                        + E3
-                                                                    ]
-
-                                                                    if (
-                                                                        len(S5)
-                                                                        == 0
-                                                                    ):
-
+                        
+                                                                    if Circle_times == 1:
+                        
                                                                         File_information5_17 = (
-                                                                            "00000000"
-                                                                            + Check
+                                                                            "1" + SCircle_times + INFO
                                                                         )
-
-                                                                        Ex = Check
-
-                                                                        elapsed_time = process_file1(
-                                                                            Extract1=1,
-                                                                            File_information5_17=File_information5_17,
-                                                                            name=name,
-                                                                            x=x,
+                        
+                                                                    if Circle_times != 1:
+                        
+                                                                        File_information5_17 = (
+                                                                            "1" + SCircle_times + INFOS
                                                                         )
+                        
 
-                                                                        return elapsed_time
-
-                                                                    E1 = int(
-                                                                        Z[
-                                                                            block : block
-                                                                            + E3
-                                                                        ],
-                                                                        2,
-                                                                    )
-
-                                                                    block += E3
-
-                                                                    TUPLE4 = int(
-                                                                        Z[
-                                                                            block : block
-                                                                            + 5
-                                                                        ],
-                                                                        2,
-                                                                    )
-
-                                                                    block += 5
-
-                                                                    E5 = int(
-                                                                        Z[
-                                                                            block : block
-                                                                            + TUPLE4
-                                                                        ],
-                                                                        2,
-                                                                    )
-
-                                                                    block += (
-                                                                        TUPLE4
-                                                                    )
-
-                                                                    b = 0
-
-                                                                    E3 = ""
-
-                                                                    while (
-                                                                        b
-                                                                        < E5 - 1
-                                                                    ):
-
-                                                                        E3 += E2
-
-                                                                        b += 1
-
-                                                                        # print(E2)
-
-                                                                    TUPLE1 = TUPLE1[
-                                                                        block:
-                                                                    ]
-                                                                    E1 *= 8
-
-                                                                    TUPLE1 = (
-                                                                        TUPLE1[
-                                                                            :E1
-                                                                        ]
-                                                                        + E3
-                                                                        + TUPLE1[
-                                                                            E1:
-                                                                        ]
-                                                                    )
-
-                                                                    block += (
-                                                                        long_F
-                                                                    )
-
-                                                                elif E == "1":
-
-                                                                    block += 1
-
-                                                                    Z7 = 1
-
-                                                                    if (
-                                                                        cut_b
-                                                                        == 0
-                                                                    ):
-
-                                                                        TUPLE1 = TUPLE1[
-                                                                            block:
-                                                                        ]
-
-                                                                        block += long_F
-
-                                                                        cut_b = (
-                                                                            1
+                                                                    N4 = 2
+                        
+                                                                    if N4 == 2:
+                        
+                                                                        long_1 = len(
+                                                                            File_information5_17
                                                                         )
+                        
+                                                                        add_bits = ""
+                        
+                                                                        count_bits = 8 - long_1 % 8
+                        
+                                                                        z = 0
+                        
+                                                                        if count_bits != 0:
+                        
+                                                                            while z < count_bits:
+                        
+                                                                                add_bits = (
+                                                                                    "0" + add_bits
+                                                                                )
+                        
+                                                                                z = z + 1
+                        
+                                                                        File_information5_17 = (
+                                                                            add_bits
+                                                                            + File_information5_17
+                                                                        )
+                        
+                                                                        N4 = 3
+                        
+                                                                        if N4 == 3:
+                        
+                                                                            File_information5 = (
+                                                                                File_information5_17
+                                                                            )
+                        
+                                                                            Check2 = (
+                                                                                File_information5_17
+                                                                            )
+                        
+                                                                            N5 == 1
+                        
+                                                                            if N5 == 1:
+                        
+                                                                                Ex = "00000000" + Check
+                        
+                                                                                File_information5_17 = (
+                                                                                    Ex
+                                                                                )
+                        
+                                                                                elapsed_time = process_file1(
+                                                                                    Extract1=1,
+                                                                                    File_information5_17=File_information5_17,
+                                                                                    name=name,
+                                                                                    x=x,
+                                                                                )
 
-                                                                        # print(CB)
 
-                                                                        # print(block)
-
-                                                                else:
-
-                                                                    block += 1
-
-                                                            # print(Long_PM1)
-
-                                                            TUPLE = TUPLE1
-
-                                                            # print(len(TUPLE))
-
-                                                            N3 = 1
-
-                                                            Circle_times += 1
-
-                                                            # print(Circle_times)
-
-                                                            INFO = TUPLE
-
-                                                            Extract1 = 0
-
-                                                            N3 = 0
-
-                                                            # print(len(TUPLE))
-
-                                                            # print(Circle_times4)
-
-                                                            if (
-                                                                Circle_times
-                                                                == Circle_times4
-                                                            ):
-
-                                                                Extract1 = 1
-
-                                                                if (
-                                                                    Check
-                                                                    == TUPLE
-                                                                ):
-                                                                    File_information5_17 = (
-                                                                        Check2
-                                                                    )
-                                                                    if (
-                                                                        Check2[
-                                                                            :8
-                                                                        ]
-                                                                        == "00000000"
-                                                                    ):
-                                                                        File_information5_17 = Check2[
-                                                                            8:
-                                                                        ]
-
-                                                                if (
-                                                                    Check
-                                                                    != TUPLE
-                                                                ):
-
-                                                                    Ex = (
-                                                                        "00000000"
-                                                                        + Check
-                                                                    )
-
-                                                                    File_information5_17 = (
-                                                                        Ex
-                                                                    )
-
-                                                                    elapsed_time = process_file1(
-                                                                        Extract1=1,
-                                                                        File_information5_17=File_information5_17,
-                                                                        name=name,
-                                                                        x=x,
-                                                                    )
-
-                                                                    return elapsed_time
-
+                                
                                 if Extract1 == 1:
                                     n = int(File_information5_17, 2)
                                     width_bits = "%0{}x".format(
@@ -996,9 +1012,58 @@ class compression:
 
                                     while Extract1 != 1:
                                     	
-
+                                        
+                                        T8=INFO
+                                        Transform=T8
+                                        shora=1
+                                        if shora==1:
 
                                         
+                                            try:
+                                                # Step 1: Ask the user to enter a binary string without spaces
+                                                binary_input = Transform
+                                                
+                                                # Step 2: Validate the binary input and decode into byte values (0-255)
+                                                if len(binary_input) % 8 != 0:
+                                                    raise ValueError("Binary input must be a multiple of 8 bits.")
+                                                
+                                                byte_values = [int(binary_input[i:i+8], 2) for i in range(0, len(binary_input), 8)]
+                                            
+                                                # Step 3: Convert the byte values into base 256 (hexadecimal)
+                                                base256_message = ''.join(format(num, '02x') for num in byte_values)
+                                            
+                                                # Step 4: Calculate the product of the byte values
+                                                product = 1
+                                                for byte in byte_values:
+                                                    product *= byte
+                                            
+                                                # Step 5: Calculate the binary representation of the product
+                                                product_binary = format(product, 'b')  # Binary representation without spaces
+                                            
+                                                # Step 6: Convert byte values back to binary representation (8 bits each, no spaces)
+                                                binary_message = ''.join(format(num, '08b') for num in byte_values)
+                                            
+                                                # Step 7: Display the results
+                                                #print(f"Input Binary: {binary_input}")
+                                                #print(f"Byte Values (decoded from binary): {byte_values}")
+                                                #print(f"Product of Byte Values: {product}")
+                                                #print(f"Binary Representation of Product: {product_binary}")
+                                                #print(f"Decoded Message in Base 256 (hexadecimal): {base256_message}")
+                                                #print(f"Binary Representation (8 bits each, no spaces): {binary_message}")
+                                                #print("The decoded message based on the byte values is displayed above.")
+                                            
+                                            except ValueError as e:
+                                                print(f"Error: {e}")
+                                   
+                                        
+                                        
+
+
+                                        T10=product_binary
+                                    #print(T10)
+                                        TUPLE=T10
+                                        TUPLE1 = TUPLE[1:]                                        
+                                        INFO=TUPLE
                                         TUPLE=INFO
                                         long_L = len(TUPLE)
 
