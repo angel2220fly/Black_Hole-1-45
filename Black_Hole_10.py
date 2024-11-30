@@ -33,19 +33,14 @@ class compression:
 
             name = input("What is name of file input? ")
             
-            compress_extract = input("compress: 1 extract: 2? ")
-            if compress_extract=="1":
-                i=1
-            elif compress_extract=="2":
-                i=2
-            else:
-                print("Incorrect letter select!")
-                raise SystemExit
+
 
             long_21 = len(name)
 
-            name_f = name[long_21 - 2 :]
-            if i ==2:
+            name_f = name[long_21 - 4:]
+            
+       
+            if name_f==".bin":
 
                 i = 2
 
@@ -261,24 +256,26 @@ class compression:
                                             # Step 2: Convert count_times_of_minus to binary
                                             count_times_of_minus_format = format(count_times_of_minus, '01b')
                                             count_times_of_minus_format_long = len(count_times_of_minus_format)
-                                            count_times_of_minus_format_long_f = format(count_times_of_minus_format_long, '032b')
+                                            count_times_of_minus_format_long_f = format(count_times_of_minus_format_long, '01b')
+                                            result1=len(count_times_of_minus_format_long_f)
+                                            result1_format=format(result1,'05b')
                                         
                                             # Step 3: Convert Plus_From_Minus to binary
                                             Plus_From_Minus_fomat = format(Plus_From_Minus, '01b')
                                             Minus_long_f = len(Plus_From_Minus_fomat)
-                                            Minus_long_format = format(Minus_long_f, '032b')
+                                            Minus_long_format = format(Minus_long_f, '01b')
+                                            result2=len(Minus_long_format)
+                                            result2_format=format(result2,'05b')
                                         
                                             # Step 4: Combine all components into Result
-                                            Result = (count_times_of_minus_format_long_f +
-                                                      count_times_of_minus_format +
-                                                      Minus_long_format +
+                                            Result = (result1_format+count_times_of_minus_format_long_f +
+                                                      count_times_of_minus_format+result2_format+Minus_long_format +
                                                       Plus_From_Minus_fomat)
                                             
                                             return Result
-                                            
-                                        SB=int(Transform,2)
+                                        
                                         # Example usage:
-                                        original_number = SB # Replace with any integer you want to encode
+                                        original_number = int(Transform,2)  # Replace with any integer you want to encode
                                         #print("Encode_number:")
                                         #print(original_number)
                                         encoded_result = encode(original_number)
@@ -389,7 +386,7 @@ class compression:
 
                                         jl = width_bits3
 
-                                        name1 = name + ".b"
+                                        name1 = name + ".bin"
 
                                         with open(name1, "wb") as f2:
 
@@ -502,47 +499,54 @@ class compression:
                                     c11=1
                                     if c11==1:
                                                                 
-                                                def decode(Result):
-                                                    # Step 1: Extract count_times_of_minus_format_long_f (32 bits)
-                                                    count_times_of_minus_format_long_f = Result[:32]
-                                                    count_times_of_minus_format_long = int(count_times_of_minus_format_long_f, 2)
-                                                    
-                                                    # Step 2: Extract count_times_of_minus_format
-                                                    start = 32
-                                                    end = 32 + count_times_of_minus_format_long
-                                                    count_times_of_minus_format = Result[start:end]
-                                                    count_times_of_minus = int(count_times_of_minus_format, 2)
-                                                    
-                                                    # Step 3: Extract Minus_long_format (32 bits)
-                                                    start = end
-                                                    end = start + 32
-                                                    Minus_long_format = Result[start:end]
-                                                    Minus_long = int(Minus_long_format, 2)
-                                                    
-                                                    # Step 4: Extract Plus_From_Minus_fomat
-                                                    start = end
-                                                    end = start + Minus_long
-                                                    Plus_From_Minus_fomat = Result[start:end]
-                                                    Plus_From_Minus = int(Plus_From_Minus_fomat, 2)
-                                                    
-                                                    # Step 5: Reconstruct the original number
-                                                    number = 0
-                                                    for i in range(1, count_times_of_minus + 1):
-                                                        number += i
-                                                    original_number = number - Plus_From_Minus
-                                                    
-                                                    return original_number
-                                                
-                                                # Example usage:
-                                                encoded_result =  encoded_result# Replace with the actual encoded Result
-                                                decoded_number = decode(encoded_result)
-                                                #print("Decoded Number:", decoded_number)
-                                                decoded_number=format(decoded_number,'01b')
-                                                
+                                        def decode(Result):
+                                            # Step 1: Extract result1_format (5 bits)
+                                            result1_format = Result[:5]
+                                            result1 = int(result1_format, 2)
                                             
-                                                                                                            
-
-                                    TUPLE=decoded_number[1:]
+                                            # Step 2: Extract count_times_of_minus_format_long_f (result1 bits)
+                                            start = 5
+                                            end = 5 + result1
+                                            count_times_of_minus_format_long_f = Result[start:end]
+                                            count_times_of_minus_format_long = int(count_times_of_minus_format_long_f, 2)
+                                            
+                                            # Step 3: Extract count_times_of_minus_format (count_times_of_minus_format_long bits)
+                                            start = end
+                                            end = start + count_times_of_minus_format_long
+                                            count_times_of_minus_format = Result[start:end]
+                                            count_times_of_minus = int(count_times_of_minus_format, 2)
+                                            
+                                            # Step 4: Extract result2_format (5 bits)
+                                            start = end
+                                            end = start + 5
+                                            result2_format = Result[start:end]
+                                            result2 = int(result2_format, 2)
+                                            
+                                            # Step 5: Extract Minus_long_format (result2 bits)
+                                            start = end
+                                            end = start + result2
+                                            Minus_long_format = Result[start:end]
+                                            Minus_long = int(Minus_long_format, 2)
+                                            
+                                            # Step 6: Extract Plus_From_Minus_fomat (Minus_long bits)
+                                            start = end
+                                            end = start + Minus_long
+                                            Plus_From_Minus_fomat = Result[start:end]
+                                            Plus_From_Minus = int(Plus_From_Minus_fomat, 2)
+                                            
+                                            # Step 7: Reconstruct the original number
+                                            number = 0
+                                            for i in range(1, count_times_of_minus + 1):
+                                                number += i
+                                            original_number = number - Plus_From_Minus
+                                            
+                                            return original_number
+                                        
+                                        # Example usage:
+                                        encoded_result = encoded_result  # Replace with the actual encoded Result
+                                        decoded_number = decode(encoded_result)
+                                        decoded_number_f=format(decoded_number,'01b')
+                                    TUPLE=decoded_number_f[1:]
                                     TUPLE1 = TUPLE
                                     INFO = TUPLE
                                     # print(INFO)
