@@ -267,11 +267,11 @@ class compression:
                                                                                     
                                     # Example Usage
                                     original_number = int(Transform,2) # Replace with the number you want to compress
-                                    print("Original Number:", original_number)
+                                    #print("Original Number:", original_number)
                                     
                                     # Compress
                                     compressed = compress(original_number)
-                                    print("Compressed Result:", compressed)
+                                    #print("Compressed Result:", compressed)
                                     encoded_result = compressed                                       
                                         
                                     T10=encoded_result   
