@@ -240,38 +240,45 @@ class compression:
                                     if c_c==0:
                                             def compress(original_number):
                                                 """
-                                                Compresses an integer into a binary string using fixed-length encoding for components.
+                                                Compresses an integer of arbitrary size into a binary string.
                                                 """
                                                 # Step 1: Calculate count_times_of_minus and Plus_From_Minus
                                                 number_Minus = original_number
                                                 count_times_of_minus = 0
                                                 M = 0
                                             
-                                                # Perform the iterative subtraction
+                                                # Perform iterative subtraction
                                                 while number_Minus > 0:
                                                     M += 1
                                                     number_Minus -= M
                                                     count_times_of_minus += 1
                                             
-                                                # Calculate the leftover positive value (Plus_From_Minus)
+                                                # Calculate leftover positive value (Plus_From_Minus)
                                                 Plus_From_Minus = -number_Minus
                                             
-                                                # Step 2: Convert count_times_of_minus and Plus_From_Minus to binary with fixed lengths
-                                                count_binary = format(count_times_of_minus, '07b')  # 7 bits for count_times_of_minus
-                                                plus_binary = format(Plus_From_Minus, '08b')       # 8 bits for Plus_From_Minus
+                                                # Step 2: Convert count_times_of_minus and Plus_From_Minus to binary
+                                                count_binary = format(count_times_of_minus, 'b')
+                                                plus_binary = format(Plus_From_Minus, 'b')
                                             
-                                                # Combine all components into a single fixed-length string
-                                                compressed_result = f"{count_binary}{plus_binary}"
+                                                # Step 3: Encode lengths of both fields
+                                                count_length_binary = format(len(count_binary), '016b')  # 16 bits for length of count_binary
+                                                plus_length_binary = format(len(plus_binary), '016b')    # 16 bits for length of plus_binary
+                                            
+                                                # Combine all components into the compressed result
+                                                compressed_result = f"{count_length_binary}{plus_length_binary}{count_binary}{plus_binary}"
                                                 return compressed_result
-                                                
-                                                                                    
+                                                                                #print("Compressed Result:", compressed)
+                                                                                
+                                                                                
+                                    
                                     # Example Usage
-                                    original_number = int(Transform,2) # Replace with the number you want to compress
+                                    original_number = int(Transform,2)  # Replace with the number you want to compress (up to 1 GB)
                                     #print("Original Number:", original_number)
                                     
                                     # Compress
                                     compressed = compress(original_number)
-                                    #print("Compressed Result:", compressed)
+                                    #print("Compressed Result:", compressed)                                                                                
+                                                                                
                                     encoded_result = compressed                                       
                                         
                                     T10=encoded_result   
@@ -497,35 +504,45 @@ class compression:
                                                                                                         
                                         def decompress(compressed_result):
                                             """
-                                            Decompresses a fixed-length binary string back into the original integer.
+                                            Decompresses a binary string back into the original integer.
                                             """
-                                            # Step 1: Extract count_times_of_minus and Plus_From_Minus from the fixed-length string
-                                            count_binary = compressed_result[:7]  # First 7 bits
-                                            plus_binary = compressed_result[7:]   # Remaining 8 bits
+                                            # Step 1: Extract lengths of fields
+                                            count_length = int(compressed_result[:16], 2)  # First 16 bits for count_binary length
+                                            plus_length = int(compressed_result[16:32], 2)  # Next 16 bits for plus_binary length
                                         
+                                            # Step 2: Extract count_binary and plus_binary
+                                            count_binary_start = 32
+                                            count_binary_end = count_binary_start + count_length
+                                            count_binary = compressed_result[count_binary_start:count_binary_end]
+                                        
+                                            plus_binary_start = count_binary_end
+                                            plus_binary_end = plus_binary_start + plus_length
+                                            plus_binary = compressed_result[plus_binary_start:plus_binary_end]
+                                        
+                                            # Convert binary fields back to integers
                                             count_times_of_minus = int(count_binary, 2)
                                             Plus_From_Minus = int(plus_binary, 2)
                                         
-                                            # Step 2: Reconstruct the original number
+                                            # Step 3: Reconstruct the original number
                                             number = 0
                                             for i in range(1, count_times_of_minus + 1):
                                                 number += i
                                             original_number = number - Plus_From_Minus
                                         
                                             return original_number
-                                        
                                                                                                   
                                                                 
-                                        # Decompress
-                                        decompressed = decompress(compressed)
-                                        print("Decoded Number:", decompressed)
-                                        
+  
                                         
                                        
                                         
                                      
                                         
+                                    
+                                    decompressed = decompress(compressed)
                                     original_number=format(decompressed,'01b')
+                                      
+                                      
                                     TUPLE=original_number[1:]
                                     TUPLE1 = TUPLE
                                     INFO = TUPLE
