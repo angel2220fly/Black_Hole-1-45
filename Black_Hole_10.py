@@ -314,6 +314,7 @@ class compression:
                                         INFOS=INFO
                                     if is_not_compress==1:
                                         times_compress-=1
+                                        #print(times_compress)
                                                    
 
 
@@ -322,7 +323,7 @@ class compression:
                                     #print(len(INFO))
 
                                     if (
-                                        long_one_time <= 256 or times_compress==(2**24)-1 or is_not_compress==1
+                                            long_one_time <= 256 or times_compress==(2**24)-1 or is_not_compress==1
                                         
                                     ):
                                         stop_compress = 1
@@ -540,6 +541,7 @@ class compression:
                                             F3=0
                                             block=0
                                             TUPLE=""
+                                            print(INFO)
                                             while block<long_F:
                                                     F=Transform[block:block+15]
                                                     #print(F)
@@ -548,7 +550,7 @@ class compression:
                                                     if len(F)==8:
                                                         
                                                     
-                                                        #block+=15
+                                                        block+=15
                                                         TUPLE+=F
                                                         
                                                         
@@ -582,7 +584,7 @@ class compression:
         
                                             long_L = len(TUPLE)
                                             Tc += 1
-                                            #print(Tc)
+                                            print(Tc)
         
                                             if tce == Tc:
                                                 Extract1 = 1
