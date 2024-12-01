@@ -32,7 +32,6 @@ class compression:
 
 
             name = input("What is name of file input? ")
-            
 
 
             long_21 = len(name)
@@ -47,6 +46,7 @@ class compression:
             else:
 
                 i = 1
+       
             
 
             # print(i)
@@ -238,55 +238,84 @@ class compression:
                                     T10 = ""
                                     c_c = 0
                                     
-                                    M2=len(Transform)-1
+                                    if c_c==0:
+                                        block=0
+                                        is_not_compress=0
+                                        F9=0
+                                        while block<long_F:
+                                            F=Transform[block:block+16]
+                                            if len(F)==8:
+                                                F4=F
+                                                F9=1
+                                            F8=int(F,2)
+                                            F4=format(F8,'015b')
+                                            
+                                           
+                                            
+                                            
                                     
                                     
-                                    def compress(original_number, M2):
-                                            """
-                                            Compresses an integer into a binary string representation.
-                                            """
-                                            # Step 1: Calculate count_times_of_minus and Plus_From_Minus
-                                            number_Minus = original_number
-                                            count_times_of_minus = 0
-                                            M3 = M2 - 1
-                                            M = 2 ** M3
-                                        
-                                            # Perform iterative subtraction
-                                            while number_Minus > 0:
-                                                M//2
-                                                number_Minus -= M
-                                                count_times_of_minus += 1
-                                        
-                                            # Calculate leftover positive value (Plus_From_Minus)
-                                            Plus_From_Minus = -number_Minus
-                                        
-                                            # Step 2: Convert count_times_of_minus and Plus_From_Minus to binary
-                                            count_binary = format(count_times_of_minus, 'b')
-                                            plus_binary = format(Plus_From_Minus, 'b')
-                                        
-                                            # Step 3: Encode lengths of both fields
-                                            count_length_binary = format(len(count_binary), '016b')  # 16 bits for length of count_binary
-                                            plus_length_binary = format(len(plus_binary), '016b')    # 16 bits for length of plus_binary
-                                        
-                                            # Combine all components into the compressed result
-                                            compressed_result = f"{count_length_binary}{plus_length_binary}{count_binary}{plus_binary}"
-                                            return compressed_result                                       
-                                    # Example Usage
-                                    Transform = Transform # Take input from the user
-                                    Transform = "1" + Transform  # Modify the Transform string as per your requirements
                                     
-                                    c_c = 0  # Example control variable (you may modify this as needed)
-                                    
-                                    # Encoding function call
-                                    original_number = int(Transform, 2)  # Convert the transformed string to an integer
-                                    compressed = compress(original_number, M2)  # Compress the number
-                                    
-                                    encoded_result = compressed  # Encoded result
-                                    
-                                    # Print the binary representation of the encoded result
-                                    #print("Encoded Binary Result:", encoded_result)                                                                         
-                                    compressed_result=encoded_result
-                                    T10=compressed_result   
+                                            if len(F)!=0:
+                              
+                                                M2 = int(F, 2) % 2  # Get the modulo of Transform when divided by 2
+                                                
+                                                if M2 == 0:
+                                                    M3 = (int(F, 2) // 2) +1  # Modify M3 based on the logic
+                                                else:
+                                                    M3 = (int(F, 2) // 2) +3  # Modify M3 based on the logic
+                                     
+                                                M4=format(M3,'015b')
+                                                #print(len(M4))
+                                                #print("compress: binary from str:", M4)
+                                                M7=format(M3,'015b')
+                                                
+        
+                                                encoded_result=M4
+                                                
+                                                #Decode:
+                                                    
+                                                if len(M4)==16:
+                                                    is_not_compress=1
+                                                    
+                                                F2=0
+                                                F3=0
+                                                
+                                                while F3!=1:
+                                                
+                                                    F1=format(F2,'015b')
+                                                        
+                                                    M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
+                                                    
+                                                    if M2 == 0:
+                                                        M5 = (int(F1, 2) // 2) + 1 # Modify M3 based on the logic
+                                                    else:
+                                                        M5 = (int(F1, 2) // 2) + 3 # Modify M3 based on the logic
+                                                    M6=format(M5,'015b')
+                                                 
+
+                                                    if M6==M7 and F1==F4:
+                                                                                                                                                     F4=format(F8,'015b')
+                                                                                                                                                     #print(F4)
+                                                                                                                                                     
+                                                                                                                                                     
+                                                                                                                                                     F3=1
+                                                                                                                                             
+                                                                                                                                               
+                                                    F2+=1                                                                                             
+                                     
+                                                M4=format(M3,'015b')
+                                                if F9==1:
+                                                    F4=F
+                                                T10+=F4
+                                                    
+                                                #print(len(M4))
+                                                #print("compress: binary from str:", M4)                                                    
+                                                
+                                                
+                                                
+                                            block+=16
+                                            #print(block) 
                                     
                                         
                                         
@@ -300,13 +329,17 @@ class compression:
 
                                     INFO = T10
                                     T8 = T10
+                                    
+                                    if is_not_compress==1:
+                                        INFO="00000000"+Transform[1:]
+                                        
 
 
                                     long_one_time = len(T10)
                                     #print(long_one_time)
 
                                     if (
-                                        long_one_time <= 256 or times_compress==255
+                                        long_one_time <= 256 or times_compress==0
                                         
                                     ):
                                         stop_compress = 1
@@ -322,14 +355,7 @@ class compression:
                                         
                                        
                                         
-                                        Subtract = format(
-                                            M2, "01b"
-                                        )
-                                        
-                                        SL=len(Subtract)
-                                        SL1= format(
-                                            SL, "08b"
-                                        )                                                                               
+                                                                                                              
    
                                         
                                         times_compression_format = format(
@@ -360,8 +386,6 @@ class compression:
                                         I_F_A_L = format(len(I_F_A), "08b")
                                         File_information5_17 = (
                                             "1"
-                                            + SL1
-                                            + Subtract
                                             + times_255p
                                             + times_255
                                             + times_compression_format
@@ -434,183 +458,177 @@ class compression:
                         if i == 2:
 
                             if C == 1:
-
                                 Extract1 = 0
                                 File_information5 = INFO
+                                if INFO[:8]=="00000000":
+                                    
+                                    INFO=INFO[8:]
+                                    TUPLE1=INFO
+                                
 
                                 # extract
+                                else:
 
-                                if Circle_times3 == 0:
-
-                                    long_16 = len(File_information5)
-
-                                    if File_information5[:1] == "0":
-
-                                        while File_information5[:1] != "1":
-
-                                            if File_information5[:1] == "0":
-
-                                                File_information5 = (
-                                                    File_information5[1:]
-                                                )
-
-                                    if File_information5[:1] == "1":
-
-                                        File_information5 = File_information5[
-                                            1:
-                                        ]
-
-                                INFO = File_information5
-                                # print(INFO)
-
-                                if Circle_times3 == 0:
-                                    # times count extract
-                                    
-                                    SL = int(INFO[:8], 2)
-                                    
-
-                                    INFO = INFO[8:]
-                                    
-                                    
-                                                                                                      
-                                    
-                                    M2 = int(INFO[:SL], 2)
-                                    
-
-                                    INFO = INFO[SL:]
-
-                                    CEI = int(INFO[:16], 2)
-
-                                    # print(CE)
-
-                                    INFO = INFO[16:]
-
-                                    CE = int(INFO[:CEI], 2)
-
-                                    # print(CE)
-
-                                    INFO = INFO[CEI:]
-
-                                    tce = int(INFO[:CE], 2)
-
-                                    # print(tce)
-
-                                    INFO = INFO[CE:]
-                                    #############
-
-                                    # INFO before file before size of file
-                                    CE1 = int(INFO[:8], 2)
-
-                                    # print(CE)
-
-                                    INFO = INFO[8:]
-                                    bfnz = int(INFO[:CE1], 2)
-
-                                    # print(bfnz)
-
-                                    INFO = INFO[CE1:]
-                                    #############
-
-                                    # INFO before file after size of file
-                                    CE2 = int(INFO[:8], 2)
-
-                                    # print(CE)
-
-                                    INFO = INFO[8:]
-                                    efnz = int(INFO[:CE2], 2)
-
-                                    # print(efnz)
-
-                                    INFO = INFO[CE2:]
-                                    # e.g.: 12 8-10
-                                    #############
-
-                                while Extract1 != 1:
-                                    # 1 bits 21
-                                    # 0 19
-                                    long_F = len(INFO)
-                                    
-                                    Transform=INFO
-                                    compressed=Transform
-                                    def decode(encoded_result, M2):
-                                            """
-                                            Decodes the binary string back into the original integer.
-                                            """
-                                            # Step 1: Extract the lengths of the fields
-                                            count_length = int(encoded_result[:16], 2)  # First 16 bits for count_binary length
-                                            plus_length = int(encoded_result[16:32], 2)  # Next 16 bits for plus_binary length
-                                        
-                                            # Step 2: Extract count_binary and plus_binary
-                                            count_binary_start = 32
-                                            count_binary_end = count_binary_start + count_length
-                                            count_binary = encoded_result[count_binary_start:count_binary_end]
-                                        
-                                            plus_binary_start = count_binary_end
-                                            plus_binary_end = plus_binary_start + plus_length
-                                            plus_binary = encoded_result[plus_binary_start:plus_binary_end]
-                                        
-                                            # Convert binary fields back to integers
-                                            count_times_of_minus = int(count_binary, 2) if count_binary else 0
-                                            Plus_From_Minus = int(plus_binary, 2) if plus_binary else 0
-                                        
-                                            # Step 3: Reconstruct the original number
-                                            M3 = M2 - 1
-                                            M = 2 ** M3
-                                        
-                                            # Rebuild number_Minus through iterative addition
-                                            number_Minus = 0
-                                            for _ in range(count_times_of_minus):
-                                                M//2
-                                                number_Minus += M
-                                        
-                                            
-                                            # Add the leftover value
-                                            original_number = number_Minus - Plus_From_Minus
-                                            return original_number
-                                      
-                                
-                                    encoded_result=Transform
-                                    decoded_number = decode(encoded_result, M2)
-                                    original_number=format(decoded_number, 'b')
-                                      
-                                    TUPLE=original_number[1:]
-                                    TUPLE1 = TUPLE
-                                    INFO = TUPLE
+                                    if Circle_times3 == 0:
+    
+                                        long_16 = len(File_information5)
+    
+                                        if File_information5[:1] == "0":
+    
+                                            while File_information5[:1] != "1":
+    
+                                                if File_information5[:1] == "0":
+    
+                                                    File_information5 = (
+                                                        File_information5[1:]
+                                                    )
+    
+                                        if File_information5[:1] == "1":
+    
+                                            File_information5 = File_information5[
+                                                1:
+                                            ]
+    
+                                    INFO = File_information5
                                     # print(INFO)
-
-                                    long_L = len(TUPLE)
-                                    Tc += 1
-                                    # print(Tc)
-
-                                    if tce == Tc:
-                                        Extract1 = 1
-
-                                if Extract1 == 1:
-                                    num4 = int(TUPLE1, 2)
-                                    # print(num4)
-                                    C19 = "0" + str(bfnz) + "b"
-                                    TUPLE1 = format(num4, C19)
-                                    File_information5_17 = TUPLE1
-
-                                if Extract1 == 1:
-                                    L = len(File_information5_17)
-                                    n = int(File_information5_17, 2)
-                                    width_bits = "%0" + str((L // 8) * 2) + "x"
-                                    width_bits3 = binascii.unhexlify(
-                                        width_bits % n
-                                    )
-                                    width_bits2 = len(width_bits3)
-                                    name2 = name[:-2]
-                                    start_time = time()
-                                    with open(name2, "wb") as f2:
-                                        f2.write(width_bits3)
-                                    elapsed_time = time() - start_time
-                                    speed_bits = (long_11 * 8) // float(
-                                        elapsed_time
-                                    )
-                                    print(f"Speed bits: {speed_bits:.5f}")
-                                    print("checker seccefully")
-                                    return str(elapsed_time)
+    
+                                    if Circle_times3 == 0:
+                                        # times count extract
+                                        
+     
+    
+                                        CEI = int(INFO[:16], 2)
+    
+                                        # print(CE)
+    
+                                        INFO = INFO[16:]
+    
+                                        CE = int(INFO[:CEI], 2)
+    
+                                        # print(CE)
+    
+                                        INFO = INFO[CEI:]
+    
+                                        tce = int(INFO[:CE], 2)
+    
+                                        # print(tce)
+    
+                                        INFO = INFO[CE:]
+                                        #############
+    
+                                        # INFO before file before size of file
+                                        CE1 = int(INFO[:8], 2)
+    
+                                        # print(CE)
+    
+                                        INFO = INFO[8:]
+                                        bfnz = int(INFO[:CE1], 2)
+    
+                                        # print(bfnz)
+    
+                                        INFO = INFO[CE1:]
+                                        #############
+    
+                                        # INFO before file after size of file
+                                        CE2 = int(INFO[:8], 2)
+    
+                                        # print(CE)
+    
+                                        INFO = INFO[8:]
+                                        efnz = int(INFO[:CE2], 2)
+    
+                                        # print(efnz)
+    
+                                        INFO = INFO[CE2:]
+                                        # e.g.: 12 8-10
+                                        #############
+    
+                                        while Extract1 != 1:
+                                            # 1 bits 21
+                                            # 0 19
+                                            long_F = len(INFO)
+                                            #print(long_F)
+                                            
+                                            Transform=INFO
+                                            
+                                            compressed=Transform
+                                            F2=0
+                                            F3=0
+                                            block=0
+                                            TUPLE=""
+                                            while block<long_F:
+                                                    F=Transform[block:block+15]
+                                                    #print(F)
+                                                    F2=0
+                                                    F3=0
+                                                    if len(F)==8:
+                                                        
+                                                    
+                                                        #block+=15
+                                                        TUPLE+=F
+                                                        
+                                                        
+                                                    if len(F)!=8:
+                                                      
+                                                
+                                                    
+                                                        while F3!=1:
+                                                            
+                                                                F1=format(F2,'016b')
+                                                                    
+                                                                M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
+                                                                
+                                                                if M2 == 0:
+                                                                    M5 = (int(F1, 2) // 2) + 1  # Modify M3 based on the logic
+                                                                else:
+                                                                    M5 = (int(F1, 2) // 2) + 3  # Modify M3 based on the logic
+                                                                M6=format(M5,'015b')
+                                                                if F==M6:
+                                                                    TUPLE+=F1
+                                                                    F3=1
+                                                                F2+=1
+                                                        block+=15
+                                                        #print(block)                                                        
+                                                            
+                                                                                                  
+                                                            
+                                            TUPLE1 = TUPLE
+                                            INFO = TUPLE
+                                            #print(INFO)
+        
+                                            long_L = len(TUPLE)
+                                            Tc += 1
+                                            # print(Tc)
+        
+                                            if tce == Tc:
+                                                Extract1 = 1
+    
+                                    if Extract1 == 1:
+                                        num4 = int(TUPLE1, 2)
+                                        # print(num4)
+                                        C19 = "0" + str(bfnz) + "b"
+                                        TUPLE1 = format(num4, C19)
+                                        File_information5_17 = TUPLE1
+    
+                                    if Extract1 == 1:
+                                        L = len(File_information5_17)
+                                        n = int(File_information5_17, 2)
+                                        width_bits = "%0" + str((L // 8) * 2) + "x"
+                                        width_bits3 = binascii.unhexlify(
+                                            width_bits % n
+                                        )
+                                        width_bits2 = len(width_bits3)
+                                        name2 = name[:-2]
+                                        start_time = time()
+                                        with open(name2, "wb") as f2:
+                                            f2.write(width_bits3)
+                                        elapsed_time = time() - start_time
+                                        speed_bits = (long_11 * 8) // float(
+                                            elapsed_time
+                                        )
+                                        print(f"Speed bits: {speed_bits:.5f}")
+                                        print("checker seccefully")
+                                        return str(elapsed_time)
 
 
 d = compression()
