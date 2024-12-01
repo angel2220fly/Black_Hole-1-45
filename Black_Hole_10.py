@@ -565,7 +565,7 @@ class compression:
                                             TUPLE=""
                                             #print(INFO)
                                             while block<long_F:
-                                                    F=Transform[block:block+15]
+                                                    F=Transform[block:block+23]
                                                     #print(F)
                                                     F2=0
                                                     F3=0
