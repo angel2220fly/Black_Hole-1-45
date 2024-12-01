@@ -234,7 +234,7 @@ class compression:
                                     block = 0
                                     long_after_bits = len(INFO)
                                     Transform = INFO
-                                    long_F = len(I8)
+                                    long_F = len(Transform)
                                     T10 = ""
                                     c_c = 0
                                     
@@ -242,6 +242,7 @@ class compression:
                                         block=0
                                         is_not_compress=0
                                         F9=0
+                                        #print()
                                         while block<long_F:
                                             F=Transform[block:block+16]
                                             if len(F)==8:
@@ -281,29 +282,8 @@ class compression:
                                                 F2=0
                                                 F3=0
                                                 
-                                                while F3!=1:
-                                                
-                                                    F1=format(F2,'015b')
-                                                        
-                                                    M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
-                                                    
-                                                    if M2 == 0:
-                                                        M5 = (int(F1, 2) // 2) + 1 # Modify M3 based on the logic
-                                                    else:
-                                                        M5 = (int(F1, 2) // 2) + 3 # Modify M3 based on the logic
-                                                    M6=format(M5,'015b')
-                                                 
-
-                                                    if M6==M7 and F1==F4:
-                                                                                                                                                     F4=format(F8,'015b')
-                                                                                                                                                     #print(F4)
-                                                                                                                                                     
-                                                                                                                                                     
-                                                                                                                                                     F3=1
-                                                                                                                                             
-                                                                                                                                               
-                                                    F2+=1                                                                                             
-                                     
+                                                F4=format(F8,'015b')
+                                                                                                        
                                                 M4=format(M3,'015b')
                                                 if F9==1:
                                                     F4=F
@@ -330,22 +310,26 @@ class compression:
                                     INFO = T10
                                     T8 = T10
                                     
+                                    if is_not_compress==0:
+                                        INFOS=INFO
                                     if is_not_compress==1:
-                                        INFO="00000000"+Transform[1:]
-                                        
+                                        times_compress-=1
+                                                   
 
 
                                     long_one_time = len(T10)
                                     #print(long_one_time)
+                                    #print(len(INFO))
 
                                     if (
-                                        long_one_time <= 256 or times_compress==(2**24)-1
+                                        long_one_time <= 256 or times_compress==(2**24)-1 or is_not_compress==1
                                         
                                     ):
                                         stop_compress = 1
                                         Compress_file = 1
                                     long_bits_after_b_1 = 1
                                     times_compress += 1
+                                    INFO=INFOS
                                     
 
                                 # print(Compress_file)
@@ -598,7 +582,7 @@ class compression:
         
                                             long_L = len(TUPLE)
                                             Tc += 1
-                                            # print(Tc)
+                                            #print(Tc)
         
                                             if tce == Tc:
                                                 Extract1 = 1
