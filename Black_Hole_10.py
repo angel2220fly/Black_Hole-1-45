@@ -32,14 +32,14 @@ class compression:
 
 
             name = input("What is name of file input? ")
-
+            C_1= input("compress: 1 or Extract: 2 ? ")
 
             long_21 = len(name)
 
             name_f = name[long_21 - 4:]
             
        
-            if name_f==".bin":
+            if C_1=="2":
 
                 i = 2
 
