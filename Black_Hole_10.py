@@ -70,6 +70,7 @@ class compression:
             C2 = 0
             C3 = 0
             C4 = 0
+            F10=0
            
             ZEROS_ONE_1 = ""
             Circle_times = 0
@@ -317,7 +318,9 @@ class compression:
                                     if is_not_compress==0:
                                         INFOS=INFO
                                     elif is_not_compress==1 and times_compress==0:
-                                              INFOS="00000000"+INFO                            
+                                              F10=1
+                                              INFOS=INFO
+                                                             
                                                                             
                                     elif is_not_compress==1 and times_compress!=0:
                                     
@@ -393,6 +396,10 @@ class compression:
                                             + I_F_A
                                             + INFO
                                         )
+                                        if F10==1:
+                                            File_information5_17="00000000"+File_information5_17
+                                            #print(INFO)
+                                        
 
                                         long_1 = len(File_information5_17)
                                         add_bits = ""
@@ -458,10 +465,12 @@ class compression:
                             if C == 1:
                                 Extract1 = 0
                                 File_information5 = INFO
+                                #print(INFO)
                                 if INFO[:8]=="00000000":
                                     
                                     INFO=INFO[8:]
                                     TUPLE1=INFO
+                                    #print(TUPLE1)
                                 
 
                                 # extract
