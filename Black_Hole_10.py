@@ -102,6 +102,10 @@ class compression:
             with open(name, "rb") as binary_file:
 
                 data = binary_file.read()
+                if i==2:
+                    import paq
+                    data=paq.decompress(data)
+                    
                 s = str(data)
 
                 long_11 = len(data)
@@ -437,6 +441,9 @@ class compression:
                                         File_information5_2 = Clear
 
                                         jl = width_bits3
+                                        
+                                        import paq
+                                        jl=paq.compress(jl)
 
                                         name1 = name + ".bin"
 
