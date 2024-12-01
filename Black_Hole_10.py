@@ -245,12 +245,12 @@ class compression:
                                         F9=0
                                         #print()
                                         while block<long_F:
-                                            F=Transform[block:block+16]
+                                            F=Transform[block:block+24]
                                             if len(F)==8:
                                                 F4=F
                                                 F9=1
                                             F8=int(F,2)
-                                            F4=format(F8,'015b')
+                                            F4=format(F8,'023b')
                                             
                                            
                                             
@@ -267,26 +267,26 @@ class compression:
                                                 else:
                                                     M3 = (int(F, 2) // 2) +3  # Modify M3 based on the logic
                                      
-                                                M4=format(M3,'015b')
+                                                M4=format(M3,'023b')
                                                 #print(len(M4))
                                                 #print("compress: binary from str:", M4)
-                                                M7=format(M3,'015b')
+                                                M7=format(M3,'023b')
                                                 
         
                                                 encoded_result=M4
                                                 
                                                 #Decode:
                                                     
-                                                if len(M4)==16:
+                                                if len(M4)==24:
                                                     is_not_compress=1
                                                     #print(M4)
                                                     
                                                 F2=0
                                                 F3=0
                                                 
-                                                F4=format(F8,'015b')
+                                                F4=format(F8,'023b')
                                                                                                         
-                                                M4=format(M3,'015b')
+                                                M4=format(M3,'023b')
                                                 if F9==1:
                                                     F4=F
                                                 T10+=F4
@@ -296,7 +296,7 @@ class compression:
                                                 
                                                 
                                                 
-                                            block+=16
+                                            block+=24
                                             #print(block) 
                                     
                                         
@@ -582,7 +582,7 @@ class compression:
                                                     
                                                         while F3!=1:
                                                             
-                                                                F1=format(F2,'016b')
+                                                                F1=format(F2,'024b')
                                                                     
                                                                 M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
                                                                 
@@ -590,7 +590,7 @@ class compression:
                                                                     M5 = (int(F1, 2) // 2) + 1  # Modify M3 based on the logic
                                                                 else:
                                                                     M5 = (int(F1, 2) // 2) + 3  # Modify M3 based on the logic
-                                                                M6=format(M5,'015b')
+                                                                M6=format(M5,'023b')
                                                                 if F==M6:
                                                                     TUPLE+=F1
                                                                     F3=1
