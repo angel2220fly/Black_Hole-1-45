@@ -250,7 +250,7 @@ class compression:
                                         #print()
                                         while block<long_F:
                                             F=Transform[block:block+24]
-                                            if len(F)==8:
+                                            if len(F)<=16:
                                                 F4=F
                                                 F9=1
                                             F8=int(F,2)
@@ -576,7 +576,7 @@ class compression:
                                                     #print(F)
                                                     F2=0
                                                     F3=0
-                                                    if len(F)==8:
+                                                    if len(F)<=16:
                                                         
                                                     
                                                         block+=15
