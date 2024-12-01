@@ -278,6 +278,7 @@ class compression:
                                                     
                                                 if len(M4)==16:
                                                     is_not_compress=1
+                                                    #print(M4)
                                                     
                                                 F2=0
                                                 F3=0
@@ -330,6 +331,8 @@ class compression:
                                         Compress_file = 1
                                     long_bits_after_b_1 = 1
                                     times_compress += 1
+                                    if len(INFOS)==0:
+                                        raise SystemExit
                                     INFO=INFOS
                                     
 
