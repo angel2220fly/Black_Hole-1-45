@@ -595,7 +595,7 @@ class compression:
                                                                     TUPLE+=F1
                                                                     F3=1
                                                                 F2+=1
-                                                        block+=15
+                                                        block+=23
                                                         #print(block)                                                        
                                                             
                                                                                                   
