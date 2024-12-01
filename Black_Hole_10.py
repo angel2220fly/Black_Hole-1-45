@@ -541,7 +541,7 @@ class compression:
                                             F3=0
                                             block=0
                                             TUPLE=""
-                                            print(INFO)
+                                            #print(INFO)
                                             while block<long_F:
                                                     F=Transform[block:block+15]
                                                     #print(F)
@@ -584,7 +584,7 @@ class compression:
         
                                             long_L = len(TUPLE)
                                             Tc += 1
-                                            print(Tc)
+                                            #print(Tc)
         
                                             if tce == Tc:
                                                 Extract1 = 1
