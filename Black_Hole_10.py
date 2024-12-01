@@ -310,11 +310,21 @@ class compression:
 
                                     INFO = T10
                                     T8 = T10
+                                    #is_not_compress=1
+                                    
+                                        
                                     
                                     if is_not_compress==0:
                                         INFOS=INFO
-                                    if is_not_compress==1:
+                                    elif is_not_compress==1 and times_compress==0:
+                                              INFOS="00000000"+INFO                            
+                                                                            
+                                    elif is_not_compress==1 and times_compress!=0:
+                                    
                                         times_compress-=1
+
+                                        
+                                        
                                         #print(times_compress)
                                                    
 
