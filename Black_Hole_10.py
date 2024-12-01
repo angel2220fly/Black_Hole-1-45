@@ -582,7 +582,7 @@ class compression:
                                                     if len(F)<=22:
                                                         
                                                     
-                                                        block+=15
+                                                        block+=23
                                                         TUPLE+=F
                                                         
                                                         
