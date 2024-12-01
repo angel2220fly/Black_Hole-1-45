@@ -339,7 +339,7 @@ class compression:
                                     #print(long_one_time)
 
                                     if (
-                                        long_one_time <= 256 or times_compress==0
+                                        long_one_time <= 256 or times_compress==(2**24)-1
                                         
                                     ):
                                         stop_compress = 1
