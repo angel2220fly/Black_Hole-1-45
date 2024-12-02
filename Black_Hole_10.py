@@ -480,7 +480,42 @@ class compression:
                                     
                                     INFO=INFO[8:]
                                     TUPLE1=INFO
-                                    #print(TUPLE1)
+                                    bfnz=len(TUPLE1)
+                                    Extract1=1
+    
+                                    if Extract1 == 1:
+                                        num4 = int(TUPLE1, 2)
+                                        # print(num4)
+                                        C19 = "0" + str(bfnz) + "b"
+                                        TUPLE1 = format(num4, C19)
+                                        File_information5_17 = TUPLE1                                    
+                                    
+                                    if Extract1 == 1:
+                                        num4 = int(TUPLE1, 2)
+                                        # print(num4)
+                                        C19 = "0" + str(bfnz) + "b"
+                                        TUPLE1 = format(num4, C19)
+                                        File_information5_17 = TUPLE1
+    
+                                    if Extract1 == 1:
+                                        L = len(File_information5_17)
+                                        n = int(File_information5_17, 2)
+                                        width_bits = "%0" + str((L // 8) * 2) + "x"
+                                        width_bits3 = binascii.unhexlify(
+                                            width_bits % n
+                                        )
+                                        width_bits2 = len(width_bits3)
+                                        name2 = name[:-2]
+                                        start_time = time()
+                                        with open(name2, "wb") as f2:
+                                            f2.write(width_bits3)
+                                        elapsed_time = time() - start_time
+                                        speed_bits = (long_11 * 8) // float(
+                                            elapsed_time
+                                        )
+                                        print(f"Speed bits: {speed_bits:.5f}")
+                                        print("checker seccefully")
+                                        return str(elapsed_time)                                   
                                 
 
                                 # extract
