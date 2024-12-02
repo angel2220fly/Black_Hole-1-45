@@ -294,6 +294,9 @@ class compression:
                                                 F4=format(F8,'023b')
                                                                                                         
                                                 M4=format(M3,'023b')
+                                                #print(len(M4))
+                                                if len(M4)==24:
+                                                    is_not_compress=1
                                                 if F9==1:
                                                     F4=F
                                                 T10+=F4
@@ -652,7 +655,7 @@ class compression:
                                             while block<long_F:
                                                     F=Transform[block:block+23]
                                                     #print(F)
-                                                    F2=0
+                                                    F2=16777000
                                                     F3=0
                                                     if len(F)<=22:
                                                         
@@ -676,6 +679,7 @@ class compression:
                                                                 else:
                                                                     M5 = (int(F1, 2) // 2) + 4  # Modify M3 based on the logic
                                                                 M6=format(M5,'023b')
+                                                                #print(M6)
                                                                 if F==M6:
                                                                     TUPLE+=F1
                                                                     F3=1
