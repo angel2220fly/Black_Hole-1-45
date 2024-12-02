@@ -257,6 +257,7 @@ class compression:
                                                 F4=F
                                                 F9=1
                                             F8=int(F,2)
+                                            #print(F8)
                                             F4=format(F8,'023b')
                                             
                                            
@@ -294,7 +295,7 @@ class compression:
                                                 F4=format(F8,'023b')
                                                                                                         
                                                 M4=format(M3,'023b')
-                                                #print(len(M4))
+                                                #print(M4)
                                                 if len(M4)==24:
                                                     is_not_compress=1
                                                 if F9==1:
@@ -655,7 +656,7 @@ class compression:
                                             while block<long_F:
                                                     F=Transform[block:block+23]
                                                     #print(F)
-                                                    F2=16777000
+                                                    F2=0
                                                     F3=0
                                                     if len(F)<=22:
                                                         
@@ -666,9 +667,11 @@ class compression:
                                                         
                                                     if len(F)!=8:
                                                       
+                                                      while F3!=1:
+                                                      
                                                 
                                                     
-                                                        while F3!=1:
+                                                     
                                                             
                                                                 F1=format(F2,'024b')
                                                                     
@@ -684,7 +687,7 @@ class compression:
                                                                     TUPLE+=F1
                                                                     F3=1
                                                                 F2+=1
-                                                        block+=23
+                                                                block+=23
                                                         #print(block)                                                        
                                                             
                                                                                                   
