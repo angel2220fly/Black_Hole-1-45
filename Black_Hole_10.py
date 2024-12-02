@@ -32,6 +32,8 @@ class compression:
 
 
             name = input("What is name of file input? ")
+            
+            compress_extract=input("Compress: 1 extract: 2? ")
            
 
             long_21 = len(name)
@@ -39,7 +41,7 @@ class compression:
             name_f = name[long_21 - 2:]
             
        
-            if name_f==".b":
+            if compress_extract=="2":
 
                 i = 2
 
@@ -249,7 +251,8 @@ class compression:
                                         is_not_compress=0
                                         F9=0
                                         #print()
-                                     
+                                        MF9=0
+                                        MF10=format(MF9,'05b')                                     
                                         while block<long_F:
                                             F=Transform[block:block+24]
                                             if len(F)==23:
@@ -260,7 +263,7 @@ class compression:
                                                 F9=1
                                                 
                                             
-                                               
+                                             
                                              
                                                 MF9=len(F)
                                                 MF10=format(MF9,'05b')
@@ -407,7 +410,7 @@ class compression:
                                         I_F_A_L = format(len(I_F_A), "08b")
                                         File_information5_17 = (
                                             "1"
-                                            +MF10
+                                            + MF10
                                             + times_255p
                                             + times_255
                                             + times_compression_format
@@ -710,9 +713,10 @@ class compression:
                                                                 #print(M6)
                                                                 if F==M6:
                                                                     TUPLE+=F1
+                                                                    block+=23
                                                                     F3=1
                                                                 F2+=1
-                                                        block+=23
+                                                        
                                                         #print(block)         
                                                                 
                                                         #print(block)                                                        
