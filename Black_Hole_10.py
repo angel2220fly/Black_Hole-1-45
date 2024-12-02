@@ -36,10 +36,10 @@ class compression:
 
             long_21 = len(name)
 
-            name_f = name[long_21 - 4:]
+            name_f = name[long_21 - 2:]
             
        
-            if name_f==".bin":
+            if name_f==".b":
 
                 i = 2
 
@@ -469,7 +469,7 @@ class compression:
                                         
                                       
 
-                                        name1 = name + ".bin"
+                                        name1 = name + ".b"
 
                                         with open(name1, "wb") as f2:
 
