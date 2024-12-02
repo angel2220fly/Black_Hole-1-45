@@ -686,8 +686,9 @@ class compression:
                                                                 if F==M6:
                                                                     TUPLE+=F1
                                                                     F3=1
+                                                                    block+=23
                                                                 F2+=1
-                                                                block+=23
+                                                                
                                                         #print(block)                                                        
                                                             
                                                                                                   
