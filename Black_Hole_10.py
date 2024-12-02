@@ -471,6 +471,65 @@ class compression:
                                         return xs
 
                         if i == 2:
+                            
+
+
+                            def process_file(Extract1, TUPLE1, bfnz, long_11, name):
+                                """
+                                Processes a binary file: 
+                                - Formats binary strings
+                                - Converts binary to raw bytes
+                                - Writes to a new file
+                                - Calculates and displays processing speed
+                                """
+                                if Extract1 == 1:
+                                    # Convert binary string to an integer
+                                    num4 = int(TUPLE1, 2)
+                                    
+                                    # Format integer back to binary with specified width
+                                    C19 = "0" + str(bfnz) + "b"
+                                    TUPLE1 = format(num4, C19)
+                                    
+                                    # Store formatted binary string
+                                    File_information5_17 = TUPLE1
+                            
+                                    # Get length of the binary string
+                                    L = len(File_information5_17)
+                                    
+                                    # Convert binary string to an integer
+                                    n = int(File_information5_17, 2)
+                                    
+                                    # Prepare format for hexadecimal representation
+                                    width_bits = "%0" + str((L // 8) * 2) + "x"
+                                    
+                                    # Convert hexadecimal to raw bytes
+                                    width_bits3 = binascii.unhexlify(width_bits % n)
+                                    
+                                    # Determine the size of the byte data
+                                    width_bits2 = len(width_bits3)
+                                    
+                                    # Prepare the output filename by trimming the last two characters
+                                    name2 = name[:-2]
+                                    
+                                    # Write raw bytes to a new file
+                                    start_time = time()
+                                    with open(name2, "wb") as f2:
+                                        f2.write(width_bits3)
+                                    elapsed_time = time() - start_time
+                                    
+                                    # Calculate the speed in bits per second
+                                    speed_bits = (long_11 * 8) / float(elapsed_time)
+                                    
+                                    # Output results
+                                    print(f"Speed bits: {speed_bits:.5f} bps")
+                                    print("Checker successfully")
+                                    
+                                    # Return elapsed time as a string
+                                    return str(elapsed_time)
+                            
+                            # Example of how to call the function:
+                            # elapsed_time = process_file(1, "1010101010101010", 16, 1024, "output.bin")
+                            # print(f"Elapsed time: {elapsed_time} seconds")                            
 
                             if C == 1:
                                 Extract1 = 0
@@ -482,40 +541,19 @@ class compression:
                                     TUPLE1=INFO
                                     bfnz=len(TUPLE1)
                                     Extract1=1
-    
-                                    if Extract1 == 1:
-                                        num4 = int(TUPLE1, 2)
-                                        # print(num4)
-                                        C19 = "0" + str(bfnz) + "b"
-                                        TUPLE1 = format(num4, C19)
-                                        File_information5_17 = TUPLE1                                    
+                                    # Call the function
+                                    x3 = process_file(Extract1, TUPLE1, bfnz, long_11, name)
+                                
                                     
-                                    if Extract1 == 1:
-                                        num4 = int(TUPLE1, 2)
-                                        # print(num4)
-                                        C19 = "0" + str(bfnz) + "b"
-                                        TUPLE1 = format(num4, C19)
-                                        File_information5_17 = TUPLE1
-    
-                                    if Extract1 == 1:
-                                        L = len(File_information5_17)
-                                        n = int(File_information5_17, 2)
-                                        width_bits = "%0" + str((L // 8) * 2) + "x"
-                                        width_bits3 = binascii.unhexlify(
-                                            width_bits % n
-                                        )
-                                        width_bits2 = len(width_bits3)
-                                        name2 = name[:-2]
-                                        start_time = time()
-                                        with open(name2, "wb") as f2:
-                                            f2.write(width_bits3)
-                                        elapsed_time = time() - start_time
-                                        speed_bits = (long_11 * 8) // float(
-                                            elapsed_time
-                                        )
-                                        print(f"Speed bits: {speed_bits:.5f}")
-                                        print("checker seccefully")
-                                        return str(elapsed_time)                                   
+                                    print(f"Elapsed time: {x3} seconds")  
+                                    
+                                    print("checker seccefully")
+
+                                    xs = float(x3)
+
+                                    xs = str(xs)
+
+                                    return xs                                                                                                           
                                 
 
                                 # extract
@@ -658,32 +696,17 @@ class compression:
                                             if tce == Tc:
                                                 Extract1 = 1
     
-                                    if Extract1 == 1:
-                                        num4 = int(TUPLE1, 2)
-                                        # print(num4)
-                                        C19 = "0" + str(bfnz) + "b"
-                                        TUPLE1 = format(num4, C19)
-                                        File_information5_17 = TUPLE1
-    
-                                    if Extract1 == 1:
-                                        L = len(File_information5_17)
-                                        n = int(File_information5_17, 2)
-                                        width_bits = "%0" + str((L // 8) * 2) + "x"
-                                        width_bits3 = binascii.unhexlify(
-                                            width_bits % n
-                                        )
-                                        width_bits2 = len(width_bits3)
-                                        name2 = name[:-2]
-                                        start_time = time()
-                                        with open(name2, "wb") as f2:
-                                            f2.write(width_bits3)
-                                        elapsed_time = time() - start_time
-                                        speed_bits = (long_11 * 8) // float(
-                                            elapsed_time
-                                        )
-                                        print(f"Speed bits: {speed_bits:.5f}")
-                                        print("checker seccefully")
-                                        return str(elapsed_time)
+                                    # Call the function
+                                    x3 = process_file(Extract1, TUPLE1, bfnz, long_11, name)
+                                    print(f"Elapsed time: {x3} seconds")  
+                                    
+                                    print("checker seccefully")
+
+                                    xs = float(x3)
+
+                                    xs = str(xs)
+
+                                    return xs                                            
 
 
 d = compression()
