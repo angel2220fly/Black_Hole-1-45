@@ -270,7 +270,7 @@ class compression:
                                                 M2 = int(F, 2) % 2  # Get the modulo of Transform when divided by 2
                                                 
                                                 if M2 == 0:
-                                                    M3 = (int(F, 2) // 2) +1  # Modify M3 based on the logic
+                                                    M3 = (int(F, 2) // 2) -4# Modify M3 based on the logic
                                                 else:
                                                     M3 = (int(F, 2) // 2) +4  # Modify M3 based on the logic
                                      
@@ -672,7 +672,7 @@ class compression:
                                                                 M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
                                                                 
                                                                 if M2 == 0:
-                                                                    M5 = (int(F1, 2) // 2) + 1  # Modify M3 based on the logic
+                                                                    M5 = (int(F1, 2) // 2) - 4  # Modify M3 based on the logic
                                                                 else:
                                                                     M5 = (int(F1, 2) // 2) + 4  # Modify M3 based on the logic
                                                                 M6=format(M5,'023b')
