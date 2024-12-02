@@ -323,7 +323,7 @@ class compression:
                                         
                                     
                                     if is_not_compress==0:
-                                        INFOS=INFO
+                                        INFOS="1"+INFO
                                     elif is_not_compress==1 and times_compress==0:
                                               F10=1
                                               INFOS=INFO
@@ -563,10 +563,12 @@ class compression:
                                         while Extract1 != 1:
                                             # 1 bits 21
                                             # 0 19
-                                            long_F = len(INFO)
+
                                             #print(long_F)
                                             
-                                            Transform=INFO
+                                            Transform=INFO[1:]
+                                            #print(INFO)
+                                            long_F = len(Transform)                                            
                                             
                                             compressed=Transform
                                             F2=0
