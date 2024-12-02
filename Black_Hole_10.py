@@ -32,14 +32,14 @@ class compression:
 
 
             name = input("What is name of file input? ")
-            C_1= input("compress: 1 or Extract: 2 ? ")
+           
 
             long_21 = len(name)
 
             name_f = name[long_21 - 4:]
             
        
-            if C_1=="2":
+            if name_f==".bin":
 
                 i = 2
 
@@ -105,6 +105,7 @@ class compression:
                 if i==2:
                     import paq
                     data=paq.decompress(data)
+               
                     
                 s = str(data)
 
@@ -248,6 +249,8 @@ class compression:
                                         is_not_compress=0
                                         F9=0
                                         #print()
+                                        MF9=0
+                                        MF10=format(MF9,'05b')
                                         while block<long_F:
                                             F=Transform[block:block+24]
                                             if len(F)==23:
@@ -256,8 +259,15 @@ class compression:
                                             if len(F)<=22:
                                                 F4=F
                                                 F9=1
-                                            F8=int(F,2)
+                                                
+                                            
+                                               
+                                             
+                                                MF9=len(F)
+                                                MF10=format(MF9,'05b')
+                                                #print(MF10)
                                             #print(F8)
+                                            F8=int(F,2)
                                             F4=format(F8,'023b')
                                             
                                            
@@ -324,7 +334,7 @@ class compression:
                                     T8 = T10
                                     #is_not_compress=1
                                     
-                                        
+                                    #print(is_not_compress)
                                     
                                     if is_not_compress==0:
                                         INFOS="1"+INFO
@@ -348,7 +358,7 @@ class compression:
                                     #print(len(INFO))
 
                                     if (
-                                            long_one_time <= 256 or times_compress==(2**24)-1 or is_not_compress==1
+                                            times_compress==0
                                         
                                     ):
                                         stop_compress = 1
@@ -398,6 +408,7 @@ class compression:
                                         I_F_A_L = format(len(I_F_A), "08b")
                                         File_information5_17 = (
                                             "1"
+                                            +MF10
                                             + times_255p
                                             + times_255
                                             + times_compression_format
@@ -451,6 +462,12 @@ class compression:
                                         
                                         import paq
                                         jl=paq.compress(jl)
+                                        
+                                     
+                                        
+                                     
+                                        
+                                      
 
                                         name1 = name + ".bin"
 
@@ -589,7 +606,10 @@ class compression:
                                     if Circle_times3 == 0:
                                         # times count extract
                                         
-     
+                                        
+                                        MF10=int(INFO[:5], 2)
+                                        
+                                        INFO = INFO[5:]     
     
                                         CEI = int(INFO[:16], 2)
     
@@ -655,6 +675,8 @@ class compression:
                                             #print(INFO)
                                             while block<long_F:
                                                     F=Transform[block:block+23]
+                                                 
+                                                    
                                                     #print(F)
                                                     F2=0
                                                     F3=0
@@ -662,31 +684,30 @@ class compression:
                                                         
                                                     
                                                         block+=23
-                                                        TUPLE+=F
+                                                        F1=int(F,2)
+                                                  
+                                                        
+                                                       
+                                                         
+                                                      
+                                                        
                                                         
                                                         
                                                     if len(F)!=8:
+                                                                M2 = int(F, 2) % 2
                                                       
-                                                      while F3!=1:
-                                                      
-                                                
-                                                    
-                                                     
-                                                            
-                                                                F1=format(F2,'024b')
-                                                                    
-                                                                M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
+
                                                                 
                                                                 if M2 == 0:
-                                                                    M5 = (int(F1, 2) // 2) - 4  # Modify M3 based on the logic
+                                                                    M5 = (int(F, 2) * 2) +4  # Modify M3 based on the logic
                                                                 else:
-                                                                    M5 = (int(F1, 2) // 2) + 4  # Modify M3 based on the logic
-                                                                M6=format(M5,'023b')
+                                                                    M5 = (int(F, 2) * 2) -4  # Modify M3 based on the logic
+                                                                M6=format(M5,'024b')
                                                                 #print(M6)
-                                                                if F==M6:
-                                                                    TUPLE+=F1
-                                                                    F3=1
-                                                                    block+=23
+                                                               
+                                                                TUPLE+=M6
+                                                                F3=1
+                                                                block+=23
                                                                 F2+=1
                                                                 
                                                         #print(block)                                                        
@@ -696,10 +717,18 @@ class compression:
                                             TUPLE1 = TUPLE
                                             INFO = TUPLE
                                             #print(INFO)
+                                            M14=len(TUPLE)
+                                            
+                                            
+                                            
+                                            TUPLE1=TUPLE1[:M14-24]+TUPLE1[M14-MF10:]
+                                            TUPLE=TUPLE1
+                                               
+                                           
         
                                             long_L = len(TUPLE)
                                             Tc += 1
-                                            #print(Tc)
+                                            #print(long_L)
         
                                             if tce == Tc:
                                                 Extract1 = 1
