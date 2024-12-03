@@ -421,7 +421,7 @@ class compression:
                                             + INFO
                                         )
                                         if F10==1:
-                                            File_information5_17="00000000"+INFO
+                                            File_information5_17="00000000"+File_information5_17
                                             #print(INFO)
                                         
 
