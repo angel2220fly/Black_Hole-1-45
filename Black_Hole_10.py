@@ -32,16 +32,14 @@ class compression:
 
 
             name = input("What is name of file input? ")
-            
-            compress_extract=input("Compress: 1 extract: 2? ")
            
 
             long_21 = len(name)
 
-            name_f = name[long_21 - 2:]
+            name_f = name[long_21 - 4:]
             
        
-            if compress_extract=="2":
+            if name_f==".bin":
 
                 i = 2
 
@@ -252,7 +250,7 @@ class compression:
                                         F9=0
                                         #print()
                                         MF9=0
-                                        MF10=format(MF9,'05b')                                     
+                                        MF10=format(MF9,'05b')
                                         while block<long_F:
                                             F=Transform[block:block+24]
                                             if len(F)==23:
@@ -263,7 +261,7 @@ class compression:
                                                 F9=1
                                                 
                                             
-                                             
+                                               
                                              
                                                 MF9=len(F)
                                                 MF10=format(MF9,'05b')
@@ -339,7 +337,7 @@ class compression:
                                     #print(is_not_compress)
                                     
                                     if is_not_compress==0:
-                                        INFOS=INFO
+                                        INFOS="1"+INFO
                                     elif is_not_compress==1 and times_compress==0:
                                               F10=1
                                               INFOS=INFO
@@ -410,7 +408,7 @@ class compression:
                                         I_F_A_L = format(len(I_F_A), "08b")
                                         File_information5_17 = (
                                             "1"
-                                            + MF10
+                                            +MF10
                                             + times_255p
                                             + times_255
                                             + times_compression_format
@@ -471,7 +469,7 @@ class compression:
                                         
                                       
 
-                                        name1 = name + ".b"
+                                        name1 = name + ".bin"
 
                                         with open(name1, "wb") as f2:
 
@@ -665,7 +663,7 @@ class compression:
 
                                             #print(long_F)
                                             
-                                            Transform=INFO
+                                            Transform=INFO[1:]
                                             #print(INFO)
                                             long_F = len(Transform)                                            
                                             
@@ -696,28 +694,21 @@ class compression:
                                                         
                                                         
                                                     if len(F)!=8:
+                                                                M2 = int(F, 2) % 2
                                                       
-                                                
-                                                    
-                                                        while F3!=1:
-                                                            
-                                                                F1=format(F2,'024b')
-                                                                    
-                                                                M2 = int(F1, 2) % 2  # Get the modulo of Transform when divided by 2
+
                                                                 
                                                                 if M2 == 0:
-                                                                    M5 = (int(F1, 2) // 2) - 4  # Modify M3 based on the logic
+                                                                    M5 = (int(F, 2) * 2) +4  # Modify M3 based on the logic
                                                                 else:
-                                                                    M5 = (int(F1, 2) // 2) + 4  # Modify M3 based on the logic
-                                                                M6=format(M5,'023b')
+                                                                    M5 = (int(F, 2) * 2) -4  # Modify M3 based on the logic
+                                                                M6=format(M5,'024b')
                                                                 #print(M6)
-                                                                if F==M6:
-                                                                    TUPLE+=F1
-                                                                    block+=23
-                                                                    F3=1
+                                                               
+                                                                TUPLE+=M6
+                                                                F3=1
+                                                                block+=23
                                                                 F2+=1
-                                                        
-                                                        #print(block)         
                                                                 
                                                         #print(block)                                                        
                                                             
@@ -728,11 +719,10 @@ class compression:
                                             #print(INFO)
                                             M14=len(TUPLE)
                                             
-                                            #print(MF10)
                                             
-                                            TUPLE1=TUPLE1[:M14-24]+TUPLE1[M14-MF10:]
+                                            if MF10!=24:
+                                                TUPLE1=TUPLE1[:M14-24]+TUPLE1[M14-MF10:]
                                             TUPLE=TUPLE1
-                                            #print(TUPLE)
                                                
                                            
         
