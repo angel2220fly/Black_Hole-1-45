@@ -1,79 +1,72 @@
 import random
 import os
-import paq
 
-# Pseudorandom number generator for compression
-def prng_compress(data):
-    compressed = []
-    seed = random.randint(0, 2**24 - 1)  # Random seed for compression
+def prng_compress(data, seed):
+    """Compresses data using a PRNG with a given seed."""
     random.seed(seed)
-    for char in data:
-        compressed.append(chr((ord(char) ^ random.randint(0, 255)) % 256))  # XOR with random number
-    return ''.join(compressed), seed
+    compressed = bytes([ord(c) ^ random.randint(0, 255) for c in data])
+    return compressed
 
-# Pseudorandom number generator for extraction
 def prng_extract(compressed_data, seed):
-    extracted = []
+    """Extracts data using a PRNG with a given seed."""
     random.seed(seed)
-    for char in compressed_data:
-        extracted.append(chr((ord(char) ^ random.randint(0, 255)) % 256))  # Reverse XOR
-    return ''.join(extracted)
+    extracted = ''.join([chr(c ^ random.randint(0, 255)) for c in compressed_data])
+    return extracted
 
-# Compress file using PRNG first, then zlib
 def compress_file():
-    input_file_name = input("Enter the input file name for compression: ")
-    if not os.path.exists(input_file_name):
-        print("The specified file does not exist.")
+    """Compresses a file using PRNG and zlib."""
+    input_filename = input("Enter input filename: ")
+    if not os.path.exists(input_filename):
+        print("File not found.")
         return
 
-    with open(input_file_name, 'rb') as f:
-        input_data = f.read()  # Read the entire file in binary mode
+    try:
+        with open(input_filename, 'rb') as infile:
+            data = infile.read()
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return
 
-    # Convert binary data to string for PRNG compression
-    input_data_str = ''.join(map(chr, input_data))
-    prng_compressed_data, seed = prng_compress(input_data_str)  # PRNG compression
+    seed = random.randint(0, 2**24 - 1)
+    compressed_data = prng_compress(data.decode('latin-1', errors='replace'), seed) #Handle potential encoding issues
+    zlib_compressed = compressed_data
 
-    # Convert PRNG-compressed data to bytes
-    prng_compressed_bytes = prng_compressed_data.encode('utf-8')
+    output_filename = input("Enter output filename: ")
+    try:
+        with open(output_filename, 'wb') as outfile:
+            outfile.write(seed.to_bytes(3, 'big'))
+            outfile.write(zlib_compressed)
+        print(f"File compressed to {output_filename}")
+    except Exception as e:
+        print(f"Error writing file: {e}")
 
-    # Apply zlib compression to PRNG output
-    zlib_compressed_data = paq.compress(prng_compressed_bytes)
 
-    output_file_name = input("Enter the output file name for compressed data: ")
-    with open(output_file_name, 'wb') as f:
-        f.write(seed.to_bytes(3, 'big'))  # Save the seed as 3 bytes
-        f.write(zlib_compressed_data)  # Save zlib-compressed data
-    print(f"File compressed and saved to {output_file_name}")
-
-# Extract file compressed with PRNG and zlib
 def extract_file():
-    input_file_name = input("Enter the input file name for extraction: ")
-    if not os.path.exists(input_file_name):
-        print("The specified file does not exist.")
+    """Extracts a file compressed with PRNG and zlib."""
+    input_filename = input("Enter input filename: ")
+    if not os.path.exists(input_filename):
+        print("File not found.")
         return
 
-    with open(input_file_name, 'rb') as f:
-        seed = int.from_bytes(f.read(3), 'big')  # Read the 3-byte seed
-        zlib_compressed_data = f.read()  # Read the rest of the file
+    try:
+        with open(input_filename, 'rb') as infile:
+            seed = int.from_bytes(infile.read(3), 'big')
+            zlib_compressed = infile.read()
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return
 
-    # Decompress using zlib
-    prng_compressed_bytes = paq.decompress(zlib_compressed_data)
+    try:
+        compressed_data = zlib_compressed
+        extracted_data = prng_extract(compressed_data, seed)
+        output_filename = input("Enter output filename: ")
+        with open(output_filename, 'wb') as outfile:
+            outfile.write(extracted_data.encode('latin-1', errors='replace')) #Handle potential encoding issues
+        print(f"File extracted to {output_filename}")
+    except Exception as e:
+        print(f"Error extracting file: {e}")
 
-    # Decode PRNG-compressed data to a string
-    prng_compressed_data = prng_compressed_bytes.decode('utf-8')
 
-    # Extract original data using PRNG
-    extracted_data = prng_extract(prng_compressed_data, seed)
-
-    # Convert the extracted string back to bytes
-    extracted_data_bytes = bytes(map(ord, extracted_data))
-
-    output_file_name = input("Enter the output file name for extracted data: ")
-    with open(output_file_name, 'wb') as f:
-        f.write(extracted_data_bytes)  # Save extracted data as binary
-    print(f"Data extracted and saved to {output_file_name}")
-
-# Main program logic
 def main():
     print("Select an option:")
     print("1. Compress File")
@@ -85,7 +78,7 @@ def main():
     elif option == '2':
         extract_file()
     else:
-        print("Invalid option. Please select 1 or 2.")
+        print("Invalid option.")
 
 if __name__ == '__main__':
     main()
