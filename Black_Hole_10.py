@@ -19,7 +19,7 @@ def prng_extract(compressed_data, seed):
         extracted.append(chr((ord(char) ^ random.randint(0, 255)) % 256))  # Reverse XOR
     return ''.join(extracted)
 
-# Compress file using PRNG and zlib
+# Compress file using PRNG first, then zlib
 def compress_file():
     input_file_name = input("Enter the input file name for compression: ")
     if not os.path.exists(input_file_name):
@@ -27,14 +27,17 @@ def compress_file():
         return
 
     with open(input_file_name, 'rb') as f:
-        input_data = f.read()  # Read entire file in binary mode
+        input_data = f.read()  # Read the entire file in binary mode
 
     # Convert binary data to string for PRNG compression
     input_data_str = ''.join(map(chr, input_data))
     prng_compressed_data, seed = prng_compress(input_data_str)  # PRNG compression
 
-    # Apply zlib compression to the PRNG output
-    zlib_compressed_data = paq.compress(prng_compressed_data.encode('utf-8'))
+    # Convert PRNG-compressed data to bytes
+    prng_compressed_bytes = prng_compressed_data.encode('utf-8')
+
+    # Apply zlib compression to PRNG output
+    zlib_compressed_data = paq.compress(prng_compressed_bytes)
 
     output_file_name = input("Enter the output file name for compressed data: ")
     with open(output_file_name, 'wb') as f:
@@ -54,7 +57,10 @@ def extract_file():
         zlib_compressed_data = f.read()  # Read the rest of the file
 
     # Decompress using zlib
-    prng_compressed_data = paq.decompress(zlib_compressed_data).decode('utf-8')
+    prng_compressed_bytes = paq.decompress(zlib_compressed_data)
+
+    # Decode PRNG-compressed data to a string
+    prng_compressed_data = prng_compressed_bytes.decode('utf-8')
 
     # Extract original data using PRNG
     extracted_data = prng_extract(prng_compressed_data, seed)
