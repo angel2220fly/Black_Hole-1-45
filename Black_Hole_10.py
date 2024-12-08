@@ -1,7 +1,6 @@
 import random
 import os
 import paq
-
 print("Created by Jurijus Pacalovas.")
 
 def compress(data):
@@ -11,17 +10,6 @@ def compress(data):
 def decompress(data):
     """Decompress data using zlib."""
     return paq.decompress(data)
-
-def preprocess_data(data):
-    """
-    Preprocess the data to remove the specific byte sequence 00 63 00 00.
-
-    Args:
-        data: The original binary data.
-    Returns:
-        The modified binary data with the specified sequence removed.
-    """
-    return data.replace(b'\x00\x63\x00\x00', b'')
 
 def compress_file_with_prng_size_adjustment(target_size, max_attempts=100, max_random_bytes=100):
     """
@@ -43,9 +31,6 @@ def compress_file_with_prng_size_adjustment(target_size, max_attempts=100, max_r
     except Exception as e:
         print(f"Error reading file: {e}")
         return
-
-    # Preprocess the data to remove the specific byte sequence
-    data = preprocess_data(data)
 
     # Attempt to adjust size by prepending random data
     best_compressed_data = None
