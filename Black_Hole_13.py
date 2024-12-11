@@ -1,8 +1,9 @@
 import random
 import paq
 import os
-import zlib
+
 print("Created by Jurijus Pacalovas.")
+
 def generate_headings_and_variations():
     """Generates data file only if it doesn't already exist."""
     file_name = input("Enter the name of the file to save the output (e.g., table4.txt): ").strip()
@@ -44,13 +45,12 @@ def compress_file(input_filename, output_filename, chunk_size):
                 chunk = infile.read(chunk_size)
                 if not chunk:
                     break
-                compressed_chunk_zlib = zlib.compress(chunk)
-                compressed_chunk_paq = paq.compress(compressed_chunk_zlib)
+                compressed_chunk_paq = paq.compress(chunk)
                 compressed_data += compressed_chunk_paq
 
         with open(output_filename, 'wb') as outfile:
             outfile.write(compressed_data)
-        print(f"Compression successful (zlib + paq). Output saved to {output_filename}")
+        print(f"Compression successful (paq only). Output saved to {output_filename}")
         return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
@@ -69,17 +69,16 @@ def decompress_file(input_filename, output_filename, chunk_size):
                 if not chunk:
                     break
                 decompressed_chunk_paq = paq.decompress(chunk)
-                decompressed_chunk_zlib = zlib.decompress(decompressed_chunk_paq)
-                decompressed_data += decompressed_chunk_zlib
+                decompressed_data += decompressed_chunk_paq
 
         with open(output_filename, 'wb') as outfile:
             outfile.write(decompressed_data)
-        print(f"Decompression successful (paq + zlib). Output saved to {output_filename}")
+        print(f"Decompression successful (paq only). Output saved to {output_filename}")
         return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
         return False
-    except (paq.error, zlib.error) as e:
+    except paq.error as e:
         print(f"Error during decompression: {e}")
         return False
     except Exception as e:
