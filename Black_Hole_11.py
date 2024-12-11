@@ -1,123 +1,77 @@
+import random
 import paq
-from collections import Counter
-import secrets
+import pickle
 import os
-import zlib
 
-def create_opposite_table(data):
-    """Creates an opposite table mapping frequently occurring bytes to shorter values."""
-    frequency = Counter(data)
-    sorted_items = sorted(frequency.items(), key=lambda item: -item[1])
-    table = {item[0]: idx for idx, item in enumerate(sorted_items)}
-    return table
+def generate_headings_and_variations(filename="data.pkl"):
+    """Generates data and saves it to a pickle file."""
+    max_headings = 2**17
+    variations_per_heading = 128
+    half_variations = variations_per_heading // 2
+    random.seed(42)
+    data = {}
+    for heading in range(max_headings):
+        first_half = random.sample(range(256), half_variations)
+        second_half = list(reversed(first_half))
+        variations_8_bits = first_half + second_half
+        data[heading] = variations_8_bits
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f)
+    print(f"Data generated and saved to {filename}")
 
-def compress_with_table(input_filename, output_filename, random_table_filename="table1.bin"):
-    """Compresses the file using an opposite table and a random 8-bit substitution table."""
+
+def compress_file(input_filename, output_filename):
     try:
         with open(input_filename, 'rb') as infile:
             data = infile.read()
-
-        if not data:
-            print("Input file is empty. No data to compress.")
-            return
-
-        table = create_opposite_table(data)
-
-        # Load or generate the random 8-bit substitution table
-        if not os.path.exists(random_table_filename):
-            generate_8bit_random_table(random_table_filename)
-        with open(random_table_filename, 'rb') as rf:
-            random_table = list(rf.read())
-
-
-        compressed_data = bytearray()
-        for byte in data:
-            substituted_byte = random_table[byte] #Substitute using the random table
-            compressed_data.append(table.get(substituted_byte, substituted_byte)) #Apply frequency table
-
-
-        zlib_compressed_data = paq.compress(bytes(compressed_data))
-
+        compressed_data = paq.compress(data)
         with open(output_filename, 'wb') as outfile:
-            table_size = len(table)
-            outfile.write(table_size.to_bytes(4, 'big'))
-            for original, compressed in table.items():
-                outfile.write(original.to_bytes(1, 'big'))
-                outfile.write(compressed.to_bytes(1, 'big'))
-            outfile.write(zlib_compressed_data)
-
-        print(f"Data compressed successfully into {output_filename}.")
-
+            outfile.write(compressed_data)
+        print(f"Compression successful. Output saved to {output_filename}")
     except FileNotFoundError:
-        print(f"Error: File '{input_filename}' not found.")
+        print(f"Error: Input file '{input_filename}' not found.")
     except Exception as e:
-        print(f"Error during compression: {e}")
+        print(f"An error occurred during compression: {e}")
 
-def decompress_with_table(input_filename, output_filename, random_table_filename="table1.bin"):
-    """Decompresses the file."""
+def decompress_file(input_filename, output_filename):
     try:
         with open(input_filename, 'rb') as infile:
-            table_size = int.from_bytes(infile.read(4), 'big')
-            table = {}
-            for _ in range(table_size):
-                original = infile.read(1)[0]
-                compressed = infile.read(1)[0]
-                table[compressed] = original
-            zlib_compressed_data = infile.read()
-
-        with open(random_table_filename, 'rb') as rf:
-            random_table = list(rf.read())
-
-        decompressed_data = paq.decompress(zlib_compressed_data)
-        decompressed_data_final = bytearray()
-        for byte in decompressed_data:
-            original_byte = table.get(byte, byte) #Reverse frequency table
-            decompressed_data_final.append(random_table.index(original_byte)) #Reverse random substitution
-
-
+            compressed_data = infile.read()
+        decompressed_data = paq.decompress(compressed_data)
         with open(output_filename, 'wb') as outfile:
-            outfile.write(decompressed_data_final)
-
-        print(f"Data decompressed successfully into {output_filename}.")
-
+            outfile.write(decompressed_data)
+        print(f"Decompression successful. Output saved to {output_filename}")
     except FileNotFoundError:
-        print(f"Error: File '{input_filename}' not found.")
-    except Exception as e:
+        print(f"Error: Input file '{input_filename}' not found.")
+    except paq.error as e:
         print(f"Error during decompression: {e}")
-
-def generate_8bit_random_table(filename="table1.bin"):
-    """Generates a table of 256 entries, each with 8 random bits, using secrets, and saves it to a file."""
-    rng = secrets.SystemRandom()
-    table = [rng.randint(0, 255) for _ in range(256)]
-
-    with open(filename, "wb") as f:
-        f.write(bytes(table))
-
-    print(f"8-bit random table generated and saved to '{filename}'.")
+    except Exception as e:
+        print(f"An error occurred during decompression: {e}")
 
 
 def main():
+    if not os.path.exists("data.pkl"):
+        generate_headings_and_variations()
+
     while True:
-        print("Choose an option:")
-        print("1: Compress a File")
-        print("2: Decompress a File")
+        print("\nChoose an option:")
+        print("1: Compress the data file")
+        print("2: Decompress a file")
         print("3: Exit")
         choice = input("Enter your choice (1/2/3): ")
 
         if choice == '1':
-            input_file = input("Enter the name of the input file: ")
-            output_file = input("Enter the name of the output file (e.g., output.paq): ")
-            compress_with_table(input_file, output_file)
+            input_file = input("Enter the name of the input file (data.pkl): ")
+            output_file = input("Enter the name of the output file (data.paq): ")
+            compress_file(input_file, output_file)
         elif choice == '2':
-            input_file = input("Enter the name of the input file to decompress: ")
-            output_file = input("Enter the name of the output file (e.g., output_decompressed.txt): ")
-            decompress_with_table(input_file, output_file)
+            input_file = input("Enter the name of the compressed file to decompress (data.paq): ")
+            output_file = input("Enter the name of the output file for decompression (data_decompressed.pkl): ")
+            decompress_file(input_file, output_file)
         elif choice == '3':
-            print("Exiting the program.")
             break
         else:
-            print("Invalid choice, please choose 1, 2, or 3.")
-
+            print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
