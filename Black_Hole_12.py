@@ -1,7 +1,8 @@
 import random
 import paq
 import os
-
+import zlib
+print("Created by Jurijus Pacalovas.")
 def generate_headings_and_variations():
     """Generates data file only if it doesn't already exist."""
     file_name = input("Enter the name of the file to save the output (e.g., table4.txt): ").strip()
@@ -39,10 +40,16 @@ def compress_file(input_filename, output_filename):
     try:
         with open(input_filename, 'rb') as infile:
             data = infile.read()
-        compressed_data = paq.compress(data)
+
+        # Compress with zlib first
+        compressed_zlib = zlib.compress(data)
+
+        # Then compress with paq
+        compressed_paq = paq.compress(compressed_zlib)
+
         with open(output_filename, 'wb') as outfile:
-            outfile.write(compressed_data)
-        print(f"Compression successful. Output saved to {output_filename}")
+            outfile.write(compressed_paq)
+        print(f"Compression successful (zlib + paq). Output saved to {output_filename}")
         return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
@@ -56,15 +63,18 @@ def decompress_file(input_filename, output_filename):
     try:
         with open(input_filename, 'rb') as infile:
             compressed_data = infile.read()
-        decompressed_data = paq.decompress(compressed_data)
+        # Decompress with paq first
+        decompressed_zlib = paq.decompress(compressed_data)
+        # Then decompress with zlib
+        decompressed_data = zlib.decompress(decompressed_zlib)
         with open(output_filename, 'wb') as outfile:
             outfile.write(decompressed_data)
-        print(f"Decompression successful. Output saved to {output_filename}")
+        print(f"Decompression successful (paq + zlib). Output saved to {output_filename}")
         return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
         return False
-    except paq.error as e:
+    except (paq.error, zlib.error) as e:  # Catch errors from both libraries
         print(f"Error during decompression: {e}")
         return False
     except Exception as e:
