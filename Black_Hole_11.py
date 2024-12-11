@@ -2,6 +2,7 @@ import random
 import paq
 import pickle
 import os
+print("Created by Jurijus Pacalovas.")
 
 def generate_headings_and_variations(filename="data.pkl"):
     """Generates data and saves it to a pickle file."""
