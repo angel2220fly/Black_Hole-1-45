@@ -3,7 +3,6 @@ import paq
 import pickle
 import os
 import hashlib
-import zlib
 import io
 
 print("Created by Jurijus Pacalovas.")
@@ -29,23 +28,14 @@ def generate_headings_and_variations(filename="data.pkl"):
 def compress_file(input_filename, output_filename):
     try:
         with open(input_filename, 'rb') as infile:
-            data = pickle.load(infile)
-
-        table_data = data['table']
-        compressed_table = zlib.compress(pickle.dumps(table_data))
-        data['table'] = compressed_table
-        modified_data = pickle.dumps(data)
-        compressed_paq = paq.compress(modified_data)
-
+            data = infile.read() # Read the entire file content
+        compressed_paq = paq.compress(data)
         with open(output_filename, 'wb') as outfile:
             outfile.write(compressed_paq)
-        print(f"Compression successful (table zlib + paq). Output saved to {output_filename}")
+        print(f"Compression successful (paq only). Output saved to {output_filename}")
         return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
-        return False
-    except KeyError:
-        print("Error: 'table' key not found in the pickle file.")
         return False
     except Exception as e:
         print(f"An error occurred during compression: {e}")
@@ -57,17 +47,14 @@ def decompress_file(input_filename, output_filename):
         with open(input_filename, 'rb') as infile:
             compressed_data = infile.read()
         decompressed_data = paq.decompress(compressed_data)
-        data = pickle.loads(decompressed_data)
-        decompressed_table = pickle.loads(zlib.decompress(data['table']))
-        data['table'] = decompressed_table
-        with open(output_filename, 'wb') as outfile:
-            pickle.dump(data, outfile)
-        print(f"Decompression successful (paq + table zlib). Output saved to {output_filename}")
+        with open(output_file, 'wb') as outfile:
+            outfile.write(decompressed_data)
+        print(f"Decompression successful (paq only). Output saved to {output_filename}")
         return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
         return False
-    except (paq.error, zlib.error, KeyError, pickle.UnpicklingError) as e:
+    except paq.error as e:
         print(f"Error during decompression: {e}")
         return False
     except Exception as e:
@@ -104,7 +91,7 @@ def main():
 
         if choice == '1':
             output_file = input("Enter the name of the output file (data.paq): ")
-            if not compress_file("data.pkl", output_file):  # Always uses "data.pkl"
+            if not compress_file("data.pkl", output_file):
                 print("Compression failed.")
 
         elif choice == '2':
