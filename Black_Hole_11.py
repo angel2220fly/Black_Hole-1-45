@@ -2,8 +2,11 @@ import random
 import paq
 import pickle
 import os
+import hashlib
+import zlib
+import io
 
-print("Created by Jurijus Pacalovas.")
+print("Created by Jurijus Pacalovas (Improved by Cici).")
 
 def generate_7bit_random(count):
     """Generates a list of 7-bit random numbers."""
@@ -11,28 +14,38 @@ def generate_7bit_random(count):
 
 def generate_headings_and_variations(filename="data.pkl"):
     """Generates data with a 7-bit PRNG and saves it to a pickle file."""
-    max_headings = 2**17  # Adjust as needed.  Large number, be mindful of memory usage.
+    max_headings = 2**17  # Adjust as needed. Large number, be mindful of memory usage.
     variations_per_heading = 128 # Adjust as needed
     random.seed(42) #for reproducibility. Remove for truly random data.
-    data = {}
+    data = {'table': {}} # Initialize with a 'table' dictionary
     for heading in range(max_headings):
-        data[heading] = generate_7bit_random(variations_per_heading)
+        data['table'][heading] = generate_7bit_random(variations_per_heading)
     with open(filename, 'wb') as f:
         pickle.dump(data, f)
     print(f"Data generated and saved to {filename}")
+    return True
 
 
 def compress_file(input_filename, output_filename):
     try:
         with open(input_filename, 'rb') as infile:
-            data = infile.read()
-        compressed_data = paq.compress(data)
+            data = pickle.load(infile)
+
+        table_data = data['table']
+        compressed_table = zlib.compress(pickle.dumps(table_data))
+        data['table'] = compressed_table
+        modified_data = pickle.dumps(data)
+        compressed_paq = paq.compress(modified_data)
+
         with open(output_filename, 'wb') as outfile:
-            outfile.write(compressed_data)
-        print(f"Compression successful. Output saved to {output_filename}")
-        return True # Indicate success
+            outfile.write(compressed_paq)
+        print(f"Compression successful (table zlib + paq). Output saved to {output_filename}")
+        return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
+        return False
+    except KeyError:
+        print("Error: 'table' key not found in the pickle file.")
         return False
     except Exception as e:
         print(f"An error occurred during compression: {e}")
@@ -44,18 +57,35 @@ def decompress_file(input_filename, output_filename):
         with open(input_filename, 'rb') as infile:
             compressed_data = infile.read()
         decompressed_data = paq.decompress(compressed_data)
+        data = pickle.loads(decompressed_data)
+        decompressed_table = pickle.loads(zlib.decompress(data['table']))
+        data['table'] = decompressed_table
         with open(output_filename, 'wb') as outfile:
-            outfile.write(decompressed_data)
-        print(f"Decompression successful. Output saved to {output_filename}")
-        return True # Indicate success
+            pickle.dump(data, outfile)
+        print(f"Decompression successful (paq + table zlib). Output saved to {output_filename}")
+        return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
         return False
-    except paq.error as e:
+    except (paq.error, zlib.error, KeyError, pickle.UnpicklingError) as e:
         print(f"Error during decompression: {e}")
         return False
     except Exception as e:
         print(f"An error occurred during decompression: {e}")
+        return False
+
+
+def verify_data(original_file, decompressed_file):
+    try:
+        with open(original_file, 'rb') as f1, open(decompressed_file, 'rb') as f2:
+            hash1 = hashlib.sha256(f1.read()).hexdigest()
+            hash2 = hashlib.sha256(f2.read()).hexdigest()
+        return hash1 == hash2
+    except FileNotFoundError:
+        print("Error: One or both files not found for verification.")
+        return False
+    except Exception as e:
+        print(f"An error occurred during data verification: {e}")
         return False
 
 
@@ -67,21 +97,25 @@ def main():
 
     while True:
         print("\nChoose an option:")
-        print("1: Compress the data file")
+        print("1: Compress the data file (data.pkl)")
         print("2: Decompress a file")
         print("3: Exit")
         choice = input("Enter your choice (1/2/3): ")
 
         if choice == '1':
-            input_file = input("Enter the name of the input file (data.pkl): ")
             output_file = input("Enter the name of the output file (data.paq): ")
-            if not compress_file(input_file, output_file):
+            if not compress_file("data.pkl", output_file):  # Always uses "data.pkl"
                 print("Compression failed.")
 
         elif choice == '2':
             input_file = input("Enter the name of the compressed file to decompress (data.paq): ")
             output_file = input("Enter the name of the output file for decompression (data_decompressed.pkl): ")
-            if not decompress_file(input_file, output_file):
+            if decompress_file(input_file, output_file):
+                if verify_data("data.pkl", output_file):
+                    print("Decompression successful and data verified.")
+                else:
+                    print("Decompression successful, but data verification failed!")
+            else:
                 print("Decompression failed.")
 
         elif choice == '3':
