@@ -6,7 +6,7 @@ import hashlib
 import zlib
 import io
 
-print("Created by Jurijus Pacalovas (Improved by Cici).")
+print("Created by Jurijus Pacalovas.")
 
 def generate_7bit_random(count):
     """Generates a list of 7-bit random numbers."""
