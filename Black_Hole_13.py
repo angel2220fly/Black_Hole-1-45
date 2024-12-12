@@ -85,14 +85,19 @@ def main():
 
         if choice == '1':
             try:
-                chunk = int(input("Enter the chunk size (must be between 25 and 128): "))
-                if chunk < 25 or chunk > 128:
-                    print("Chunk size must be between 25 and 128. Please try again.")
-                    continue
+                while True:  # Loop until valid chunk size is entered
+                    try:
+                        chunk = int(input("Enter the chunk size (must be between 25 and 128): "))
+                        if 25 <= chunk <= 128:
+                            break
+                        else:
+                            print("Chunk size must be between 25 and 128. Please try again.")
+                    except ValueError:
+                        print("Invalid input. Please enter a valid integer.")
                 if not generate_headings_and_variations(chunk):
                     print("Data generation failed.")
-            except ValueError:
-                print("Invalid input. Please enter a valid integer for the chunk size.")
+            except Exception as e:
+                print(f"An unexpected error occurred: {e}")
 
         elif choice == '2':
             input_file = input("Enter the name of the input file (e.g., table4.txt): ")
