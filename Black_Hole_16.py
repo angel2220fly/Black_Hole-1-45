@@ -37,64 +37,55 @@ def generate_headings_and_chunks():
         return False
 
 
-def compress_file(input_filename, output_filename):
+def compress_file(input_filename, output_filename, use_paq=True):
     try:
         with open(input_filename, 'rb') as infile:
             data = infile.read()
-
-        # Ask user if they want to use PAQ for compression
-        use_paq = input("Do you want to use PAQ for compression? Enter 1 for YES or 0 for NO: ").strip()
-
-        # Check if PAQ is to be used
-        if use_paq == '1':
+        
+        if use_paq:
             compressed_data = paq.compress(data)
             print("Compression using PAQ successful.")
-            compressed = 1  # Mark as PAQ compressed
-        elif use_paq == '0':
+        else:
             compressed_data = data  # No compression (just copy the data)
             print("No compression (PAQ not used), raw data copied.")
-            compressed = 0  # No PAQ compression
-        else:
-            print("Invalid input. No compression applied.")
-            return 0  # Invalid input, no compression
 
-        # Write compressed data to output file
         with open(output_filename, 'wb') as outfile:
             outfile.write(compressed_data)
-
+        
         print(f"Compression successful. Output saved to {output_filename}")
-        return compressed
+        return True
     except FileNotFoundError:
         print(f"Error: Input file '{input_filename}' not found.")
-        return 0  # Indicate failure
+        return False
     except Exception as e:
         print(f"An error occurred during compression: {e}")
-        return 0  # Indicate failure
+        return False
 
 
-def decompress_and_save_raw_data(input_filename, output_filename):
+def decompress_and_save_raw_data(input_filename, output_filename, use_paq=True):
     try:
-        # Automatically decide to use PAQ for decompression if the file has a .paq extension
-        if input_filename.endswith('.paq'):
-            with open(input_filename, 'rb') as infile:
-                compressed_data = infile.read()  # Read the entire compressed data
+        # Open the compressed file
+        with open(input_filename, 'rb') as infile:
+            compressed_data = infile.read()  # Read the entire compressed data
 
-            # Decompress the data using PAQ
+        # Decompress the data using PAQ, if the user chooses PAQ
+        if use_paq:
             decompressed_data = paq.decompress(compressed_data)
             print("Decompression using PAQ successful.")
-
-            # Save the raw decompressed data to the output file
-            with open(output_filename, 'wb') as outfile:
-                outfile.write(decompressed_data)
-
-            print(f"Decompression successful. Raw decompressed data saved to {output_filename}")
-            return 1  # Indicate PAQ decompression was used
         else:
-            print(f"Error: The file '{input_filename}' is not a PAQ-compressed file.")
-            return 0  # Indicate failure
+            # If PAQ is not used, just copy the data as is (in case the file is not PAQ-compressed)
+            decompressed_data = compressed_data
+            print("No decompression (PAQ not used), raw data copied.")
+
+        # Save the raw decompressed data to the output file
+        with open(output_filename, 'wb') as outfile:
+            outfile.write(decompressed_data)
+
+        print(f"Decompression successful. Raw decompressed data saved to {output_filename}")
+        return True
     except Exception as e:
         print(f"An error occurred during decompression: {e}")
-        return 0  # Indicate failure
+        return False
 
 
 def main():
@@ -114,23 +105,22 @@ def main():
             input_file = input("Enter the name of the input file (e.g., table4.txt): ")
             output_file = input("Enter the name of the output file (e.g., table4.paq or table4_no_paq.txt): ")
 
-            # Ask user to compress using PAQ or not
-            compression_result = compress_file(input_file, output_file)
-            if compression_result == 1:
-                print("File was compressed using PAQ.")
-            elif compression_result == 0:
-                print("Compression failed or PAQ was not used.")
+            use_paq = input("Would you like to use PAQ compression? (yes/no): ").strip().lower()
+            use_paq = True if use_paq == 'yes' else False
+
+            if not compress_file(input_file, output_file, use_paq):
+                print("Compression failed.")
 
         elif choice == '3':
             input_file = input("Enter the name of the compressed file to decompress (e.g., table4.paq): ")
             output_file = input("Enter the name of the output file for decompression (e.g., table4_decompressed.bin): ")
 
-            # Automatically use PAQ for decompression
-            decompression_result = decompress_and_save_raw_data(input_file, output_file)
-            if decompression_result == 1:
-                print("File was decompressed using PAQ.")
-            elif decompression_result == 0:
-                print("Decompression failed or PAQ was not used.")
+            # Ask the user if they want to use PAQ for decompression
+            use_paq = input("Did the file use PAQ compression? (yes/no): ").strip().lower()
+            use_paq = True if use_paq == 'yes' else False
+
+            if not decompress_and_save_raw_data(input_file, output_file, use_paq):
+                print("Decompression failed.")
 
         elif choice == '4':
             break
