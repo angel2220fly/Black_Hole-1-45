@@ -1,7 +1,6 @@
 # Constants for the algorithm
 MAX_VALUE = 255  # 8-bit max value (adjusted for byte-level handling)
 REPLACEMENT_VALUE = 254  # Replacement for MAX_VALUE
-METADATA_BITS = 16  # Number of metadata bits (2 bytes)
 
 def compress(input_file, output_file):
     """
@@ -38,23 +37,64 @@ def compress(input_file, output_file):
     except Exception as e:
         print(f"Error during compression: {e}")
 
-def main():
+def extract(input_file, output_file):
     """
-    Main function to handle user input for compression.
+    Extract a binary file by reversing the compression process.
     """
     try:
-        # Ask the user how many times they want to compress
-        num_compressions = int(input("How many times would you like to compress a file? ").strip())
+        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+            data = infile.read()
+            extracted_data = bytearray()
 
-        # Loop for each compression operation
-        for i in range(num_compressions):
-            print(f"\nCompression {i + 1}:")
-            # Ask for the input and output filenames
-            input_file = input("Enter the input file name: ").strip()
-            output_file = input("Enter the output file name: ").strip()
+            # Extraction logic: replacing REPLACEMENT_VALUE with MAX_VALUE
+            for byte in data:
+                if byte == REPLACEMENT_VALUE:
+                    extracted_data.append(MAX_VALUE)
+                else:
+                    extracted_data.append(byte)
 
-            compress(input_file, output_file)
+            # Add back the removed byte to restore original size
+            extracted_data.append(MAX_VALUE)
 
+            # Write extracted data
+            outfile.write(extracted_data)
+            print(f"Compressed file size: {len(data)} bytes")
+            print(f"Extracted file size: {len(extracted_data)} bytes")
+            print("Extraction successful!")
+
+    except Exception as e:
+        print(f"Error during extraction: {e}")
+
+def main():
+    """
+    Main function to handle user input for compression or extraction, with repeat functionality.
+    """
+    try:
+        print("Choose an option:")
+        print("1. Compress a file")
+        print("2. Extract a file")
+        choice = input("Enter your choice (1 or 2): ").strip()
+
+        if choice in ['1', '2']:
+            times = int(input("How many times do you want to repeat this operation? ").strip())
+            if times <= 0:
+                print("The number of times must be greater than zero.")
+                return
+
+            for i in range(times):
+                print(f"\nOperation {i + 1} of {times}:")
+                input_file = input("Enter the input file name: ").strip()
+                output_file = input("Enter the output file name: ").strip()
+
+                if choice == '1':
+                    compress(input_file, output_file)
+                elif choice == '2':
+                    extract(input_file, output_file)
+
+        else:
+            print("Invalid choice. Please choose 1 or 2.")
+    except ValueError:
+        print("Invalid input. Please enter a valid number for the repetitions.")
     except Exception as e:
         print(f"Error: {e}")
 
