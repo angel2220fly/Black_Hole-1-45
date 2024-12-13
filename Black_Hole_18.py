@@ -76,16 +76,16 @@ def main():
         choice = input("Enter your choice (1 or 2): ").strip()
 
         if choice in ['1', '2']:
-            times = int(input("How many times do you want to repeat this operation? ").strip())
+            input_file = input("Enter the input file name: ").strip()
+            output_file = input("Enter the output file name: ").strip()
+            times = int(input("How many times do you want to repeat the operation? ").strip())
+
             if times <= 0:
                 print("The number of times must be greater than zero.")
                 return
 
             for i in range(times):
                 print(f"\nOperation {i + 1} of {times}:")
-                input_file = input("Enter the input file name: ").strip()
-                output_file = input("Enter the output file name: ").strip()
-
                 if choice == '1':
                     compress(input_file, output_file)
                 elif choice == '2':
