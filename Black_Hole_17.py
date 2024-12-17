@@ -120,7 +120,7 @@ def main():
     elif choice == '2':  # Decompression with zlib
         dictionary_file = "Dictionary.txt"
         input_file = input("Enter the name of the compressed file (e.g., compressed.zlib): ")
-        output_file = input_file[:-5]
+        output_file = input_file[:-2]
         decompress_file(dictionary_file, input_file, output_file)
 
     else:
