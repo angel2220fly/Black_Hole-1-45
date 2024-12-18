@@ -1,108 +1,90 @@
 import os
-import paq
 import struct
+try:
+    import paq
+except ImportError:
+    print("Error: The 'paq' library is not installed. Please install it using 'pip install paq8px'.")
+    exit()
 
-def load_dictionary(dictionary_file):
-    """Loads the dictionary."""
+def load_dictionary(dictionary_file, encoding="utf-8"):
+    """Loads the dictionary, handling potential errors more gracefully."""
     try:
         word_to_index = {}
         index_to_word = {}
-        with open(dictionary_file, "r", encoding="utf-8") as f:
+        with open(dictionary_file, "r", encoding=encoding) as f:
             for index, line in enumerate(f):
                 word = line.strip()
                 if word:
                     word_to_index[word] = index
                     index_to_word[index] = word
+        if not word_to_index:
+            raise ValueError("Dictionary file is empty.")
         return word_to_index, index_to_word
     except FileNotFoundError:
         print(f"Error: Dictionary file '{dictionary_file}' not found.")
         return None, None
-    except Exception as e:
+    except (ValueError, UnicodeDecodeError) as e:
         print(f"Error loading dictionary: {e}")
         return None, None
 
-
-def compress_file(dictionary_file, input_file, output_file):
-    """Compresses the file."""
-    word_to_index, _ = load_dictionary(dictionary_file)
+def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
+    word_to_index, _ = load_dictionary(dictionary_file, encoding)
     if word_to_index is None:
         return
 
     try:
-        with open(input_file, "r", encoding="utf-8") as infile, open(output_file, "wb") as outfile:
-            data = infile.read()
+        with open(input_file, "r", encoding=encoding) as infile, open(output_file, "wb") as outfile:
+            text = infile.read()
+            lines = text.splitlines()
             encoded_data = bytearray()
-
-            for char in data:
-                if char.isspace():  # space or newline
-                    if char == '\n':
-                        encoded_data.append(0x0A)  # newline
+            for line in lines:
+                words = line.split()
+                for word in words:
+                    if word in word_to_index:
+                        index = word_to_index[word]
+                        encoded_data.extend(struct.pack(">I", index))
                     else:
-                        encoded_data.append(ord(' '))  # space
-                else:  # other characters
-                    word = ""
-                    while char and not char.isspace():
-                        word += char
-                        try:
-                            char = next(iter(data))  # consume next character
-                        except StopIteration:
-                            char = None
-                            break  # end of file
-                    if word:
-                        if word in word_to_index:
-                            index = word_to_index[word]
-                            encoded_data.extend(struct.pack(">I", index))
-                        else:
-                            for c in word:
-                                encoded_data.append(ord(c))  # encode characters individually
+                        for char in word:
+                            encoded_data.append(ord(char))
+                encoded_data.append(0x0A)
 
             compressed_data = paq.compress(bytes(encoded_data))
             outfile.write(compressed_data)
             print(f"File compressed and saved as '{output_file}'")
-
-    except FileNotFoundError:
-        print(f"Error: Input file '{input_file}' not found.")
-    except Exception as e:
+    except (FileNotFoundError, IOError) as e:
         print(f"Error compressing file: {e}")
 
-
-
-def decompress_file(dictionary_file, input_file, output_file):
-    """Decompresses the file."""
-    _, index_to_word = load_dictionary(dictionary_file)
+def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
+    _, index_to_word = load_dictionary(dictionary_file, encoding)
     if index_to_word is None:
         return
 
     try:
-        with open(input_file, "rb") as infile, open(output_file, "w", encoding="utf-8") as outfile:
+        with open(input_file, "rb") as infile, open(output_file, "w", encoding=encoding) as outfile:
             compressed_data = infile.read()
             decompressed_data = paq.decompress(compressed_data)
             decoded_text = ""
             i = 0
             while i < len(decompressed_data):
-                byte = decompressed_data[i]
-                if byte == ord(' '):
-                    decoded_text += " "
-                    i += 1
-                elif byte == 0x0A:
+                try:
+                    if decompressed_data[i:i+4] == b'\x00\x00\x00\x00':  # end of file marker
+                        break
+                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]
+                    decoded_text += index_to_word.get(index, "") #Handle missing words gracefully
+                    i += 4
+                except (struct.error, KeyError):
+                    if i < len(decompressed_data):
+                        decoded_text += chr(decompressed_data[i])
+                        i += 1
+                    else:
+                        break
+                if i < len(decompressed_data) and decompressed_data[i] == 0x0A:  # Handle newline
                     decoded_text += "\n"
                     i += 1
-                else:
-                    word = ""
-                    word += chr(byte)
-                    i += 1
-                    while i < len(decompressed_data) and decompressed_data[i] not in (ord(' '), 0x0A):
-                        word += chr(decompressed_data[i])
-                        i += 1
-                    if word:
-                        decoded_text += word
 
-            outfile.write(decoded_text.strip())
+            outfile.write(decoded_text)
             print(f"File decompressed and saved as '{output_file}'")
-
-    except FileNotFoundError:
-        print(f"Error: Compressed file '{input_file}' not found.")
-    except Exception as e:
+    except (FileNotFoundError, IOError) as e:
         print(f"Error decompressing file: {e}")
 
 
@@ -111,21 +93,27 @@ def main():
     print("1. Compress a file")
     print("2. Decompress a file")
     choice = input("Enter your choice: ")
+    dictionary_file = "Dictionary.txt"
+    encoding = "utf-8"
 
-    if choice == '1':  # Compression
-        dictionary_file = "Dictionary.txt"
-        input_file = input("Enter the name of the input file to compress: ")
-        output_file = input_file + ".b"
-        compress_file(dictionary_file, input_file, output_file)
+    if choice == '1':
+        input_file = input("Enter the input file to compress: ")
+        if not os.path.exists(input_file):
+            print(f"Error: Input file '{input_file}' not found.")
+            return
 
-    elif choice == '2':  # Decompression
-        dictionary_file = "Dictionary.txt"
-        input_file = input("Enter the name of the compressed file: ")
-        output_file = input_file[:-2]
-        decompress_file(dictionary_file, input_file, output_file)
+        output_file = input_file + ".paq"
+        compress_file(dictionary_file, input_file, output_file, encoding)
+    elif choice == '2':
+        input_file = input("Enter the compressed file: ")
+        if not os.path.exists(input_file):
+            print(f"Error: Compressed file '{input_file}' not found.")
+            return
 
+        output_file = input_file[:-4]
+        decompress_file(dictionary_file, input_file, output_file, encoding)
     else:
-        print("Invalid choice. Please enter 1 or 2.")
+        print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
