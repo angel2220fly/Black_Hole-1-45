@@ -1,56 +1,50 @@
 import os
 import paq
 
-# Function to load the dictionary from a line-by-line file
 def load_dictionary(dictionary_file):
-    """Loads the dictionary file into a mapping of index to word (line-by-line format)."""
+    """Loads the dictionary."""
     try:
-        index_to_word = {}
         word_to_index = {}
+        index_to_word = {}
         with open(dictionary_file, "r", encoding="utf-8") as f:
             for index, line in enumerate(f):
                 word = line.strip()
-                if word:  # Ensure the line is not empty
-                    index_to_word[index] = word
+                if word:
                     word_to_index[word] = index
+                    index_to_word[index] = word
         return word_to_index, index_to_word
     except FileNotFoundError:
         print(f"Error: Dictionary file '{dictionary_file}' not found.")
         return None, None
 
-# Function to compress a file
 def compress_file(dictionary_file, input_file, output_file):
-    """Compresses a text file using a dictionary and then with zlib."""
+    """Compresses the file."""
     word_to_index, _ = load_dictionary(dictionary_file)
     if word_to_index is None:
         return
 
     try:
-        with open(input_file, "r", encoding="utf-8") as in_f, open(output_file, "wb") as out_f:
-            data = in_f.read()
+        with open(input_file, "r", encoding="utf-8") as infile, open(output_file, "wb") as outfile:
+            data = infile.read()
             binary_data = ""
 
             words = data.split()
-            if words:
-                for word in words:
-                    if word in word_to_index:
-                        index = word_to_index[word]
-                        binary_data += f"{index:020b}" # Changed to 20 bits
-                        binary_data += "10"  # Space marker
-                    else:
-                        for char in word:
-                            if char == '\n':
-                                binary_data += "1111111111111111" #16 bits for newline
-                            else:
-                                binary_data += "11" + f"{ord(char):08b}" # 10 bits for other chars
+            for word in words:
+                if word in word_to_index:
+                    index = word_to_index[word]
+                    binary_data += bin(index)[2:].zfill(20)  # 20-bit word index
+                    binary_data += "10"  # Space marker
+                else:
+                    for char in word:
+                        if char == '\n':
+                            binary_data += "0000000000000000" # 16-bit newline (consistent length)
+                        else:
+                            binary_data += bin(ord(char))[2:].zfill(8) # 8-bit character code
 
-                # Convert binary data to bytes and compress with zlib
-                byte_data = int(binary_data, 2).to_bytes((len(binary_data) + 7) // 8, byteorder="big")
-                compressed_data = paq.compress(byte_data)
-                out_f.write(compressed_data)
-                print(f"File compressed (custom method + zlib) and saved as '{output_file}'")
-            else:
-                print("Warning: Input file is empty or contains only whitespace.")
+            byte_data = int(binary_data, 2).to_bytes((len(binary_data) + 7) // 8, byteorder="big")
+            compressed_data = paq.compress(byte_data)
+            outfile.write(compressed_data)
+            print(f"File compressed and saved as '{output_file}'")
 
     except FileNotFoundError:
         print(f"Error: Input file '{input_file}' not found.")
@@ -58,72 +52,65 @@ def compress_file(dictionary_file, input_file, output_file):
         print(f"Error: Unable to compress file. Details: {e}")
 
 
-# Function to decompress a file
 def decompress_file(dictionary_file, input_file, output_file):
-    """Decompresses a binary file using the dictionary and then with zlib."""
+    """Decompresses the file."""
     _, index_to_word = load_dictionary(dictionary_file)
     if index_to_word is None:
         return
 
     try:
-        with open(input_file, "rb") as f, open(output_file, "w", encoding="utf-8") as out_f:
-            compressed_bytes = f.read()
-            # Decompress with zlib first
-            decompressed_bytes = paq.decompress(compressed_bytes)
-            binary_data = bin(int.from_bytes(decompressed_bytes, byteorder="big"))[2:]
-            binary_data = binary_data.zfill(len(decompressed_bytes) * 8) # Pad with leading zeros
+        with open(input_file, "rb") as infile, open(output_file, "w", encoding="utf-8") as outfile:
+            compressed_data = infile.read()
+            decompressed_data = paq.decompress(compressed_data)
+            binary_data = bin(int.from_bytes(decompressed_data, byteorder="big"))[2:]
+            binary_data = binary_data.zfill(len(decompressed_data) * 8)
 
-            decompressed_data = ""
+            decompressed_text = ""
             i = 0
             while i < len(binary_data):
-                if binary_data[i:i+2] == "10": # Space
-                    decompressed_data += " "
-                    i += 2
-                elif binary_data[i:i+16] == "1111111111111111": # Newline
-                    decompressed_data += "\n"
+                if binary_data[i:i+16] == "0000000000000000": # Newline
+                    decompressed_text += "\n"
                     i += 16
-                elif binary_data[i:i+2] == "11": # Other character
-                    if i + 10 <= len(binary_data):
-                        ascii_code = int(binary_data[i+2:i+10], 2)
-                        decompressed_data += chr(ascii_code)
-                        i += 10
-                    else:
-                        print("Error: Invalid character encoding encountered during decompression.")
-                        break
-                else: #Word index
+                elif binary_data[i:i+2] == "10":  #Space
+                    decompressed_text += " "
+                    i += 2
+                else:  # Word index or character
                     try:
-                        index = int(binary_data[i:i+20], 2) # Changed to 20 bits
+                        index = int(binary_data[i:i+20], 2)
                         if index in index_to_word:
-                            decompressed_data += index_to_word[index] + " "
-                        i += 20
+                            decompressed_text += index_to_word[index] + " "
+                            i += 20
+                        else: # Handle invalid index (likely a character)
+                            char_code = int(binary_data[i:i+8], 2)
+                            decompressed_text += chr(char_code)
+                            i += 8
                     except ValueError:
-                        print("Error: Invalid index encountered during decompression.")
+                        print(f"Error: Invalid code at position {i}.")
                         break
 
-            out_f.write(decompressed_data.strip())
-            print(f"File decompressed (zlib + custom method) and saved as '{output_file}'")
+            outfile.write(decompressed_text.strip())
+            print(f"File decompressed and saved as '{output_file}'")
 
     except FileNotFoundError:
         print(f"Error: Compressed file '{input_file}' not found.")
     except Exception as e:
         print(f"Error: Unable to decompress file. Details: {e}")
 
-# Main function to handle user options
 def main():
     print("Choose an option:")
-    print("1. Compress a file (custom + zlib)")
-    print("2. Decompress a file (zlib + custom)")
+    print("1. Compress a file")
+    print("2. Decompress a file")
     choice = input("Enter your choice: ")
 
-    if choice == '1':  # Compression with zlib
-        dictionary_file = "Dictionary.txt"
+    if choice == '1':  # Compression
+        dictionary_file =  "Dictionary.txt"
         input_file = input("Enter the name of the input file to compress: ")
-        output_file = input_file + ".b"
+        output_file = input_file+".b"
         compress_file(dictionary_file, input_file, output_file)
 
-    elif choice == '2':  # Decompression with zlib
+    elif choice == '2':  # Decompression
         dictionary_file = "Dictionary.txt"
-        input_file = input("Enter the name of the compressed file (e.g., compressed.zlib): ")
+        input_file = input("Enter the name of the compressed file: ")
         output_file = input_file[:-2]
         decompress_file(dictionary_file, input_file, output_file)
 
