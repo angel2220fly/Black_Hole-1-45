@@ -1,10 +1,10 @@
 import os
 import struct
+print("Created by Jurijus Pacalovas.")
 try:
     import paq
 except ImportError:
     print("Error: The 'paq' library is not installed. Please install it using 'pip install paq8px'.")
-    print("Created by Jurijus Pacalovas.")
     exit()
 
 def load_dictionary(dictionary_file, encoding="utf-8"):
