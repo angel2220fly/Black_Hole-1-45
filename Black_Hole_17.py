@@ -4,6 +4,7 @@ try:
     import paq
 except ImportError:
     print("Error: The 'paq' library is not installed. Please install it using 'pip install paq8px'.")
+    print("Created by Jurijus Pacalovas.")
     exit()
 
 def load_dictionary(dictionary_file, encoding="utf-8"):
@@ -102,7 +103,7 @@ def main():
             print(f"Error: Input file '{input_file}' not found.")
             return
 
-        output_file = input_file + ".paq"
+        output_file = input_file + ".b"
         compress_file(dictionary_file, input_file, output_file, encoding)
     elif choice == '2':
         input_file = input("Enter the compressed file: ")
@@ -110,7 +111,7 @@ def main():
             print(f"Error: Compressed file '{input_file}' not found.")
             return
 
-        output_file = input_file[:-4]
+        output_file = input_file[:-2]
         decompress_file(dictionary_file, input_file, output_file, encoding)
     else:
         print("Invalid choice.")
