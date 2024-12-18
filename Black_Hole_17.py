@@ -35,14 +35,14 @@ def compress_file(dictionary_file, input_file, output_file):
                 for word in words:
                     if word in word_to_index:
                         index = word_to_index[word]
-                        binary_data += f"{index:019b}"
+                        binary_data += f"{index:020b}" # Changed to 20 bits
                         binary_data += "10"  # Space marker
                     else:
                         for char in word:
                             if char == '\n':
                                 binary_data += "1111111111111111" #16 bits for newline
                             else:
-                                binary_data += "11" + f"{ord(char):08b}"
+                                binary_data += "11" + f"{ord(char):08b}" # 10 bits for other chars
 
                 # Convert binary data to bytes and compress with zlib
                 byte_data = int(binary_data, 2).to_bytes((len(binary_data) + 7) // 8, byteorder="big")
@@ -88,16 +88,20 @@ def decompress_file(dictionary_file, input_file, output_file):
                         decompressed_data += chr(ascii_code)
                         i += 10
                     else:
+                        print("Error: Invalid character encoding encountered during decompression.")
                         break
                 else: #Word index
-                    index = int(binary_data[i:i+19], 2)
-                    if index in index_to_word:
-                        decompressed_data += index_to_word[index] + " "
-                    i += 19
+                    try:
+                        index = int(binary_data[i:i+20], 2) # Changed to 20 bits
+                        if index in index_to_word:
+                            decompressed_data += index_to_word[index] + " "
+                        i += 20
+                    except ValueError:
+                        print("Error: Invalid index encountered during decompression.")
+                        break
 
             out_f.write(decompressed_data.strip())
-
-        print(f"File decompressed (zlib + custom method) and saved as '{output_file}'")
+            print(f"File decompressed (zlib + custom method) and saved as '{output_file}'")
 
     except FileNotFoundError:
         print(f"Error: Compressed file '{input_file}' not found.")
