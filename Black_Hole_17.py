@@ -42,13 +42,17 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                 words = line.split()
                 for word in words:
                     if word in word_to_index:
+                        # Encode dictionary word (00)
+                        encoded_data.append(0x00)
                         index = word_to_index[word]
                         encoded_data.extend(struct.pack(">I", index))
                     else:
+                        # Encode non-dictionary word (01)
+                        encoded_data.append(0x01)
                         for char in word:
                             encoded_data.append(ord(char))
-                encoded_data.append(0x0A)
-
+                        encoded_data.append(0x00)  # End of non-dictionary word
+                encoded_data.append(0x10)  # End of line
             compressed_data = paq.compress(bytes(encoded_data))
             outfile.write(compressed_data)
             print(f"File compressed and saved as '{output_file}'")
@@ -67,22 +71,21 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
             decoded_text = ""
             i = 0
             while i < len(decompressed_data):
-                try:
-                    if decompressed_data[i:i+4] == b'\x00\x00\x00\x00':  # end of file marker
-                        break
+                flag = decompressed_data[i]
+                i += 1
+                if flag == 0x00:  # Dictionary word
                     index = struct.unpack(">I", decompressed_data[i:i+4])[0]
-                    decoded_text += index_to_word.get(index, "") #Handle missing words gracefully
+                    decoded_text += index_to_word.get(index, "<unknown>")
                     i += 4
-                except (struct.error, KeyError):
-                    if i < len(decompressed_data):
-                        decoded_text += chr(decompressed_data[i])
+                elif flag == 0x01:  # Non-dictionary word
+                    word = ""
+                    while i < len(decompressed_data) and decompressed_data[i] != 0x00:
+                        word += chr(decompressed_data[i])
                         i += 1
-                    else:
-                        break
-                if i < len(decompressed_data) and decompressed_data[i] == 0x0A:  # Handle newline
+                    decoded_text += word
+                    i += 1  # Skip the 0x00
+                elif flag == 0x10:  # New line
                     decoded_text += "\n"
-                    i += 1
-
             outfile.write(decoded_text)
             print(f"File decompressed and saved as '{output_file}'")
     except (FileNotFoundError, IOError) as e:
