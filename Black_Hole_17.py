@@ -3,6 +3,7 @@ import struct
 print("Created by Jurijus Pacalovas.")
 print("Black_Hole_17")
 print("This software is for compression of words.")
+
 try:
     import paq
 except ImportError:
@@ -51,8 +52,11 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                     else:
                         # Encode non-dictionary word (01)
                         encoded_data.append(0x01)
-                        for char in word:
-                            encoded_data.append(ord(char))
+                        try:
+                            encoded_data.extend(word.encode('utf-8'))  # Safely encode the word
+                        except UnicodeEncodeError as e:
+                            print(f"Error encoding word '{word}': {e}")
+                            continue
                         encoded_data.append(0x00)  # End of non-dictionary word
                     
                     # Add space (0x03) if not the last word
@@ -60,6 +64,7 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                         encoded_data.append(0x03)  # Space between words
                 
                 encoded_data.append(0x02)  # End of line (0x02 represents a newline, binary 10)
+            
             compressed_data = paq.compress(bytes(encoded_data))
             outfile.write(compressed_data)
             print(f"File compressed and saved as '{output_file}'")
