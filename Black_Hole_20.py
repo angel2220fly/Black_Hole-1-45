@@ -2,6 +2,7 @@ import os
 import heapq
 from collections import defaultdict
 import paq
+print("Created by Jurijus Pacalovas.")
 
 # Method 1: Dictionary-based Compression
 def build_dictionary(file_path):
