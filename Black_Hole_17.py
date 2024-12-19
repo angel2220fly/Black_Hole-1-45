@@ -88,11 +88,15 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                     i += 1  # Skip the 0x00
                 elif flag == 0x10:  # New line
                     decoded_text += "\n"
+
+            # Remove the last byte if it is 0x20 (space)
+            if decoded_text.endswith(' '):
+                decoded_text = decoded_text[:-1]
+
             outfile.write(decoded_text)
             print(f"File decompressed and saved as '{output_file}'")
     except (FileNotFoundError, IOError) as e:
         print(f"Error decompressing file: {e}")
-
 
 def main():
     print("Choose an option:")
