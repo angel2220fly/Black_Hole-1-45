@@ -1,8 +1,10 @@
 import os
 import struct
+
 print("Created by Jurijus Pacalovas.")
 print("Black_Hole_17")
-print("This software for compression only words.")
+print("This software compresses any data, focusing on dictionary-based words.")
+
 try:
     import paq
 except ImportError:
@@ -10,7 +12,7 @@ except ImportError:
     exit()
 
 def load_dictionary(dictionary_file, encoding="utf-8"):
-    """Loads the dictionary, handling potential errors more gracefully."""
+    """Loads the dictionary, handling errors gracefully."""
     try:
         word_to_index = {}
         index_to_word = {}
@@ -36,26 +38,44 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
         return
 
     try:
-        with open(input_file, "r", encoding=encoding) as infile, open(output_file, "wb") as outfile:
-            text = infile.read()
-            lines = text.splitlines()
+        with open(input_file, "rb") as infile, open(output_file, "wb") as outfile:
+            raw_data = infile.read()
+            original_size = len(raw_data)  # Measure size of the file before compression
+            print(f"Original file size: {original_size} bytes")
+            
+            # Now encode words
             encoded_data = bytearray()
-            for line in lines:
-                words = line.split()
-                for word in words:
-                    if word in word_to_index:
+            words = raw_data.split(b" ")  # Split binary data by spaces
+
+            for word in words:
+                try:
+                    decoded_word = word.decode(encoding)  # Try decoding as text
+                    if decoded_word in word_to_index:
                         # Encode dictionary word (00)
                         encoded_data.append(0x00)
-                        index = word_to_index[word]
+                        index = word_to_index[decoded_word]
                         encoded_data.extend(struct.pack(">I", index))
                     else:
                         # Encode non-dictionary word (01)
                         encoded_data.append(0x01)
-                        for char in word:
-                            encoded_data.append(ord(char))
-                        encoded_data.append(0x00)  # End of non-dictionary word
-                encoded_data.append(0x10)  # End of line
+                        encoded_data.extend(word)
+                        encoded_data.append(0x20)  # Add space as delimiter
+                except UnicodeDecodeError:
+                    # Handle raw binary data for non-decodable segments
+                    encoded_data.append(0x01)
+                    encoded_data.extend(word)
+                    encoded_data.append(0x20)  # Add space as delimiter
+
+            # Step 2: Compress the words (encode them)
             compressed_data = paq.compress(bytes(encoded_data))
+            compressed_size = len(compressed_data)  # Measure the compressed file size
+            print(f"Compressed file size: {compressed_size} bytes")
+
+            # Step 3: Save the size of the encoded (and compressed) data
+            size_header = struct.pack(">I", original_size)  # Pack the original size as the header (4 bytes)
+            compressed_data = size_header + compressed_data  # Prepend original size to compressed data
+
+            # Write the final compressed data to the output file
             outfile.write(compressed_data)
             print(f"File compressed and saved as '{output_file}'")
     except (FileNotFoundError, IOError) as e:
@@ -67,32 +87,41 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
         return
 
     try:
-        with open(input_file, "rb") as infile, open(output_file, "w", encoding=encoding) as outfile:
+        with open(input_file, "rb") as infile, open(output_file, "wb") as outfile:
             compressed_data = infile.read()
-            decompressed_data = paq.decompress(compressed_data)
-            decoded_text = ""
-            i = 0
-            while i < len(decompressed_data):
-                flag = decompressed_data[i]
-                i += 1
-                if flag == 0x00:  # Dictionary word
-                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]
-                    decoded_text += index_to_word.get(index, "<unknown>")
-                    i += 4
-                elif flag == 0x01:  # Non-dictionary word
-                    word = ""
-                    while i < len(decompressed_data) and decompressed_data[i] != 0x00:
-                        word += chr(decompressed_data[i])
-                        i += 1
-                    decoded_text += word
-                    i += 1  # Skip the 0x00
-                elif flag == 0x10:  # New line
-                    decoded_text += "\n"
-            outfile.write(decoded_text)
+
+            # Ensure there's at least 4 bytes for the size header
+            if len(compressed_data) < 4:
+                print("Error: Not enough data for size header.")
+                return
+
+            # Extract the original file size from the first 4 bytes (size header)
+            size_header = compressed_data[:4]
+            original_size = struct.unpack(">I", size_header)[0]  # Extract the original file size from the header
+            print(f"Extracted original file size: {original_size} bytes")
+
+            # Remove the first 4 bytes (file size header)
+            decompressed_data = compressed_data[4:]
+
+            # Decompress using PAQ
+            decompressed_data = paq.decompress(decompressed_data)
+
+            # Remove the first byte (0x01) if it's present
+            if decompressed_data[0] == 0x01:
+                decompressed_data = decompressed_data[1:]
+
+            # Ensure the decompressed data matches the original size
+            if len(decompressed_data) != original_size:
+                print(f"Warning: The decompressed data size ({len(decompressed_data)}) does not match the original size ({original_size}). Truncating.")
+                decompressed_data = decompressed_data[:original_size]
+
+            # Write the resulting data to the output file
+            outfile.write(decompressed_data)
             print(f"File decompressed and saved as '{output_file}'")
     except (FileNotFoundError, IOError) as e:
         print(f"Error decompressing file: {e}")
-
+    except struct.error as e:
+        print(f"Error unpacking data: {e}")
 
 def main():
     print("Choose an option:")
