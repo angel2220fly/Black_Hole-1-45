@@ -3,6 +3,7 @@ from collections import Counter
 import struct
 import os
 print("Created by Jurijus Pacalovas.")
+print("This software for compression words.")
 
 # Huffman Node
 class HuffmanNode:
