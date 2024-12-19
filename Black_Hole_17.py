@@ -2,7 +2,7 @@ import os
 import struct
 print("Created by Jurijus Pacalovas.")
 print("Black_Hole_17")
-print("This software for compression only words.")
+print("This software is for compression of words.")
 try:
     import paq
 except ImportError:
@@ -42,7 +42,7 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
             encoded_data = bytearray()
             for line in lines:
                 words = line.split()
-                for word in words:
+                for idx, word in enumerate(words):
                     if word in word_to_index:
                         # Encode dictionary word (00)
                         encoded_data.append(0x00)
@@ -54,6 +54,11 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                         for char in word:
                             encoded_data.append(ord(char))
                         encoded_data.append(0x00)  # End of non-dictionary word
+                    
+                    # Add space (0x03) if not the last word
+                    if idx < len(words) - 1:
+                        encoded_data.append(0x03)  # Space between words
+                
                 encoded_data.append(0x02)  # End of line (0x02 represents a newline, binary 10)
             compressed_data = paq.compress(bytes(encoded_data))
             outfile.write(compressed_data)
