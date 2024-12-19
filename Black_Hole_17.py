@@ -54,7 +54,7 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                         for char in word:
                             encoded_data.append(ord(char))
                         encoded_data.append(0x00)  # End of non-dictionary word
-                encoded_data.append(0x10)  # End of line
+                encoded_data.append(0x02)  # End of line (0x02 represents a newline, binary 10)
             compressed_data = paq.compress(bytes(encoded_data))
             outfile.write(compressed_data)
             print(f"File compressed and saved as '{output_file}'")
@@ -86,12 +86,10 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                         i += 1
                     decoded_text += word
                     i += 1  # Skip the 0x00
-                elif flag == 0x10:  # New line
+                elif flag == 0x02:  # End of line (0x02 represents a newline, binary 10)
                     decoded_text += "\n"
-
-            # Remove the last byte if it is 0x20 (space)
-            if decoded_text.endswith(' '):
-                decoded_text = decoded_text[:-1]
+                elif flag == 0x03:  # Space (0x03 represents space, binary 11)
+                    decoded_text += " "
 
             outfile.write(decoded_text)
             print(f"File decompressed and saved as '{output_file}'")
