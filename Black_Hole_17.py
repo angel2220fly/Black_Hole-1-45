@@ -1,6 +1,8 @@
 import os
 import struct
 print("Created by Jurijus Pacalovas.")
+print("Black_Hole_17")
+print("This software for compression only words.")
 try:
     import paq
 except ImportError:
