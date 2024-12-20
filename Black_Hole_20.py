@@ -110,7 +110,7 @@ def compress_method_2(input_file, output_file):
     huffman_codes = build_huffman_codes(huffman_tree)
 
     compressed_data = ''.join(huffman_codes[bytes([byte])] for byte in content)
-    compressed_zlib = zlib.compress(compressed_data.encode())
+    compressed_zlib = paq.compress(compressed_data.encode())
 
     with open(output_file, 'wb') as f:
         f.write(compressed_zlib)
