@@ -1,12 +1,12 @@
+import os
 import heapq
 from collections import Counter
 import pickle
 import struct
 import paq
-import os
 
 print("Created by Jurijus Pacalovas.")
-print("This software compresses a file using multiple methods and keeps only the smallest compressed file after PAQ compression.")
+print("This software supports multiple compression methods, including Huffman coding with PAQ, replacement-based compression, and word-based compression.")
 
 # Huffman Node
 class HuffmanNode:
@@ -19,7 +19,7 @@ class HuffmanNode:
     def __lt__(self, other):
         return self.freq < other.freq
 
-# Huffman Functions
+# Huffman Encoding
 def build_huffman_tree(frequencies):
     heap = [HuffmanNode(char, freq) for char, freq in frequencies.items()]
     heapq.heapify(heap)
@@ -41,71 +41,164 @@ def generate_huffman_codes(tree, prefix="", codes=None):
     return codes
 
 def huffman_encode(data, codes):
-    return ''.join(codes[char] for char in data)
+    return ''.join(codes[word] for word in data.split())
 
-# Huffman Compression
-def compress_file_huffman(input_file, output_file):
+def huffman_decode(encoded_data, tree):
+    decoded_data = []
+    current_node = tree
+    for bit in encoded_data:
+        current_node = current_node.left if bit == '0' else current_node.right
+        if current_node.char is not None:
+            decoded_data.append(current_node.char)
+            current_node = tree
+    return ' '.join(decoded_data)
+
+# Word-based Compression Functions
+def load_dictionary(dictionary_file, encoding="utf-8"):
     try:
-        with open(input_file, 'rb') as infile:  # Read in binary mode
-            data = infile.read()
-
-        # Count frequencies of bytes
-        frequencies = Counter(data)
-        tree = build_huffman_tree(frequencies)
-        codes = generate_huffman_codes(tree)
-        encoded_data = huffman_encode(data, codes)
-
-        # Apply PAQ Compression
-        compressed_data = paq.compress(encoded_data.encode('utf-8'))
-
-        # Save compressed file and Huffman tree
-        with open(output_file, 'wb') as outfile:
-            outfile.write(compressed_data)
-        with open(output_file + ".tree", 'wb') as tree_file:
-            pickle.dump(tree, tree_file)
-
-        print(f".M1 file compressed and saved as '{output_file}'")
-        print(f"Compressed file size (M1): {os.path.getsize(output_file)} bytes")
-        return os.path.getsize(output_file)
-    except Exception as e:
-        print(f"Error during .M1 compression: {e}")
-        return float('inf')
-
-# Word Replacement Compression
-def compress_file_word(input_file, output_file, dictionary_file):
-    try:
-        # Load dictionary
         word_to_index = {}
-        with open(dictionary_file, "r", encoding="utf-8") as dict_file:
-            for index, word in enumerate(dict_file):
-                word = word.strip()
+        index_to_word = {}
+        with open(dictionary_file, "r", encoding=encoding) as f:
+            for index, line in enumerate(f):
+                word = line.strip()
                 if word:
                     word_to_index[word] = index
+                    index_to_word[index] = word
+        if not word_to_index:
+            raise ValueError("Dictionary file is empty.")
+        return word_to_index, index_to_word
+    except FileNotFoundError:
+        print(f"Error: Dictionary file '{dictionary_file}' not found.")
+        return None, None
+    except (ValueError, UnicodeDecodeError) as e:
+        print(f"Error loading dictionary: {e}")
+        return None, None
 
-        # Read input file in binary mode
-        with open(input_file, "rb") as infile:
+def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
+    word_to_index, _ = load_dictionary(dictionary_file, encoding)
+    if word_to_index is None:
+        return
+
+    try:
+        with open(input_file, "r", encoding=encoding) as infile, open(output_file, "wb") as outfile:
             text = infile.read()
+            lines = text.splitlines()
             encoded_data = bytearray()
-            for word in text.split():
-                if word in word_to_index:
-                    encoded_data.append(0x00)
-                    encoded_data.extend(struct.pack(">I", word_to_index[word]))
-                else:
-                    encoded_data.append(0x01)
-                    encoded_data.extend(word)
-                    encoded_data.append(0x00)
+            for line in lines:
+                words = line.split()
+                for idx, word in enumerate(words):
+                    if word in word_to_index:
+                        encoded_data.append(0x00)
+                        index = word_to_index[word]
+                        encoded_data.extend(struct.pack(">I", index))
+                    else:
+                        encoded_data.append(0x01)
+                        try:
+                            encoded_data.extend(word.encode('utf-8'))
+                        except UnicodeEncodeError as e:
+                            print(f"Error encoding word '{word}': {e}")
+                            continue
+                        encoded_data.append(0x00)
+                    if idx < len(words) - 1:
+                        encoded_data.append(0x03)
+                
+                encoded_data.append(0x02)
+            
             compressed_data = paq.compress(bytes(encoded_data))
-
-        # Save compressed file
-        with open(output_file, "wb") as outfile:
             outfile.write(compressed_data)
+            print(f"File compressed and saved as '{output_file}'")
+    except (FileNotFoundError, IOError) as e:
+        print(f"Error compressing file: {e}")
 
-        print(f".b file compressed and saved as '{output_file}'")
-        print(f"Compressed file size (b): {os.path.getsize(output_file)} bytes")
-        return os.path.getsize(output_file)
+def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
+    _, index_to_word = load_dictionary(dictionary_file, encoding)
+    if index_to_word is None:
+        return
+
+    try:
+        with open(input_file, "rb") as infile, open(output_file, "w", encoding=encoding) as outfile:
+            compressed_data = infile.read()
+            decompressed_data = paq.decompress(compressed_data)
+            decoded_text = ""
+            i = 0
+            while i < len(decompressed_data):
+                flag = decompressed_data[i]
+                i += 1
+                if flag == 0x00:
+                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]
+                    decoded_text += index_to_word.get(index, "<unknown>")
+                    i += 4
+                elif flag == 0x01:
+                    word = ""
+                    while i < len(decompressed_data) and decompressed_data[i] != 0x00:
+                        word += chr(decompressed_data[i])
+                        i += 1
+                    decoded_text += word
+                    i += 1
+                elif flag == 0x02:
+                    decoded_text += "\n"
+                elif flag == 0x03:
+                    decoded_text += " "
+
+            outfile.write(decoded_text)
+            print(f"File decompressed and saved as '{output_file}'")
+    except (FileNotFoundError, IOError) as e:
+        print(f"Error decompressing file: {e}")
+
+# Compression Methods
+def compress_file_huffman(input_file, output_file, method="huffman"):
+    try:
+        with open(input_file, 'r', encoding='utf-8') as infile:
+            data = infile.read()
+
+        if method == "huffman":
+            word_frequencies = Counter(data.split())
+            tree = build_huffman_tree(word_frequencies)
+            codes = generate_huffman_codes(tree)
+            encoded_data = huffman_encode(data, codes)
+
+            compressed_data = paq.compress(encoded_data.encode('utf-8'))
+
+            with open(output_file, 'wb') as outfile:
+                outfile.write(compressed_data)
+
+            with open(output_file + ".tree", 'wb') as tree_file:
+                pickle.dump(tree, tree_file)
+
+            print(f"File compressed using Huffman coding and saved as '{output_file}'")
+        else:
+            print("Invalid compression method.")
+
+    except FileNotFoundError:
+        print(f"Error: File '{input_file}' not found.")
     except Exception as e:
-        print(f"Error during .b compression: {e}")
-        return float('inf')
+        print(f"Error during compression: {e}")
+
+def decompress_file_huffman(input_file, output_file, method="huffman"):
+    try:
+        if method == "huffman":
+            with open(input_file + ".tree", 'rb') as tree_file:
+                tree = pickle.load(tree_file)
+
+            with open(input_file, 'rb') as infile:
+                compressed_data = infile.read()
+
+            encoded_data = paq.decompress(compressed_data).decode('utf-8')
+
+            decoded_data = huffman_decode(encoded_data, tree)
+
+            with open(output_file, 'w', encoding='utf-8') as outfile:
+                outfile.write(decoded_data)
+
+            print(f"File decompressed using Huffman coding and saved as '{output_file}'")
+
+        else:
+            print("Invalid decompression method.")
+
+    except FileNotFoundError:
+        print("Error: File not found.")
+    except Exception as e:
+        print(f"Error during decompression: {e}")
 
 # Main Function
 def main():
@@ -116,31 +209,22 @@ def main():
 
     if choice == '1':
         input_file = input("Enter the input file to compress: ").strip()
+        output_file_base = input("Enter the base name for the output file: ").strip()
         dictionary_file = "Dictionary.txt"
-        output_file_base = input("Enter the base name for the output files: ").strip()
 
-        # Perform compression using both methods
-        size_m1 = compress_file_huffman(input_file, output_file_base + ".M1")
-        size_b = compress_file_word(input_file, output_file_base + ".b", dictionary_file)
-
-        # Keep only the smallest file after PAQ compression
-        if size_m1 < size_b:
-            os.remove(output_file_base + ".b")
-            print(f"The smallest compressed file is: {output_file_base}.M1 ({size_m1} bytes)")
-        else:
-            os.remove(output_file_base + ".M1")
-            os.remove(output_file_base + ".M1.tree")
-            print(f"The smallest compressed file is: {output_file_base}.b ({size_b} bytes)")
-
+        # Perform compression using Huffman and replacement methods
+        compress_file_huffman(input_file, output_file_base + ".M1", method="huffman")
+        compress_file(dictionary_file, input_file, output_file_base + ".b", encoding="utf-8")
     elif choice == '2':
         input_file = input("Enter the compressed file to decompress: ").strip()
         output_file = input("Enter the output file name: ").strip()
+        dictionary_file = "Dictionary.txt"
 
         # Decompress using the chosen method
         if input_file.endswith(".M1"):
-            decompress_file_huffman(input_file, output_file)
+            decompress_file_huffman(input_file, output_file, method="huffman")
         elif input_file.endswith(".b"):
-            decompress_file_word(input_file, output_file, dictionary_file)
+            decompress_file(dictionary_file, input_file, output_file, encoding="utf-8")
         else:
             print("Invalid compressed file format.")
     else:
