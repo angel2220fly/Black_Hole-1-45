@@ -53,7 +53,7 @@ def huffman_decode(encoded_data, tree):
             current_node = tree
     return ' '.join(decoded_data)
 
-# Word-based Compression Functions
+# Word-based Compression
 def load_dictionary(dictionary_file, encoding="utf-8"):
     try:
         word_to_index = {}
@@ -64,14 +64,9 @@ def load_dictionary(dictionary_file, encoding="utf-8"):
                 if word:
                     word_to_index[word] = index
                     index_to_word[index] = word
-        if not word_to_index:
-            raise ValueError("Dictionary file is empty.")
         return word_to_index, index_to_word
     except FileNotFoundError:
         print(f"Error: Dictionary file '{dictionary_file}' not found.")
-        return None, None
-    except (ValueError, UnicodeDecodeError) as e:
-        print(f"Error loading dictionary: {e}")
         return None, None
 
 def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
@@ -86,28 +81,20 @@ def compress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
             encoded_data = bytearray()
             for line in lines:
                 words = line.split()
-                for idx, word in enumerate(words):
+                for word in words:
                     if word in word_to_index:
                         encoded_data.append(0x00)
                         index = word_to_index[word]
                         encoded_data.extend(struct.pack(">I", index))
                     else:
                         encoded_data.append(0x01)
-                        try:
-                            encoded_data.extend(word.encode('utf-8'))
-                        except UnicodeEncodeError as e:
-                            print(f"Error encoding word '{word}': {e}")
-                            continue
+                        encoded_data.extend(word.encode('utf-8'))
                         encoded_data.append(0x00)
-                    if idx < len(words) - 1:
-                        encoded_data.append(0x03)
-                
                 encoded_data.append(0x02)
-            
             compressed_data = paq.compress(bytes(encoded_data))
             outfile.write(compressed_data)
             print(f"File compressed and saved as '{output_file}'")
-    except (FileNotFoundError, IOError) as e:
+    except Exception as e:
         print(f"Error compressing file: {e}")
 
 def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
@@ -125,12 +112,12 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                 flag = decompressed_data[i]
                 i += 1
                 if flag == 0x00:
-                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]
+                    index = struct.unpack(">I", decompressed_data[i:i + 4])[0]
                     decoded_text += index_to_word.get(index, "<unknown>")
                     i += 4
                 elif flag == 0x01:
                     word = ""
-                    while i < len(decompressed_data) and decompressed_data[i] != 0x00:
+                    while decompressed_data[i] != 0x00:
                         word += chr(decompressed_data[i])
                         i += 1
                     decoded_text += word
@@ -139,66 +126,51 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
                     decoded_text += "\n"
                 elif flag == 0x03:
                     decoded_text += " "
-
             outfile.write(decoded_text)
             print(f"File decompressed and saved as '{output_file}'")
-    except (FileNotFoundError, IOError) as e:
+    except Exception as e:
         print(f"Error decompressing file: {e}")
 
-# Compression Methods
-def compress_file_huffman(input_file, output_file, method="huffman"):
+# Huffman Compression
+def compress_file_huffman(input_file, output_file):
     try:
         with open(input_file, 'r', encoding='utf-8') as infile:
             data = infile.read()
 
-        if method == "huffman":
-            word_frequencies = Counter(data.split())
-            tree = build_huffman_tree(word_frequencies)
-            codes = generate_huffman_codes(tree)
-            encoded_data = huffman_encode(data, codes)
+        word_frequencies = Counter(data.split())
+        tree = build_huffman_tree(word_frequencies)
+        codes = generate_huffman_codes(tree)
+        encoded_data = huffman_encode(data, codes)
 
-            compressed_data = paq.compress(encoded_data.encode('utf-8'))
+        compressed_data = paq.compress(encoded_data.encode('utf-8'))
 
-            with open(output_file, 'wb') as outfile:
-                outfile.write(compressed_data)
+        with open(output_file, 'wb') as outfile:
+            outfile.write(compressed_data)
 
-            with open(output_file + ".tree", 'wb') as tree_file:
-                pickle.dump(tree, tree_file)
+        with open(output_file + ".tree", 'wb') as tree_file:
+            pickle.dump(tree, tree_file)
 
-            print(f"File compressed using Huffman coding and saved as '{output_file}'")
-        else:
-            print("Invalid compression method.")
-
-    except FileNotFoundError:
-        print(f"Error: File '{input_file}' not found.")
+        print(f"File compressed using Huffman coding and saved as '{output_file}'")
     except Exception as e:
-        print(f"Error during compression: {e}")
+        print(f"Error during Huffman compression: {e}")
 
-def decompress_file_huffman(input_file, output_file, method="huffman"):
+def decompress_file_huffman(input_file, output_file):
     try:
-        if method == "huffman":
-            with open(input_file + ".tree", 'rb') as tree_file:
-                tree = pickle.load(tree_file)
+        with open(input_file + ".tree", 'rb') as tree_file:
+            tree = pickle.load(tree_file)
 
-            with open(input_file, 'rb') as infile:
-                compressed_data = infile.read()
+        with open(input_file, 'rb') as infile:
+            compressed_data = infile.read()
 
-            encoded_data = paq.decompress(compressed_data).decode('utf-8')
+        encoded_data = paq.decompress(compressed_data).decode('utf-8')
+        decoded_data = huffman_decode(encoded_data, tree)
 
-            decoded_data = huffman_decode(encoded_data, tree)
+        with open(output_file, 'w', encoding='utf-8') as outfile:
+            outfile.write(decoded_data)
 
-            with open(output_file, 'w', encoding='utf-8') as outfile:
-                outfile.write(decoded_data)
-
-            print(f"File decompressed using Huffman coding and saved as '{output_file}'")
-
-        else:
-            print("Invalid decompression method.")
-
-    except FileNotFoundError:
-        print("Error: File not found.")
+        print(f"File decompressed using Huffman coding and saved as '{output_file}'")
     except Exception as e:
-        print(f"Error during decompression: {e}")
+        print(f"Error during Huffman decompression: {e}")
 
 # Main Function
 def main():
@@ -212,23 +184,21 @@ def main():
         output_file_base = input("Enter the base name for the output file: ").strip()
         dictionary_file = "Dictionary.txt"
 
-        # Perform compression using Huffman and replacement methods
-        compress_file_huffman(input_file, output_file_base + ".M1", method="huffman")
-        compress_file(dictionary_file, input_file, output_file_base + ".b", encoding="utf-8")
+        compress_file_huffman(input_file, output_file_base + ".M1")
+        compress_file(dictionary_file, input_file, output_file_base + ".b")
     elif choice == '2':
         input_file = input("Enter the compressed file to decompress: ").strip()
         output_file = input("Enter the output file name: ").strip()
         dictionary_file = "Dictionary.txt"
 
-        # Decompress using the chosen method
         if input_file.endswith(".M1"):
-            decompress_file_huffman(input_file, output_file, method="huffman")
+            decompress_file_huffman(input_file, output_file)
         elif input_file.endswith(".b"):
-            decompress_file(dictionary_file, input_file, output_file, encoding="utf-8")
+            decompress_file(dictionary_file, input_file, output_file)
         else:
-            print("Invalid compressed file format.")
+            print("Invalid file format.")
     else:
-        print("Invalid choice. Please choose 1 or 2.")
+        print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
