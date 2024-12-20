@@ -5,7 +5,7 @@ import pickle
 from paq import compress as paq_compress, decompress as paq_decompress
 
 print("Created by Jurijus Pacalovas.")
-print("This software supports Huffman coding for compression and decompression.")
+print("This software supports multiple compression methods, including Huffman coding, PAQ, and replacement-based compression.")
 
 # Huffman Node
 class HuffmanNode:
@@ -52,60 +52,118 @@ def huffman_decode(encoded_data, tree):
             current_node = tree
     return ' '.join(decoded_data)
 
-# Compression
-def compress_file(input_file, output_file):
+# Compression Methods
+def compress_file(input_file, output_file, method="huffman"):
     try:
         with open(input_file, 'r', encoding='utf-8') as infile:
             data = infile.read()
 
-        # Frequency analysis and Huffman encoding
-        word_frequencies = Counter(data.split())
-        tree = build_huffman_tree(word_frequencies)
-        codes = generate_huffman_codes(tree)
-        encoded_data = huffman_encode(data, codes)
+        if method == "huffman":
+            # Frequency analysis and Huffman encoding
+            word_frequencies = Counter(data.split())
+            tree = build_huffman_tree(word_frequencies)
+            codes = generate_huffman_codes(tree)
+            encoded_data = huffman_encode(data, codes)
 
-        # Further compress with PAQ
-        compressed_data = paq_compress(encoded_data.encode('utf-8'))
+            # Further compress with PAQ
+            compressed_data = paq_compress(encoded_data.encode('utf-8'))
 
-        # Save compressed data and Huffman tree
-        with open(output_file, 'wb') as outfile:
-            outfile.write(compressed_data)
+            # Save compressed data and Huffman tree
+            with open(output_file, 'wb') as outfile:
+                outfile.write(compressed_data)
 
-        with open(output_file + ".tree", 'wb') as tree_file:
-            pickle.dump(tree, tree_file)
+            with open(output_file + ".tree", 'wb') as tree_file:
+                pickle.dump(tree, tree_file)
 
-        print(f"File compressed using Huffman coding and saved as '{output_file}'")
+            print(f"File compressed using Huffman coding (M1) and saved as '{output_file}'")
+
+        elif method == "replacement":
+            # Simple replacement-based compression
+            MAX_VALUE = 255
+            REPLACEMENT_VALUE = 254
+            compressed_data = bytearray()
+            replacements = 0
+            for byte in data.encode('utf-8'):
+                if byte == MAX_VALUE:
+                    compressed_data.append(REPLACEMENT_VALUE)
+                    replacements += 1
+                else:
+                    compressed_data.append(byte)
+
+            if replacements > 0:
+                compressed_data = compressed_data[:-1]  # Reduce by 1 byte
+
+            # Save compressed data
+            with open(output_file, 'wb') as outfile:
+                outfile.write(compressed_data)
+
+            print(f"File compressed using replacement-based method (M2) and saved as '{output_file}'")
+
+        else:
+            print("Invalid compression method.")
 
     except FileNotFoundError:
         print(f"Error: File '{input_file}' not found.")
     except Exception as e:
         print(f"Error during compression: {e}")
 
-# Decompression
-def decompress_file(input_file, output_file):
+def decompress_file(input_file, output_file, method="huffman"):
     try:
-        # Load Huffman tree
-        with open(input_file + ".tree", 'rb') as tree_file:
-            tree = pickle.load(tree_file)
+        if method == "huffman":
+            # Load Huffman tree
+            with open(input_file + ".tree", 'rb') as tree_file:
+                tree = pickle.load(tree_file)
 
-        with open(input_file, 'rb') as infile:
-            compressed_data = infile.read()
+            with open(input_file, 'rb') as infile:
+                compressed_data = infile.read()
 
-        # Decompress with PAQ
-        encoded_data = paq_decompress(compressed_data).decode('utf-8')
+            # Decompress with PAQ
+            encoded_data = paq_decompress(compressed_data).decode('utf-8')
 
-        # Decode data using Huffman tree
-        decoded_data = huffman_decode(encoded_data, tree)
+            # Decode data using Huffman tree
+            decoded_data = huffman_decode(encoded_data, tree)
 
-        with open(output_file, 'w', encoding='utf-8') as outfile:
-            outfile.write(decoded_data)
+            with open(output_file, 'w', encoding='utf-8') as outfile:
+                outfile.write(decoded_data)
 
-        print(f"File decompressed using Huffman coding and saved as '{output_file}'")
+            print(f"File decompressed using Huffman coding (M1) and saved as '{output_file}'")
+
+        elif method == "replacement":
+            MAX_VALUE = 255
+            REPLACEMENT_VALUE = 254
+
+            with open(input_file, 'rb') as infile:
+                compressed_data = infile.read()
+
+            decompressed_data = bytearray()
+            for byte in compressed_data:
+                if byte == REPLACEMENT_VALUE:
+                    decompressed_data.append(MAX_VALUE)
+                else:
+                    decompressed_data.append(byte)
+
+            with open(output_file, 'wb') as outfile:
+                outfile.write(decompressed_data)
+
+            print(f"File decompressed using replacement-based method (M2) and saved as '{output_file}'")
+
+        else:
+            print("Invalid decompression method.")
 
     except FileNotFoundError:
-        print(f"Error: File '{input_file}' not found.")
+        print("Error: File not found.")
     except Exception as e:
         print(f"Error during decompression: {e}")
+
+# Extract compression method from file name
+def get_compression_method_from_filename(filename):
+    if filename.endswith(".M1"):
+        return "huffman"
+    elif filename.endswith(".M2"):
+        return "replacement"
+    else:
+        print("Error: Unrecognized compression method in file name.")
+        return None
 
 # Main Function
 def main():
@@ -114,17 +172,28 @@ def main():
     print("2. Decompress a file")
     choice = input("Enter your choice (1 or 2): ").strip()
 
-    input_file = input("Enter the input file name: ").strip()
-    output_file = input("Enter the output file name: ").strip()
+    if choice == '1':
+        input_file = input("Enter the input file to compress (e.g., input.txt): ").strip()
+        output_file_base = input("Enter the base name for the output file (e.g., output): ").strip()
 
-    if choice == '1':  # Compress
-        compress_file(input_file, output_file + ".b")
+        # Example: Perform compression using Huffman and replacement methods
+        compress_file(input_file, output_file_base + ".M1", method="huffman")
+        compress_file(input_file, output_file_base + ".M2", method="replacement")
 
-    elif choice == '2':  # Decompress
-        decompress_file(input_file, output_file)
+    elif choice == '2':
+        input_file = input("Enter the compressed file to decompress (e.g., output.M1): ").strip()
+        output_file = input("Enter the output file name (e.g., decompressed.txt): ").strip()
+
+        # Extract compression method from the file name
+        method = get_compression_method_from_filename(input_file)
+
+        if method:
+            decompress_file(input_file, output_file, method)
+        else:
+            print("Error: Could not determine compression method from file name.")
 
     else:
-        print("Invalid choice. Please select 1 or 2.")
+        print("Invalid choice. Please choose 1 or 2.")
 
 if __name__ == "__main__":
     main()
