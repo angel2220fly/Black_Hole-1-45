@@ -179,12 +179,12 @@ def main():
         compressed_file = input("Enter the compressed file: ")
         
         if compressed_file.endswith(".Method_1"):
-            output_file = compressed_file.replace(".Method_1", "_decompressed.bin")
+            output_file = compressed_file.replace(".Method_1", "_decompressed.bin.txt")
             decompress_method_1(compressed_file, output_file)
             print(f"Decompressed file: {output_file}")
         
         elif compressed_file.endswith(".Method_2"):
-            output_file = compressed_file.replace(".Method_2", "_decompressed.bin")
+            output_file = compressed_file.replace(".Method_2", "_decompressed.bin.txt")
             decompress_method_2(compressed_file, output_file)
             print(f"Decompressed file: {output_file}")
         
