@@ -1,206 +1,11 @@
 import os
-import paq
-
-# Constants for the algorithm
-MAX_VALUE = 255  # 8-bit max value (adjusted for byte-level handling)
-REPLACEMENT_VALUE = 254  # Replacement for MAX_VALUE
-
-def method_1_compress(input_file, output_file):
-    """
-    Compress a binary file by replacing MAX_VALUE with REPLACEMENT_VALUE.
-    Ensures a 1-byte reduction in file size.
-    """
-    try:
-        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
-            data = infile.read()
-            compressed_data = bytearray()
-
-            # Compression logic: replacing MAX_VALUE with REPLACEMENT_VALUE
-            replacements = 0
-            for byte in data:
-                if byte == MAX_VALUE:
-                    compressed_data.append(REPLACEMENT_VALUE)
-                    replacements += 1
-                else:
-                    compressed_data.append(byte)
-
-            # If replacements occurred, reduce 1 byte for compression
-            if replacements > 0:
-                compressed_data = compressed_data[:-1]
-
-            outfile.write(compressed_data)
-            return len(compressed_data)
-
-    except Exception as e:
-        print(f"Error during Method_1 compression: {e}")
-        return float('inf')
-
-def method_2_compress(input_file, output_file):
-    """
-    Compress a binary file by replacing MAX_VALUE with REPLACEMENT_VALUE (same as Method_1).
-    """
-    try:
-        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
-            data = infile.read()
-            compressed_data = bytearray()
-
-            # Compression logic: replacing MAX_VALUE with REPLACEMENT_VALUE
-            for byte in data:
-                if byte == MAX_VALUE:
-                    compressed_data.append(REPLACEMENT_VALUE)
-                else:
-                    compressed_data.append(byte)
-
-            outfile.write(compressed_data)
-            return len(compressed_data)
-
-    except Exception as e:
-        print(f"Error during Method_2 compression: {e}")
-        return float('inf')
-
-def method_3_compress(input_file, output_file):
-    """
-    Compress a binary file using zlib compression.
-    """
-    try:
-        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
-            data = infile.read()
-            compressed_data = zlib.compress(data)
-
-            # Write compressed data to the output file
-            outfile.write(compressed_data)
-            return len(compressed_data)
-
-    except Exception as e:
-        print(f"Error during Method_3 compression (zlib): {e}")
-        return float('inf')
-
-def method_4_compress(input_file, output_file):
-    """
-    Compress a binary file using zlib compression (instead of gzip).
-    """
-    try:
-        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
-            data = infile.read()
-            compressed_data = paq.compress(data)
-
-            # Write compressed data to the output file
-            outfile.write(compressed_data)
-            return len(compressed_data)
-
-    except Exception as e:
-        print(f"Error during Method_4 compression (zlib): {e}")
-        return float('inf')
-
-def extract(input_file, output_file):
-    """
-    Extract a binary file by reversing the compression process depending on the file name.
-    """
-    try:
-        # Determine method based on the input file name
-        if '_method1' in input_file:
-            method = "Method_1"
-        elif '_method2' in input_file:
-            method = "Method_2"
-        elif '_method3' in input_file:
-            method = "Method_3"
-        elif '_method4' in input_file:
-            method = "Method_4"
-        else:
-            print("Unknown compression method in the file name.")
-            return
-
-        # Open the compressed file
-        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
-            data = infile.read()
-            extracted_data = bytearray()
-
-            if method == "Method_1" or method == "Method_2":
-                # Replacing REPLACEMENT_VALUE with MAX_VALUE for Methods 1 & 2
-                for byte in data:
-                    if byte == REPLACEMENT_VALUE:
-                        extracted_data.append(MAX_VALUE)
-                    else:
-                        extracted_data.append(byte)
-                # Add back the removed byte to restore original size
-                extracted_data.append(MAX_VALUE)
-            elif method == "Method_3" or method == "Method_4":
-                # Decompress using zlib for Methods 3 & 4
-                extracted_data = paq.decompress(data)
-
-            # Write extracted data
-            outfile.write(extracted_data)
-            print(f"Extracted file size: {len(extracted_data)} bytes")
-
-    except Exception as e:
-        print(f"Error during extraction: {e}")
-
-def main():
-    """
-    Main function to handle user input for compression or extraction.
-    """
-    try:
-        print("Choose an option:")
-        print("1. Compress a file")
-        print("2. Extract a file")
-        choice = input("Enter your choice (1 or 2): ").strip()
-
-        if choice == '1':
-            print("Enter the input file name for compression:")
-            input_file = input().strip()
-            
-            # Get the output file name for compressed file
-            output_file = input("Enter the output file name for the compressed file: ").strip()
-            
-            # Compress with all four methods and store the sizes
-            sizes = {}
-            
-            # Method_1
-            method_1_output = output_file + "_method1"
-            sizes['Method_1'] = method_1_compress(input_file, method_1_output)
-            
-            # Method_2
-            method_2_output = output_file + "_method2"
-            sizes['Method_2'] = method_2_compress(input_file, method_2_output)
-            
-            # Method_3
-            method_3_output = output_file + "_method3"
-            sizes['Method_3'] = method_3_compress(input_file, method_3_output)
-            
-            # Method_4
-            method_4_output = output_file + "_method4"
-            sizes['Method_4'] = method_4_compress(input_file, method_4_output)
-
-            # Choose the best compression method (smallest file size)
-            best_method = min(sizes, key=sizes.get)
-            best_output = output_file + f"_{best_method.lower()}"
-            print(f"The best method is {best_method} with compressed size: {sizes[best_method]} bytes.")
-            
-            # Copy the best method's output file as the final compressed file
-            os.rename(globals()[f"{best_method.lower()}_output"], best_output)
-            print(f"Final compressed file: {best_output}")
-
-        elif choice == '2':
-            input_file = input("Enter the compressed file name for extraction: ").strip()
-            output_file = input("Enter the output file name for the extracted file: ").strip()
-            
-            # Extract the file based on method used in the file name
-            extract(input_file, output_file)
-
-        else:
-            print("Invalid choice. Please choose 1 or 2.")
-
-    except Exception as e:
-        print(f"Error during main execution: {e}")
-
-if __name__ == "__main__":
-    main()
 import heapq
 from collections import Counter
-import struct
-import os
+import pickle
+from paq import compress as paq_compress, decompress as paq_decompress
+
 print("Created by Jurijus Pacalovas.")
-print("This software for compression words.")
+print("This software supports multiple compression methods, including Huffman coding, PAQ, and replacement-based compression.")
 
 # Huffman Node
 class HuffmanNode:
@@ -213,23 +18,18 @@ class HuffmanNode:
     def __lt__(self, other):
         return self.freq < other.freq
 
-
+# Huffman Encoding
 def build_huffman_tree(frequencies):
-    """Build Huffman tree from frequencies."""
     heap = [HuffmanNode(char, freq) for char, freq in frequencies.items()]
     heapq.heapify(heap)
-
     while len(heap) > 1:
         left = heapq.heappop(heap)
         right = heapq.heappop(heap)
         merged = HuffmanNode(freq=left.freq + right.freq, left=left, right=right)
         heapq.heappush(heap, merged)
-
     return heap[0]
 
-
 def generate_huffman_codes(tree, prefix="", codes=None):
-    """Generate Huffman codes."""
     if codes is None:
         codes = {}
     if tree.char is not None:
@@ -239,14 +39,10 @@ def generate_huffman_codes(tree, prefix="", codes=None):
         generate_huffman_codes(tree.right, prefix + "1", codes)
     return codes
 
-
 def huffman_encode(data, codes):
-    """Encode data using Huffman codes."""
     return ''.join(codes[word] for word in data.split())
 
-
 def huffman_decode(encoded_data, tree):
-    """Decode data using the Huffman tree."""
     decoded_data = []
     current_node = tree
     for bit in encoded_data:
@@ -256,103 +52,150 @@ def huffman_decode(encoded_data, tree):
             current_node = tree
     return ' '.join(decoded_data)
 
-
-def compress_with_paq(data):
-    """Compress data using the `paq` library."""
-    try:
-        import paq
-        compressed_data = paq.compress(data.encode('utf-8'))
-        return compressed_data
-    except ImportError:
-        print("Error: The 'paq' library is not installed. Install it using 'pip install paq8px'.")
-        exit()
-
-
-def decompress_with_paq(data):
-    """Decompress data using the `paq` library."""
-    try:
-        import paq
-        decompressed_data = paq.decompress(data).decode('utf-8')
-        return decompressed_data
-    except ImportError:
-        print("Error: The 'paq' library is not installed. Install it using 'pip install paq8px'.")
-        exit()
-
-
-def compress_file(input_file, output_file):
-    """Compress a file using Huffman coding and paq."""
+# Compression Methods
+def compress_file(input_file, output_file, method="huffman"):
     try:
         with open(input_file, 'r', encoding='utf-8') as infile:
             data = infile.read()
 
-        # Frequency analysis
-        word_frequencies = Counter(data.split())
-        tree = build_huffman_tree(word_frequencies)
-        codes = generate_huffman_codes(tree)
+        if method == "huffman":
+            # Frequency analysis and Huffman encoding
+            word_frequencies = Counter(data.split())
+            tree = build_huffman_tree(word_frequencies)
+            codes = generate_huffman_codes(tree)
+            encoded_data = huffman_encode(data, codes)
 
-        # Encode data with Huffman
-        encoded_data = huffman_encode(data, codes)
+            # Further compress with PAQ
+            compressed_data = paq_compress(encoded_data.encode('utf-8'))
 
-        # Compress with paq
-        compressed_data = compress_with_paq(encoded_data)
+            # Save compressed data and Huffman tree
+            with open(output_file, 'wb') as outfile:
+                outfile.write(compressed_data)
 
-        # Save compressed data and Huffman tree
-        with open(output_file, 'wb') as outfile:
-            outfile.write(compressed_data)
+            with open(output_file + ".tree", 'wb') as tree_file:
+                pickle.dump(tree, tree_file)
 
-        with open("huffman_tree.pkl", "wb") as tree_file:
-            import pickle
-            pickle.dump(tree, tree_file)
+            print(f"File compressed using Huffman coding and saved as '{output_file}'")
 
-        print(f"File compressed and saved as '{output_file}'")
+        elif method == "replacement":
+            # Simple replacement-based compression
+            MAX_VALUE = 255
+            REPLACEMENT_VALUE = 254
+            compressed_data = bytearray()
+            replacements = 0
+            for byte in data.encode('utf-8'):
+                if byte == MAX_VALUE:
+                    compressed_data.append(REPLACEMENT_VALUE)
+                    replacements += 1
+                else:
+                    compressed_data.append(byte)
+
+            if replacements > 0:
+                compressed_data = compressed_data[:-1]  # Reduce by 1 byte
+
+            # Save compressed data
+            with open(output_file, 'wb') as outfile:
+                outfile.write(compressed_data)
+
+            print(f"File compressed using replacement-based method and saved as '{output_file}'")
+
+        else:
+            print("Invalid compression method.")
+
     except FileNotFoundError:
         print(f"Error: File '{input_file}' not found.")
+    except Exception as e:
+        print(f"Error during compression: {e}")
 
-
-def decompress_file(input_file, output_file):
-    """Decompress a file using Huffman coding and paq."""
+def decompress_file(input_file, output_file, method="huffman"):
     try:
-        with open("huffman_tree.pkl", "rb") as tree_file:
-            import pickle
-            tree = pickle.load(tree_file)
+        if method == "huffman":
+            # Load Huffman tree
+            with open(input_file + ".tree", 'rb') as tree_file:
+                tree = pickle.load(tree_file)
 
-        with open(input_file, 'rb') as infile:
-            compressed_data = infile.read()
+            with open(input_file, 'rb') as infile:
+                compressed_data = infile.read()
 
-        # Decompress with paq
-        encoded_data = decompress_with_paq(compressed_data)
+            # Decompress with PAQ
+            encoded_data = paq_decompress(compressed_data).decode('utf-8')
 
-        # Decode data with Huffman
-        decoded_data = huffman_decode(encoded_data, tree)
+            # Decode data using Huffman tree
+            decoded_data = huffman_decode(encoded_data, tree)
 
-        with open(output_file, 'w', encoding='utf-8') as outfile:
-            outfile.write(decoded_data)
+            with open(output_file, 'w', encoding='utf-8') as outfile:
+                outfile.write(decoded_data)
 
-        print(f"File decompressed and saved as '{output_file}'")
+            print(f"File decompressed using Huffman coding and saved as '{output_file}'")
+
+        elif method == "replacement":
+            MAX_VALUE = 255
+            REPLACEMENT_VALUE = 254
+
+            with open(input_file, 'rb') as infile:
+                compressed_data = infile.read()
+
+            decompressed_data = bytearray()
+            for byte in compressed_data:
+                if byte == REPLACEMENT_VALUE:
+                    decompressed_data.append(MAX_VALUE)
+                else:
+                    decompressed_data.append(byte)
+
+            with open(output_file, 'wb') as outfile:
+                outfile.write(decompressed_data)
+
+            print(f"File decompressed using replacement-based method and saved as '{output_file}'")
+
+        else:
+            print("Invalid decompression method.")
+
     except FileNotFoundError:
         print("Error: File not found.")
     except Exception as e:
         print(f"Error during decompression: {e}")
 
-
+# Main Function
 def main():
-    """Main function for user interaction."""
     print("Choose an option:")
     print("1. Compress a file")
     print("2. Decompress a file")
-    choice = input("Enter your choice: ")
+    choice = input("Enter your choice: ").strip()
 
     if choice == '1':
-        input_file = input("Enter the input file to compress: ")
-        output_file = input_file + ".b"
-        compress_file(input_file, output_file)
-    elif choice == '2':
-        input_file = input("Enter the compressed file: ")
-        output_file = input_file[:-2]  # Remove ".paq" extension
-        decompress_file(input_file, output_file)
-    else:
-        print("Invalid choice.")
+        input_file = input("Enter the input file to compress: ").strip()
+        output_file = input("Enter the output file name: ").strip()
 
+        print("Choose a compression method:")
+        print("1. Huffman")
+        print("2. Replacement-based")
+        method_choice = input("Enter your choice: ").strip()
+
+        if method_choice == '1':
+            compress_file(input_file, output_file, method="huffman")
+        elif method_choice == '2':
+            compress_file(input_file, output_file, method="replacement")
+        else:
+            print("Invalid compression method. Please choose 1 or 2.")
+
+    elif choice == '2':
+        input_file = input("Enter the compressed file to decompress: ").strip()
+        output_file = input("Enter the output file name: ").strip()
+
+        print("Choose a decompression method:")
+        print("1. Huffman")
+        print("2. Replacement-based")
+        method_choice = input("Enter your choice: ").strip()
+
+        if method_choice == '1':
+            decompress_file(input_file, output_file, method="huffman")
+        elif method_choice == '2':
+            decompress_file(input_file, output_file, method="replacement")
+        else:
+            print("Invalid decompression method. Please choose 1 or 2.")
+
+    else:
+        print("Invalid choice. Please choose 1 or 2.")
 
 if __name__ == "__main__":
     main()
