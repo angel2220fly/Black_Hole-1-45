@@ -210,7 +210,7 @@ def main():
     if choice == '1':
         input_file = input("Enter the input file to compress: ").strip()
         output_file_base = input("Enter the base name for the output file: ").strip()
-        dictionary_file = input("Enter the dictionary file for word-based compression: ").strip()
+        dictionary_file = "Dictionary.txt"
 
         # Perform compression using Huffman and replacement methods
         compress_file_huffman(input_file, output_file_base + ".M1", method="huffman")
