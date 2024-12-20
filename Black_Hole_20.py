@@ -1,7 +1,128 @@
-import os
 import heapq
-import paq
+import os
+import struct
 from collections import defaultdict
+import paq
+
+class HuffmanNode:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(freq):
+    """Constructs the Huffman tree from the frequency dictionary."""
+    heap = [HuffmanNode(char, freq[char]) for char in freq]
+    heapq.heapify(heap)
+
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+        merged = HuffmanNode(None, left.freq + right.freq)
+        merged.left = left
+        merged.right = right
+        heapq.heappush(heap, merged)
+
+    return heap[0]
+
+def build_huffman_codes(node, prefix="", codebook={}):
+    """Builds the Huffman codes by traversing the Huffman tree."""
+    if node is not None:
+        if node.char is not None:
+            codebook[node.char] = prefix
+        build_huffman_codes(node.left, prefix + "0", codebook)
+        build_huffman_codes(node.right, prefix + "1", codebook)
+    return codebook
+
+def compress_method_2(input_file, output_file):
+    """Compresses the input file using Huffman coding."""
+    with open(input_file, 'rb') as f:
+        content = f.read()
+
+    # Step 1: Calculate frequency of each byte
+    freq = defaultdict(int)
+    for byte in content:
+        freq[bytes([byte])] += 1
+
+    # Step 2: Build Huffman tree
+    huffman_tree = build_huffman_tree(freq)
+    huffman_codes = build_huffman_codes(huffman_tree)
+
+    # Step 3: Compress the data using the Huffman codes
+    compressed_data = ''.join(huffman_codes[bytes([byte])] for byte in content)
+
+    # Step 4: Write the compressed file in binary format
+    with open(output_file, 'wb') as f:
+        # First, write the header (the length of the codes)
+        f.write(struct.pack('H', len(huffman_codes)))  # Number of codes
+        for byte, code in huffman_codes.items():
+            f.write(struct.pack('B', byte[0]))  # Byte value
+            # Write the length of the code and then the code itself
+            f.write(struct.pack('B', len(code)))
+            f.write(int(code, 2).to_bytes((len(code) + 7) // 8, byteorder='big'))
+        
+        # Now, write the actual compressed data
+        bit_stream = ''
+        for byte in content:
+            bit_stream += huffman_codes[bytes([byte])]
+        
+        # Convert bit stream to bytes and write
+        padding = 8 - len(bit_stream) % 8
+        bit_stream = '0' * padding + bit_stream  # Add padding
+        byte_array = bytearray()
+        for i in range(0, len(bit_stream), 8):
+            byte_array.append(int(bit_stream[i:i+8], 2))
+
+        f.write(bytearray(byte_array))
+
+    print(f"File successfully compressed using Huffman coding to {output_file}")
+
+def decompress_method_2(input_file, output_file):
+    """Decompresses a file compressed with Huffman coding."""
+    with open(input_file, 'rb') as f:
+        # Step 1: Read the header (the length of the codes)
+        num_codes = struct.unpack('H', f.read(2))[0]
+
+        huffman_codes = {}
+        reverse_codes = {}
+
+        # Step 2: Read the codes
+        for _ in range(num_codes):
+            byte = struct.unpack('B', f.read(1))[0]
+            code_length = struct.unpack('B', f.read(1))[0]
+            code = bin(int.from_bytes(f.read((code_length + 7) // 8), byteorder='big'))[2:].zfill(code_length)
+            huffman_codes[code] = bytes([byte])
+            reverse_codes[bytes([byte])] = code
+
+        # Step 3: Read the compressed data
+        bit_stream = ''
+        byte = f.read(1)
+        while byte:
+            bit_stream += bin(byte[0])[2:].zfill(8)
+            byte = f.read(1)
+
+        # Step 4: Remove padding
+        padding = bit_stream[:8]
+        bit_stream = bit_stream[8:]
+        
+        # Step 5: Decode the bit stream using the reverse codes
+        current_code = ''
+        result = []
+        for bit in bit_stream:
+            current_code += bit
+            if current_code in reverse_codes:
+                result.append(reverse_codes[current_code])
+                current_code = ''
+
+        # Step 6: Write the decompressed file
+        with open(output_file, 'wb') as out_f:
+            out_f.write(b''.join(result))
+
+    print(f"File successfully decompressed to {output_file}")
 
 # Method 1: Dictionary-based Compression with zlib for byte values (0-255)
 def build_dictionary(file_path):
@@ -63,86 +184,6 @@ def decompress_method_1(input_file, output_file):
     
     with open(output_file, 'wb') as f:
         f.write(b''.join(decompressed_data))
-
-# Method 2: Huffman Compression with zlib for byte values (0-255)
-class HuffmanNode:
-    def __init__(self, char, freq):
-        self.char = char
-        self.freq = freq
-        self.left = None
-        self.right = None
-
-    def __lt__(self, other):
-        return self.freq < other.freq
-
-def build_huffman_tree(freq):
-    heap = [HuffmanNode(char, freq[char]) for char in freq]
-    heapq.heapify(heap)
-
-    while len(heap) > 1:
-        left = heapq.heappop(heap)
-        right = heapq.heappop(heap)
-        merged = HuffmanNode(None, left.freq + right.freq)
-        merged.left = left
-        merged.right = right
-        heapq.heappush(heap, merged)
-
-    return heap[0]
-
-def build_huffman_codes(node, prefix="", codebook={}):
-    if node is not None:
-        if node.char is not None:
-            codebook[node.char] = prefix
-        build_huffman_codes(node.left, prefix + "0", codebook)
-        build_huffman_codes(node.right, prefix + "1", codebook)
-    return codebook
-
-def compress_method_2(input_file, output_file):
-    """Compresses the input file using Huffman coding and zlib for byte values (0-255)."""
-    with open(input_file, 'rb') as f:
-        content = f.read()
-
-    freq = defaultdict(int)
-    for byte in content:
-        freq[bytes([byte])] += 1
-
-    huffman_tree = build_huffman_tree(freq)
-    huffman_codes = build_huffman_codes(huffman_tree)
-
-    compressed_data = ''.join(huffman_codes[bytes([byte])] for byte in content)
-    compressed_zlib = paq.compress(compressed_data.encode())
-
-    with open(output_file, 'wb') as f:
-        f.write(compressed_zlib)
-
-    with open(output_file + ".codes", 'w') as codes_file:
-        for byte, code in huffman_codes.items():
-            codes_file.write(f"{byte[0]}:{code}\n")
-
-def decompress_method_2(input_file, output_file):
-    """Decompresses a Huffman compressed file using zlib for byte values (0-255)."""
-    with open(input_file + ".codes", 'r') as codes_file:
-        huffman_codes = {}
-        for line in codes_file:
-            byte, code = line.split(':')
-            huffman_codes[code.strip()] = bytes([int(byte)])
-    
-    reverse_codes = {v: k for k, v in huffman_codes.items()}
-    with open(input_file, 'rb') as f:
-        compressed_data = f.read()
-
-    decompressed_data = zlib.decompress(compressed_data).decode()
-
-    current_code = ""
-    result = []
-    for bit in decompressed_data:
-        current_code += bit
-        if current_code in reverse_codes:
-            result.append(reverse_codes[current_code])
-            current_code = ""
-    
-    with open(output_file, 'wb') as f:
-        f.write(b''.join(result))
 
 # Main Menu
 def main():
