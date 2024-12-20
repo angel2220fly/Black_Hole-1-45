@@ -1,238 +1,197 @@
-import heapq
 import os
-import struct
-from collections import defaultdict
 import paq
 
-class HuffmanNode:
-    def __init__(self, char, freq):
-        self.char = char
-        self.freq = freq
-        self.left = None
-        self.right = None
+# Constants for the algorithm
+MAX_VALUE = 255  # 8-bit max value (adjusted for byte-level handling)
+REPLACEMENT_VALUE = 254  # Replacement for MAX_VALUE
 
-    def __lt__(self, other):
-        return self.freq < other.freq
+def method_1_compress(input_file, output_file):
+    """
+    Compress a binary file by replacing MAX_VALUE with REPLACEMENT_VALUE.
+    Ensures a 1-byte reduction in file size.
+    """
+    try:
+        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+            data = infile.read()
+            compressed_data = bytearray()
 
-def build_huffman_tree(freq):
-    """Constructs the Huffman tree from the frequency dictionary."""
-    heap = [HuffmanNode(char, freq[char]) for char in freq]
-    heapq.heapify(heap)
+            # Compression logic: replacing MAX_VALUE with REPLACEMENT_VALUE
+            replacements = 0
+            for byte in data:
+                if byte == MAX_VALUE:
+                    compressed_data.append(REPLACEMENT_VALUE)
+                    replacements += 1
+                else:
+                    compressed_data.append(byte)
 
-    while len(heap) > 1:
-        left = heapq.heappop(heap)
-        right = heapq.heappop(heap)
-        merged = HuffmanNode(None, left.freq + right.freq)
-        merged.left = left
-        merged.right = right
-        heapq.heappush(heap, merged)
+            # If replacements occurred, reduce 1 byte for compression
+            if replacements > 0:
+                compressed_data = compressed_data[:-1]
 
-    return heap[0]
+            outfile.write(compressed_data)
+            return len(compressed_data)
 
-def build_huffman_codes(node, prefix="", codebook={}):
-    """Builds the Huffman codes by traversing the Huffman tree."""
-    if node is not None:
-        if node.char is not None:
-            codebook[node.char] = prefix
-        build_huffman_codes(node.left, prefix + "0", codebook)
-        build_huffman_codes(node.right, prefix + "1", codebook)
-    return codebook
+    except Exception as e:
+        print(f"Error during Method_1 compression: {e}")
+        return float('inf')
 
-def compress_method_2(input_file, output_file):
-    """Compresses the input file using Huffman coding."""
-    with open(input_file, 'rb') as f:
-        content = f.read()
+def method_2_compress(input_file, output_file):
+    """
+    Compress a binary file by replacing MAX_VALUE with REPLACEMENT_VALUE (same as Method_1).
+    """
+    try:
+        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+            data = infile.read()
+            compressed_data = bytearray()
 
-    # Step 1: Calculate frequency of each byte
-    freq = defaultdict(int)
-    for byte in content:
-        freq[bytes([byte])] += 1
+            # Compression logic: replacing MAX_VALUE with REPLACEMENT_VALUE
+            for byte in data:
+                if byte == MAX_VALUE:
+                    compressed_data.append(REPLACEMENT_VALUE)
+                else:
+                    compressed_data.append(byte)
 
-    # Step 2: Build Huffman tree
-    huffman_tree = build_huffman_tree(freq)
-    huffman_codes = build_huffman_codes(huffman_tree)
+            outfile.write(compressed_data)
+            return len(compressed_data)
 
-    # Step 3: Compress the data using the Huffman codes
-    compressed_data = ''.join(huffman_codes[bytes([byte])] for byte in content)
+    except Exception as e:
+        print(f"Error during Method_2 compression: {e}")
+        return float('inf')
 
-    # Step 4: Write the compressed file in binary format
-    with open(output_file, 'wb') as f:
-        # First, write the header (the length of the codes)
-        f.write(struct.pack('H', len(huffman_codes)))  # Number of codes
-        for byte, code in huffman_codes.items():
-            f.write(struct.pack('B', byte[0]))  # Byte value
-            # Write the length of the code and then the code itself
-            f.write(struct.pack('B', len(code)))
-            f.write(int(code, 2).to_bytes((len(code) + 7) // 8, byteorder='big'))
-        
-        # Now, write the actual compressed data
-        bit_stream = ''
-        for byte in content:
-            bit_stream += huffman_codes[bytes([byte])]
-        
-        # Convert bit stream to bytes and write
-        padding = 8 - len(bit_stream) % 8
-        bit_stream = '0' * padding + bit_stream  # Add padding
-        byte_array = bytearray()
-        for i in range(0, len(bit_stream), 8):
-            byte_array.append(int(bit_stream[i:i+8], 2))
+def method_3_compress(input_file, output_file):
+    """
+    Compress a binary file using zlib compression.
+    """
+    try:
+        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+            data = infile.read()
+            compressed_data = zlib.compress(data)
 
-        f.write(bytearray(byte_array))
+            # Write compressed data to the output file
+            outfile.write(compressed_data)
+            return len(compressed_data)
 
-    print(f"File successfully compressed using Huffman coding to {output_file}")
+    except Exception as e:
+        print(f"Error during Method_3 compression (zlib): {e}")
+        return float('inf')
 
-def decompress_method_2(input_file, output_file):
-    """Decompresses a file compressed with Huffman coding."""
-    with open(input_file, 'rb') as f:
-        # Step 1: Read the header (the length of the codes)
-        num_codes = struct.unpack('H', f.read(2))[0]
+def method_4_compress(input_file, output_file):
+    """
+    Compress a binary file using zlib compression (instead of gzip).
+    """
+    try:
+        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+            data = infile.read()
+            compressed_data = paq.compress(data)
 
-        huffman_codes = {}
-        reverse_codes = {}
+            # Write compressed data to the output file
+            outfile.write(compressed_data)
+            return len(compressed_data)
 
-        # Step 2: Read the codes
-        for _ in range(num_codes):
-            byte = struct.unpack('B', f.read(1))[0]
-            code_length = struct.unpack('B', f.read(1))[0]
-            code = bin(int.from_bytes(f.read((code_length + 7) // 8), byteorder='big'))[2:].zfill(code_length)
-            huffman_codes[code] = bytes([byte])
-            reverse_codes[bytes([byte])] = code
+    except Exception as e:
+        print(f"Error during Method_4 compression (zlib): {e}")
+        return float('inf')
 
-        # Step 3: Read the compressed data
-        bit_stream = ''
-        byte = f.read(1)
-        while byte:
-            bit_stream += bin(byte[0])[2:].zfill(8)
-            byte = f.read(1)
+def extract(input_file, output_file):
+    """
+    Extract a binary file by reversing the compression process depending on the file name.
+    """
+    try:
+        # Determine method based on the input file name
+        if '_method1' in input_file:
+            method = "Method_1"
+        elif '_method2' in input_file:
+            method = "Method_2"
+        elif '_method3' in input_file:
+            method = "Method_3"
+        elif '_method4' in input_file:
+            method = "Method_4"
+        else:
+            print("Unknown compression method in the file name.")
+            return
 
-        # Step 4: Remove padding
-        padding = bit_stream[:8]
-        bit_stream = bit_stream[8:]
-        
-        # Step 5: Decode the bit stream using the reverse codes
-        current_code = ''
-        result = []
-        for bit in bit_stream:
-            current_code += bit
-            if current_code in reverse_codes:
-                result.append(reverse_codes[current_code])
-                current_code = ''
+        # Open the compressed file
+        with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+            data = infile.read()
+            extracted_data = bytearray()
 
-        # Step 6: Write the decompressed file
-        with open(output_file, 'wb') as out_f:
-            out_f.write(b''.join(result))
+            if method == "Method_1" or method == "Method_2":
+                # Replacing REPLACEMENT_VALUE with MAX_VALUE for Methods 1 & 2
+                for byte in data:
+                    if byte == REPLACEMENT_VALUE:
+                        extracted_data.append(MAX_VALUE)
+                    else:
+                        extracted_data.append(byte)
+                # Add back the removed byte to restore original size
+                extracted_data.append(MAX_VALUE)
+            elif method == "Method_3" or method == "Method_4":
+                # Decompress using zlib for Methods 3 & 4
+                extracted_data = paq.decompress(data)
 
-    print(f"File successfully decompressed to {output_file}")
+            # Write extracted data
+            outfile.write(extracted_data)
+            print(f"Extracted file size: {len(extracted_data)} bytes")
 
-# Method 1: Dictionary-based Compression with zlib for byte values (0-255)
-def build_dictionary(file_path):
-    """Builds a dictionary from the given file, assuming byte-level values (0-255)."""
-    byte_count = defaultdict(int)
-    
-    with open(file_path, 'rb') as f:
-        byte = f.read(1)
-        while byte:
-            byte_count[byte] += 1
-            byte = f.read(1)
-    
-    # Sort bytes based on frequency (descending order)
-    sorted_bytes = sorted(byte_count.items(), key=lambda x: x[1], reverse=True)
-    
-    # Assign an index to each byte value
-    dictionary = {}
-    for index, (byte, _) in enumerate(sorted_bytes):
-        dictionary[byte] = index
-    
-    return dictionary
+    except Exception as e:
+        print(f"Error during extraction: {e}")
 
-def compress_method_1(input_file, output_file):
-    """Compresses the input file using dictionary-based compression and zlib for byte values (0-255)."""
-    dictionary = build_dictionary(input_file)
-    
-    with open(input_file, 'rb') as f:
-        content = f.read()
-
-    compressed_data = []
-    for byte in content:
-        compressed_data.append(str(dictionary[bytes([byte])]))
-    
-    compressed_content = ' '.join(compressed_data)
-    compressed_zlib = paq.compress(compressed_content.encode())
-    
-    with open(output_file, 'wb') as f:
-        f.write(compressed_zlib)
-    
-    # Save the dictionary
-    with open(output_file + ".dict", 'w') as dict_file:
-        for byte, index in dictionary.items():
-            dict_file.write(f"{byte[0]} {index}\n")
-
-def decompress_method_1(input_file, output_file):
-    """Decompresses a file using dictionary-based decompression and zlib for byte values (0-255)."""
-    with open(input_file + ".dict", 'r') as dict_file:
-        dictionary = {}
-        for line in dict_file:
-            byte, index = line.split()
-            dictionary[int(index)] = bytes([int(byte)])
-    
-    reverse_dict = dictionary
-    with open(input_file, 'rb') as f:
-        compressed_data = f.read()
-
-    decompressed_content = paq.decompress(compressed_data).decode()
-    decompressed_data = [reverse_dict[int(code)] for code in decompressed_content.split()]
-    
-    with open(output_file, 'wb') as f:
-        f.write(b''.join(decompressed_data))
-
-# Main Menu
 def main():
-    print("Select an option:")
-    print("1. Compress using Method 1 (words + zlib) and Method 2 (words + Huffman + zlib)")
-    print("2. Decompress a file")
-    
-    choice = input("Enter your choice: ")
-    if choice == '1':
-        input_file = input("Enter the input file: ")
-        
-        # Method 1 (Dictionary + zlib)
-        output_file_1 = input_file + ".Method_1"
-        compress_method_1(input_file, output_file_1)
-        
-        # Method 2 (Words + Huffman + zlib)
-        output_file_2 = input_file + ".Method_2"
-        compress_method_2(input_file, output_file_2)
-        
-        # Compare file sizes and delete the larger one
-        size_1 = os.path.getsize(output_file_1)
-        size_2 = os.path.getsize(output_file_2)
-        
-        if size_1 > size_2:
-            os.remove(output_file_1)
-            print(f"Deleted larger file: {output_file_1}")
-            print(f"Smaller compressed file retained: {output_file_2}")
+    """
+    Main function to handle user input for compression or extraction.
+    """
+    try:
+        print("Choose an option:")
+        print("1. Compress a file")
+        print("2. Extract a file")
+        choice = input("Enter your choice (1 or 2): ").strip()
+
+        if choice == '1':
+            print("Enter the input file name for compression:")
+            input_file = input().strip()
+            
+            # Get the output file name for compressed file
+            output_file = input("Enter the output file name for the compressed file: ").strip()
+            
+            # Compress with all four methods and store the sizes
+            sizes = {}
+            
+            # Method_1
+            method_1_output = output_file + "_method1"
+            sizes['Method_1'] = method_1_compress(input_file, method_1_output)
+            
+            # Method_2
+            method_2_output = output_file + "_method2"
+            sizes['Method_2'] = method_2_compress(input_file, method_2_output)
+            
+            # Method_3
+            method_3_output = output_file + "_method3"
+            sizes['Method_3'] = method_3_compress(input_file, method_3_output)
+            
+            # Method_4
+            method_4_output = output_file + "_method4"
+            sizes['Method_4'] = method_4_compress(input_file, method_4_output)
+
+            # Choose the best compression method (smallest file size)
+            best_method = min(sizes, key=sizes.get)
+            best_output = output_file + f"_{best_method.lower()}"
+            print(f"The best method is {best_method} with compressed size: {sizes[best_method]} bytes.")
+            
+            # Copy the best method's output file as the final compressed file
+            os.rename(globals()[f"{best_method.lower()}_output"], best_output)
+            print(f"Final compressed file: {best_output}")
+
+        elif choice == '2':
+            input_file = input("Enter the compressed file name for extraction: ").strip()
+            output_file = input("Enter the output file name for the extracted file: ").strip()
+            
+            # Extract the file based on method used in the file name
+            extract(input_file, output_file)
+
         else:
-            os.remove(output_file_2)
-            print(f"Deleted larger file: {output_file_2}")
-            print(f"Smaller compressed file retained: {output_file_1}")
-    
-    elif choice == '2':
-        compressed_file = input("Enter the compressed file: ")
-        
-        if compressed_file.endswith(".Method_1"):
-            output_file = compressed_file.replace(".Method_1", "_decompressed.bin.txt")
-            decompress_method_1(compressed_file, output_file)
-            print(f"Decompressed file: {output_file}")
-        
-        elif compressed_file.endswith(".Method_2"):
-            output_file = compressed_file.replace(".Method_2", "_decompressed.bin.txt")
-            decompress_method_2(compressed_file, output_file)
-            print(f"Decompressed file: {output_file}")
-        
-        else:
-            print("Unknown compression method. Please provide a valid file.")
-    else:
-        print("Invalid choice. Please select 1 or 2.")
+            print("Invalid choice. Please choose 1 or 2.")
+
+    except Exception as e:
+        print(f"Error during main execution: {e}")
 
 if __name__ == "__main__":
     main()
