@@ -138,14 +138,14 @@ def main():
 
         elif choice == '2':
             input_file = input("Enter the name of the input file (e.g., table4.txt): ")
-            output_file = input("Enter the name of the output file (e.g., table4.paq or table4_no_paq.txt): ")
+            output_file = input_file+".b"
 
             if not compress_file(dictionary_file, input_file, output_file, use_paq, encoding):
                 print("Compression failed.")
 
         elif choice == '3':
             input_file = input("Enter the name of the compressed file to decompress (e.g., table4.paq): ")
-            output_file = input("Enter the name of the output file for decompression (e.g., table4_decompressed.bin): ")
+            output_file = input_file[:-2]
 
             if not decompress_file(dictionary_file, input_file, output_file, use_paq, encoding):
                 print("Decompression failed.")
