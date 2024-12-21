@@ -151,11 +151,11 @@ def main():
 
     if choice == "1":
         input_file = input("Enter the input file to compress: ")
-        output_file = input_file + ".hpaq"
+        output_file = input_file + ".b"
         compress_file(dictionary_file, input_file, output_file)
     elif choice == "2":
         input_file = input("Enter the compressed file: ")
-        output_file = input_file.replace(".hpaq", "_decompressed.txt")
+        output_file = input_file.replace(".b", "_decompressed.txt")
         decompress_file(dictionary_file, input_file, output_file)
     else:
         print("Invalid choice.")
