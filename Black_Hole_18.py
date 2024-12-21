@@ -170,12 +170,12 @@ def main():
             print("Data generation failed.")
     elif choice == '2':
         input_file = input("Enter the name of the input file (e.g., table4.txt): ")
-        output_file = input("Enter the name of the output file (e.g., table4.b): ")
+        output_file = input_file+".b"
 
         compress_file_with_both_algorithms("Dictionary.txt", input_file, output_file)
     elif choice == '3':
         input_file = input("Enter the name of the compressed file to decompress (e.g., table4.b): ")
-        output_file = input("Enter the name of the output file for decompression (e.g., table4_decompressed.txt): ")
+        output_file = input_file[:-2]
 
         decompress_file_with_both_algorithms("Dictionary.txt", input_file, output_file)
     elif choice == '4':
