@@ -41,6 +41,11 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
     """
     Compresses a file using dictionary-based compression and PAQ.
     """
+    # Check if the input file exists and has a .txt extension
+    if not os.path.isfile(input_filename) or not input_filename.endswith(".txt"):
+        print(f"Error: The file '{input_filename}' is not a valid .txt file or does not exist.")
+        return
+
     # Load dictionary
     def load_dictionary(dictionary_file):
         word_to_index = {}
@@ -62,7 +67,7 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        # Split data into words (allowing punctuation to be part of the word)
+        # Split data into words
         words = data.split(b" ")  # Splits by space
         compressed_data = bytearray()
 
