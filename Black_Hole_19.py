@@ -4,7 +4,7 @@ import random
 import paq
 
 print("Created by Jurijus Pacalovas.")
-print("Black_Hole_17")
+print("Black_Hole_19")
 print("This software compresses any data, focusing on dictionary-based words.")
 
 # Function to load the dictionary from the file
