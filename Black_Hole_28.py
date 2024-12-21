@@ -73,11 +73,15 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
 
                 if normalized_word in word_to_index:
                     index = word_to_index[normalized_word]
-                    case_flag = (
-                        0x01 if decoded_word.islower() else
-                        0x02 if decoded_word.isupper() else
-                        0x03
-                    )
+                    # Determine case flag
+                    if decoded_word.islower():
+                        case_flag = 0x01  # All lowercase
+                    elif decoded_word.isupper():
+                        case_flag = 0x02  # All uppercase
+                    elif decoded_word.istitle():
+                        case_flag = 0x03  # First letter capitalized
+                    else:
+                        case_flag = 0x00  # Mixed case or non-dictionary word
                     compressed_data.append(0x00)  # Dictionary flag
                     compressed_data.append(case_flag)  # Case flag
                     compressed_data.extend(struct.pack(">I", index))
