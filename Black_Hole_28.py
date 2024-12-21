@@ -62,7 +62,7 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        # Split data into words
+        # Split data into words (allowing punctuation to be part of the word)
         words = data.split(b" ")  # Splits by space
         compressed_data = bytearray()
 
