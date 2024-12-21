@@ -33,6 +33,9 @@ def load_dictionary(dictionary_file, encoding="utf-8"):
 def generate_headings_and_chunks():
     """Generates data file with 17-bit headings and 256 positions (256 bits each) in a 256-byte chunk."""
     file_name = input("Enter the name of the file to save the output (e.g., table4.txt): ").strip()
+    if not file_name.endswith(".txt"):
+        print("Error: The file must have a .txt extension.")
+        return False
     if os.path.exists(file_name):
         print(f"The file '{file_name}' already exists. Skipping generation.")
         return True  # Indicate success (file already exists)
@@ -64,6 +67,10 @@ def generate_headings_and_chunks():
 
 # Function to compress the file with both dictionary-based compression and PAQ, handling spaces separately
 def compress_file_with_words_and_spaces(dictionary_file, input_filename, output_filename, encoding="utf-8"):
+    if not input_filename.endswith(".txt"):
+        print(f"Error: Only '.txt' files are allowed. The file '{input_filename}' is not a .txt file.")
+        return
+
     word_to_index, _ = load_dictionary(dictionary_file, encoding)
     if word_to_index is None:
         return
@@ -114,6 +121,10 @@ def compress_file_with_words_and_spaces(dictionary_file, input_filename, output_
 
 # Function to decompress the file using both PAQ decompression and dictionary decoding
 def decompress_file_with_both_algorithms(dictionary_file, input_filename, output_filename, encoding="utf-8"):
+    if not output_filename.endswith(".txt"):
+        print(f"Error: The decompressed output must be a '.txt' file. The file '{output_filename}' is not a .txt file.")
+        return
+
     _, index_to_word = load_dictionary(dictionary_file, encoding)
     if index_to_word is None:
         return
