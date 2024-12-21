@@ -11,7 +11,7 @@ except ImportError:
 
 # Created by Jurijus Pacalovas
 print("Created by Jurijus Pacalovas.")
-print("Black_Hole_17")
+print("Black_Hole_18")
 
 def load_dictionary(dictionary_file, encoding="utf-8"):
     """Loads the dictionary, handling errors gracefully."""
@@ -167,12 +167,13 @@ def main():
 
         if choice == '1':
             input_file = input("Enter the name of the input file (e.g., input.txt): ")
-            output_file = input("Enter the name of the output file (e.g., output.b): ")
+            output_file = input_file+".b"
             compress_file_with_both_algorithms(input_file, output_file)
 
         elif choice == '2':
             input_file = input("Enter the name of the compressed file (e.g., output.b): ")
-            output_file = input("Enter the name of the output file for decompression (e.g., decompressed.txt): ")
+            output_file = input_file[:-2]
+            
             decompress_file_with_both_algorithms(input_file, output_file)
 
         elif choice == '3':
