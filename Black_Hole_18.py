@@ -29,39 +29,6 @@ def load_dictionary(dictionary_file, encoding="utf-8"):
         print(f"Error loading dictionary: {e}")
         return None, None
 
-# Function to generate the table data for compression
-def generate_headings_and_chunks():
-    """Generates data file with 17-bit headings and 256 positions (256 bits each) in a 256-byte chunk."""
-    file_name = input("Enter the name of the file to save the output (e.g., table4.txt): ").strip()
-    if os.path.exists(file_name):
-        print(f"The file '{file_name}' already exists. Skipping generation.")
-        return True  # Indicate success (file already exists)
-
-    try:
-        with open(file_name, "w") as file:
-            max_headings = 2**17  # 17-bit headings (0 to 2^17-1)
-            chunk_size = 256  # Number of positions in the chunk
-
-            random.seed(42)  # for reproducibility
-
-            for heading in range(max_headings):
-                heading_bits = f"{heading:017b}"  # 17-bit heading
-
-                # Create a chunk of 256 positions (each with 256 bits, which is 32 bytes)
-                chunk = [bytes([random.randint(0, 255) for _ in range(32)]) for _ in range(chunk_size)]
-
-                # Convert each position in the chunk to binary (256 bits per position)
-                chunk_bits = ''.join(''.join(f"{byte:08b}" for byte in position) for position in chunk)
-
-                # Write the heading and the corresponding 256 positions (256 bits each)
-                file.write(f"{heading_bits} {chunk_bits}\n")
-
-        print(f"Data generated and saved to '{file_name}'.")
-        return True
-    except Exception as e:
-        print(f"An error occurred during data generation: {e}")
-        return False
-
 # Function to compress the file using both dictionary-based compression and PAQ
 def compress_file_with_both_algorithms(dictionary_file, input_filename, output_filename, encoding="utf-8"):
     word_to_index, _ = load_dictionary(dictionary_file, encoding)
@@ -69,30 +36,23 @@ def compress_file_with_both_algorithms(dictionary_file, input_filename, output_f
         return
 
     try:
-        with open(input_filename, 'rb') as infile:
+        with open(input_filename, 'r', encoding=encoding) as infile:
             data = infile.read()
 
         # Step 1: Dictionary-based compression
         encoded_data = bytearray()
-        words = data.split(b" ")  # Split binary data by spaces
+        words = data.split(" ")  # Split text data by spaces
 
         for word in words:
-            try:
-                decoded_word = word.decode(encoding)  # Try decoding as text
-                if decoded_word in word_to_index:
-                    # Encode dictionary word (00)
-                    encoded_data.append(0x00)
-                    index = word_to_index[decoded_word]
-                    encoded_data.extend(struct.pack(">I", index))
-                else:
-                    # Encode non-dictionary word (01)
-                    encoded_data.append(0x01)
-                    encoded_data.extend(word)
-                    encoded_data.append(0x20)  # Add space as delimiter
-            except UnicodeDecodeError:
-                # Handle raw binary data for non-decodable segments
+            if word in word_to_index:
+                # Encode dictionary word (00)
+                encoded_data.append(0x00)
+                index = word_to_index[word]
+                encoded_data.extend(struct.pack(">I", index))
+            else:
+                # Encode non-dictionary word (01)
                 encoded_data.append(0x01)
-                encoded_data.extend(word)
+                encoded_data.extend(word.encode(encoding))
                 encoded_data.append(0x20)  # Add space as delimiter
 
         # Step 2: PAQ Compression
@@ -147,8 +107,8 @@ def decompress_file_with_both_algorithms(dictionary_file, input_filename, output
             decoded_text = decoded_text[:-1]
 
         # Save the decompressed data to the output file
-        with open(output_filename, 'wb') as outfile:
-            outfile.write(decoded_text)
+        with open(output_filename, 'w', encoding=encoding) as outfile:
+            outfile.write(decoded_text.decode(encoding))
             print(f"File decompressed using both PAQ and dictionary-based decompression, saved as '{output_filename}'")
 
     except FileNotFoundError:
@@ -159,26 +119,20 @@ def decompress_file_with_both_algorithms(dictionary_file, input_filename, output
 # Main function to interact with the user
 def main():
     print("Choose an option:")
-    print("1. Generate data file with 17-bit headings and 256 positions (256 bits each) in a 256-byte chunk")
-    print("2. Compress the data file with both dictionary-based compression and PAQ")
-    print("3. Decompress and save the raw decompressed data")
-    print("4. Exit")
-    choice = input("Enter your choice (1/2/3/4): ")
+    print("1. Compress the data file with both dictionary-based compression and PAQ")
+    print("2. Decompress and save the raw decompressed data")
+    print("3. Exit")
+    choice = input("Enter your choice (1/2/3): ")
 
     if choice == '1':
-        if not generate_headings_and_chunks():
-            print("Data generation failed.")
-    elif choice == '2':
-        input_file = input("Enter the name of the input file (e.g., table4.txt): ")
-        output_file = input_file+".b"
-
+        input_file = input("Enter the name of the input file (e.g., text.txt): ")
+        output_file = input_file + ".b"
         compress_file_with_both_algorithms("Dictionary.txt", input_file, output_file)
-    elif choice == '3':
-        input_file = input("Enter the name of the compressed file to decompress (e.g., table4.b): ")
+    elif choice == '2':
+        input_file = input("Enter the name of the compressed file to decompress (e.g., text.txt.b): ")
         output_file = input_file[:-2]
-
         decompress_file_with_both_algorithms("Dictionary.txt", input_file, output_file)
-    elif choice == '4':
+    elif choice == '3':
         print("Exiting...")
         exit()
     else:
