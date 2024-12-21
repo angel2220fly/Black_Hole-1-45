@@ -64,6 +64,11 @@ def generate_headings_and_chunks():
 
 # Function to compress the file with both dictionary-based compression and PAQ, handling spaces separately
 def compress_file_with_words_and_spaces(dictionary_file, input_filename, output_filename, encoding="utf-8"):
+    # Check if the input file has the .txt extension
+    if not input_filename.endswith(".txt"):
+        print(f"Error: Only '.txt' files are allowed. The file '{input_filename}' is not a .txt file.")
+        return
+
     word_to_index, _ = load_dictionary(dictionary_file, encoding)
     if word_to_index is None:
         return
