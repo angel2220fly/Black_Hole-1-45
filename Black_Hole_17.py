@@ -126,27 +126,37 @@ def decompress_file(dictionary_file, input_file, output_file, encoding="utf-8"):
 
 def main():
     print("Choose an option:")
-    print("1. Compress a file")
-    print("2. Decompress a file")
+    print("1. Compress a .txt file")
+    print("2. Decompress a .b file")
     choice = input("Enter your choice: ")
     dictionary_file = "Dictionary.txt"
     encoding = "utf-8"
 
     if choice == '1':
-        input_file = input("Enter the input file to compress: ")
+        input_file = input("Enter the input .txt file to compress: ")
         if not os.path.exists(input_file):
             print(f"Error: Input file '{input_file}' not found.")
+            return
+
+        # Check if the input file has a .txt extension
+        if not input_file.lower().endswith('.txt'):
+            print("Error: Only .txt files can be compressed.")
             return
 
         output_file = input_file + ".b"
         compress_file(dictionary_file, input_file, output_file, encoding)
     elif choice == '2':
-        input_file = input("Enter the compressed file: ")
+        input_file = input("Enter the compressed .b file: ")
         if not os.path.exists(input_file):
             print(f"Error: Compressed file '{input_file}' not found.")
             return
 
-        output_file = input_file[:-2]
+        # Check if the input file has a .b extension
+        if not input_file.lower().endswith('.b'):
+            print("Error: Only .b files can be decompressed.")
+            return
+
+        output_file = input_file[:-2]  # Remove the .b extension for the output file
         decompress_file(dictionary_file, input_file, output_file, encoding)
     else:
         print("Invalid choice.")
