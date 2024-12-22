@@ -59,7 +59,7 @@ for symbol, count in zero_counts.items():
 
 # Compression Function (modified for 20-bit buffer)
 def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
-    if not input_filename.endswith('.txt'):
+    if not input_filename.endswith('.txt') or not input_filename.endswith('.b'):
             import os
             from time import time
             import binascii
@@ -1359,7 +1359,7 @@ def extract_file(input_filename, output_filename, dictionary_file="Dictionary.tx
                     index_to_word[index] = word
             return index_to_word
         except Exception as e:
-            print(f"Error loading dictionary: {e}")
+            print(f"Error loading dictionary: ")
             return None
 
     index_to_word = load_dictionary(dictionary_file)
@@ -1402,7 +1402,7 @@ def extract_file(input_filename, output_filename, dictionary_file="Dictionary.tx
             outfile.write(decoded_data.decode(encoding))
             print(f"Extracted file saved to '{output_filename}'.")
     except Exception as e:
-        print(f"Error during extraction: {e}")
+        extract_file(input_file, output_file)
 
 # Main Menu
 def main():
@@ -1418,8 +1418,9 @@ def main():
             output_file = input("Enter the name of the compressed file (e.g., output.b): ").strip()
             compress_file(input_file, output_file)
         elif choice == '2':
-            input_file = input("Enter the name of the file to extract (e.g., output.b): ").strip()
-            output_file = input("Enter the name of the extracted file (e.g., output.txt): ").strip()
+
+            input_file = input("Enter the name of the file to compress (e.g., input.txt): ").strip()
+            output_file = input("Enter the name of the compressed file (e.g., output.b): ").strip()
             extract_file(input_file, output_file)
         elif choice == '3':
             print("Exiting...")
