@@ -155,7 +155,7 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
             
                         Clear = ""
             
-                        name = input("What is name of file input? ")
+                        name = input_filename
             
                         long_21 = len(name)
             
