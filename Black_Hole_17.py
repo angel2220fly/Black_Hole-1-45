@@ -43,6 +43,22 @@ symbol_map = {
 # Reverse map for decoding
 reverse_symbol_map = {v: k for k, v in symbol_map.items()}
 
+# Function to count zeros in 5-bit values
+def count_zeros_in_bin_values():
+    zero_counts = {}
+    for symbol, value in symbol_map.items():
+        # Count zeros in the 5-bit binary value
+        zero_count = bin(value).count('0')
+        zero_counts[symbol] = zero_count
+    return zero_counts
+
+# Display the zero counts for each symbol
+zero_counts = count_zeros_in_bin_values()
+print("Zero counts in 5-bit binary values:")
+for symbol, count in zero_counts.items():
+    #print(f"Symbol: '{symbol}', Zero count: {count}")
+    i=0
+
 # Compression Function
 def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
     if not input_filename.endswith('.txt'):
@@ -135,10 +151,14 @@ def extract_file(input_filename, output_filename, dictionary_file="Dictionary.tx
             flag = decompressed_data[i]
             i += 1
             if flag == 0x00:  # Dictionary word
-                index = struct.unpack(">I", decompressed_data[i:i+4])[0]
-                word = index_to_word.get(index, "<unknown>")
-                decoded_data.extend(word.encode(encoding))
-                i += 4
+                if i + 4 <= len(decompressed_data):  # Ensure enough bytes for 4-byte index
+                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]
+                    word = index_to_word.get(index, "<unknown>")
+                    decoded_data.extend(word.encode(encoding))
+                    i += 4
+                else:
+                    print("Error: Insufficient data for dictionary word index.")
+                    break
             elif flag == 0x01:  # Non-dictionary word
                 word = bytearray()
                 while i < len(decompressed_data) and decompressed_data[i] != 0x02:
