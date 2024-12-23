@@ -2,6 +2,7 @@ import os
 import struct
 import random
 import paq
+from zipfile import ZipFile
 
 print("Created by Jurijus Pacalavas.")
 print("Black_Hole_53")
@@ -58,13 +59,16 @@ zero_counts = count_zeros_in_bin_values()
 for symbol, count in zero_counts.items():
     pass  # Optional: Display or use as needed
 
-# Compression Function for text files
+# Compression Function for text and docx files
 def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
     file_extension = input_filename.split('.')[-1]
     
     if file_extension == 'txt':
         # Compress .txt files using dictionary and PAQ
         compress_text_file(input_filename, output_filename, dictionary_file, encoding)
+    elif file_extension == 'docx':
+        # Compress .docx files
+        compress_docx_file(input_filename, output_filename)
     else:
         # Compress non-txt files using binary and PAQ
         compress_binary_file(input_filename, output_filename)
@@ -126,6 +130,24 @@ def compress_text_file(input_filename, output_filename, dictionary_file, encodin
     except Exception as e:
         print(f"Error during compression: {e}")
 
+def compress_docx_file(input_filename, output_filename):
+    try:
+        with ZipFile(input_filename, 'r') as docx_zip:
+            # Create a temporary compressed .docx
+            compressed_data = bytearray()
+            for file_name in docx_zip.namelist():
+                with docx_zip.open(file_name) as docx_file:
+                    file_data = docx_file.read()
+                    # Compress each file using PAQ
+                    compressed_file_data = paq.compress(file_data)
+                    compressed_data.extend(compressed_file_data)
+        
+        with open(output_filename, "wb") as outfile:
+            outfile.write(compressed_data)
+            print(f"Compressed .docx file saved to '{output_filename}'.")
+    except Exception as e:
+        print(f"Error during .docx compression: {e}")
+
 def compress_binary_file(input_filename, output_filename):
     try:
         with open(input_filename, "rb") as infile:
@@ -140,13 +162,16 @@ def compress_binary_file(input_filename, output_filename):
     except Exception as e:
         print(f"Error during binary compression: {e}")
 
-# Extraction Function
+# Extraction Function for text, docx, and binary files
 def extract_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
     file_extension = output_filename.split('.')[-1]
     
     if file_extension == 'txt':
         # Extract .txt files
         extract_text_file(input_filename, output_filename, dictionary_file, encoding)
+    elif file_extension == 'docx':
+        # Extract .docx files
+        extract_docx_file(input_filename, output_filename)
     else:
         # Extract non-txt files
         extract_binary_file(input_filename, output_filename)
@@ -215,6 +240,24 @@ def extract_text_file(input_filename, output_filename, dictionary_file, encoding
     except Exception as e:
         print(f"Error during extraction: {e}")
 
+def extract_docx_file(input_filename, output_filename):
+    try:
+        with open(input_filename, "rb") as infile:
+            compressed_data = infile.read()
+
+        # Decompress the data using PAQ
+        decompressed_data = paq.decompress(compressed_data)
+
+        if decompressed_data is None:
+            print(f"Error: Decompression failed for '{input_filename}'")
+            return
+
+        with ZipFile(output_filename, "w") as docx_zip:
+            docx_zip.writestr("word/document.xml", decompressed_data)
+            print(f"Extracted .docx file saved to '{output_filename}'.")
+    except Exception as e:
+        print(f"Error during .docx extraction: {e}")
+
 def extract_binary_file(input_filename, output_filename):
     try:
         with open(input_filename, "rb") as infile:
@@ -243,12 +286,12 @@ def main():
     while True:
         choice = input("Enter your choice (1/2/3): ").strip()
         if choice == '1':
-            input_file = input("Enter the name of the file to compress (e.g., input.txt or input.bin): ").strip()
-            output_file = input_file+".b"
+            input_file = input("Enter the name of the file to compress (e.g., input.txt, input.docx, or input.bin): ").strip()
+            output_file = input_file + ".b"
             compress_file(input_file, output_file)
         elif choice == '2':
-            input_file = input("Enter the name of the file to extract (e.g., output.b or output.bin): ").strip()
-            output_file = input_file[:-2]
+            input_file = input("Enter the name of the file to extract (e.g., output.b or output.docx): ").strip()
+            output_file = input_file[:-2]  # remove the ".b"
             extract_file(input_file, output_file)
         elif choice == '3':
             print("Exiting...")
