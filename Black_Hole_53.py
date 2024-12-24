@@ -1,6 +1,5 @@
 import os
 import struct
-import random
 import mimetypes
 import paq
 
@@ -58,7 +57,7 @@ def load_dictionary(dictionary_file, encoding="utf-8"):
         return None
 
 
-def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8", use_zlib=False):
+def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
     try:
         word_to_index = load_dictionary(dictionary_file, encoding)
         if word_to_index is None:
@@ -68,9 +67,9 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
         if mime_type == "text/plain":
             compress_text_file(input_filename, output_filename, word_to_index, encoding)
         elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            compress_docx_file(input_filename, output_filename, use_zlib)
+            compress_docx_file(input_filename, output_filename)
         else:
-            compress_binary_file(input_filename, output_filename, use_zlib)
+            compress_binary_file(input_filename, output_filename)
     except Exception as e:
         print(f"An error occurred during compression: {e}")
 
@@ -112,53 +111,46 @@ def compress_text_file(input_filename, output_filename, word_to_index, encoding=
         print(f"Error during text compression: {e}")
 
 
-def compress_docx_file(input_filename, output_filename, use_zlib=False):
+def compress_docx_file(input_filename, output_filename):
     try:
-        # Read the entire DOCX file as binary data
-        with open(input_filename, 'rb') as docx_file:
-            file_data = docx_file.read()
+        # Treat .docx as binary file and compress using PAQ
+        with open(input_filename, 'rb') as infile:
+            data = infile.read()
 
-        # Apply PAQ compression (can switch to zlib if needed)
-        if use_zlib:
-            compressed_data = paq.compress(file_data)
-        else:
-            compressed_data = paq.compress(file_data)
+        # Use PAQ compression on binary data
+        compressed_data = paq.compress(data)
 
-        # Save the compressed data to the output file
-        with open(output_filename, 'wb') as outfile:
+        with open(output_filename, "wb") as outfile:
             outfile.write(compressed_data)
-        
-        print(f"Compressed .docx file saved to '{output_filename}'.")
+            print(f"Compressed .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx compression: {e}")
 
 
-def compress_binary_file(input_filename, output_filename, use_zlib=False):
+def compress_binary_file(input_filename, output_filename):
     try:
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        if use_zlib:
-            compressed_data = paq.compress(data)
-        else:
-            compressed_data = paq.compress(data)
+        # Use PAQ compression for all other binary files
+        compressed_data = paq.compress(data)
 
         with open(output_filename, "wb") as outfile:
             outfile.write(compressed_data)
-            print(f"Compressed file saved to '{output_filename}'.")
+            print(f"Compressed binary file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during binary compression: {e}")
 
 
-def extract_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8", use_zlib=False):
+def extract_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
     try:
         mime_type, _ = mimetypes.guess_type(output_filename) # Check output file type
         if mime_type == "text/plain":
             extract_text_file(input_filename, output_filename, dictionary_file, encoding)
         elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            extract_docx_file(input_filename, output_filename, use_zlib)
+            extract_docx_file(input_filename, output_filename)
         else:
-            extract_binary_file(input_filename, output_filename, use_zlib)
+            extract_binary_file(input_filename, output_filename)
     except Exception as e:
         print(f"An error occurred during extraction: {e}")
 
@@ -224,40 +216,28 @@ def extract_text_file(input_filename, output_filename, dictionary_file, encoding
         print(f"Error during text extraction: {e}")
 
 
-def extract_docx_file(input_filename, output_filename, use_zlib=False):
+def extract_docx_file(input_filename, output_filename):
     try:
-        # Read the compressed DOCX file
-        with open(input_filename, 'rb') as compressed_file:
-            compressed_data = compressed_file.read()
+        with open(input_filename, 'rb') as infile:
+            compressed_data = infile.read()
 
-        # Decompress the data using PAQ
-        if use_zlib:
-            decompressed_data = paq.decompress(compressed_data)
-        else:
-            decompressed_data = paq.decompress(compressed_data)
+        # Decompress .docx file using PAQ
+        decompressed_data = paq.decompress(compressed_data)
 
-        if decompressed_data is None:
-            print(f"Error: Decompression failed for '{input_filename}'")
-            return
-
-        # Save the decompressed data back into a DOCX file
-        with open(output_filename, 'wb') as docx_file:
-            docx_file.write(decompressed_data)
-        
-        print(f"Extracted .docx file saved to '{output_filename}'.")
+        with open(output_filename, "wb") as outfile:
+            outfile.write(decompressed_data)
+            print(f"Extracted .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx extraction: {e}")
 
 
-def extract_binary_file(input_filename, output_filename, use_zlib=False):
+def extract_binary_file(input_filename, output_filename):
     try:
         with open(input_filename, "rb") as infile:
             compressed_data = infile.read()
 
-        if use_zlib:
-            decompressed_data = paq.decompress(compressed_data)
-        else:
-            decompressed_data = paq.decompress(compressed_data)
+        # Decompress binary file using PAQ
+        decompressed_data = paq.decompress(compressed_data)
 
         if decompressed_data is None:
             print(f"Error: Decompression failed for '{input_filename}'")
@@ -281,15 +261,11 @@ def main():
         if choice == '1':
             input_file = input("Enter the name of the file to compress: ").strip()
             output_file = input_file + ".b"
-            use_zlib_str = input("Use zlib instead of paq? (y/n): ").strip().lower()
-            use_zlib = use_zlib_str == 'y'
-            compress_file(input_file, output_file, use_zlib=use_zlib)
+            compress_file(input_file, output_file)
         elif choice == '2':
             input_file = input("Enter the name of the file to extract: ").strip()
             output_file = input_file[:-2]  # remove the ".b"
-            use_zlib_str = input("Use zlib instead of paq? (y/n): ").strip().lower()
-            use_zlib = use_zlib_str == 'y'
-            extract_file(input_file, output_file, use_zlib=use_zlib)
+            extract_file(input_file, output_file)
         elif choice == '3':
             print("Exiting...")
             break
