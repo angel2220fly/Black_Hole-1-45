@@ -1,7 +1,6 @@
 import os
 import struct
 import random
-from zipfile import ZipFile
 import mimetypes
 import paq
 
@@ -115,16 +114,20 @@ def compress_text_file(input_filename, output_filename, word_to_index, encoding=
 
 def compress_docx_file(input_filename, output_filename, use_zlib=False):
     try:
-        with ZipFile(input_filename, 'r') as docx_zip:
-            with ZipFile(output_filename, 'w') as compressed_docx_zip:
-                for file_name in docx_zip.namelist():
-                    with docx_zip.open(file_name) as docx_file:
-                        file_data = docx_file.read()
-                        if use_zlib:
-                            compressed_file_data = paq.compress(file_data)
-                        else:
-                            compressed_file_data = paq.compress(file_data)
-                        compressed_docx_zip.writestr(file_name, compressed_file_data)
+        # Read the entire DOCX file as binary data
+        with open(input_filename, 'rb') as docx_file:
+            file_data = docx_file.read()
+
+        # Apply PAQ compression (can switch to zlib if needed)
+        if use_zlib:
+            compressed_data = paq.compress(file_data)
+        else:
+            compressed_data = paq.compress(file_data)
+
+        # Save the compressed data to the output file
+        with open(output_filename, 'wb') as outfile:
+            outfile.write(compressed_data)
+        
         print(f"Compressed .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx compression: {e}")
@@ -223,16 +226,24 @@ def extract_text_file(input_filename, output_filename, dictionary_file, encoding
 
 def extract_docx_file(input_filename, output_filename, use_zlib=False):
     try:
-        with ZipFile(input_filename, 'r') as compressed_docx_zip:
-            with ZipFile(output_filename, 'w') as docx_zip:
-                for file_name in compressed_docx_zip.namelist():
-                    with compressed_docx_zip.open(file_name) as compressed_file:
-                        compressed_data = compressed_file.read()
-                        if use_zlib:
-                            decompressed_data = paq.decompress(compressed_data)
-                        else:
-                            decompressed_data = paq.decompress(compressed_data)
-                        docx_zip.writestr(file_name, decompressed_data)
+        # Read the compressed DOCX file
+        with open(input_filename, 'rb') as compressed_file:
+            compressed_data = compressed_file.read()
+
+        # Decompress the data using PAQ
+        if use_zlib:
+            decompressed_data = paq.decompress(compressed_data)
+        else:
+            decompressed_data = paq.decompress(compressed_data)
+
+        if decompressed_data is None:
+            print(f"Error: Decompression failed for '{input_filename}'")
+            return
+
+        # Save the decompressed data back into a DOCX file
+        with open(output_filename, 'wb') as docx_file:
+            docx_file.write(decompressed_data)
+        
         print(f"Extracted .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx extraction: {e}")
