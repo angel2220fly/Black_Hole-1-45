@@ -1,11 +1,9 @@
 import os
 import struct
 import random
-import paq
 from zipfile import ZipFile
-
-print("Created by Jurijus Pacalavas.")
-print("Black_Hole_53")
+import mimetypes
+import paq
 
 # Symbol and space mapping (5-bit representation)
 symbol_map = {
@@ -45,55 +43,39 @@ symbol_map = {
 # Reverse map for decoding
 reverse_symbol_map = {v: k for k, v in symbol_map.items()}
 
-# Function to count zeros in 5-bit values
-def count_zeros_in_bin_values():
-    zero_counts = {}
-    for symbol, value in symbol_map.items():
-        # Count zeros in the 5-bit binary value
-        zero_count = bin(value).count('0')
-        zero_counts[symbol] = zero_count
-    return zero_counts
+def load_dictionary(dictionary_file, encoding="utf-8"):
+    word_to_index = {}
+    try:
+        with open(dictionary_file, "r", encoding=encoding) as f:
+            for index, line in enumerate(f):
+                word = line.strip().lower()  # Case-insensitive
+                word_to_index[word] = index
+        return word_to_index
+    except FileNotFoundError:
+        print(f"Error: Dictionary file '{dictionary_file}' not found.")
+        return None
+    except Exception as e:
+        print(f"Error loading dictionary: {e}")
+        return None
 
-# Display the zero counts for each symbol
-zero_counts = count_zeros_in_bin_values()
-for symbol, count in zero_counts.items():
-    pass  # Optional: Display or use as needed
 
-# Compression Function for text and docx files
-def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
-    file_extension = input_filename.split('.')[-1]
-    
-    if file_extension == 'txt':
-        # Compress .txt files using dictionary and PAQ
-        compress_text_file(input_filename, output_filename, dictionary_file, encoding)
-    elif file_extension == 'docx':
-        # Compress .docx files
-        compress_docx_file(input_filename, output_filename)
-    else:
-        # Compress non-txt files using binary and PAQ
-        compress_binary_file(input_filename, output_filename)
+def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8", use_zlib=False):
+    try:
+        word_to_index = load_dictionary(dictionary_file, encoding)
+        if word_to_index is None:
+            return
 
-def compress_text_file(input_filename, output_filename, dictionary_file, encoding="utf-8"):
-    if not input_filename.endswith('.txt'):
-        print("Error: Only .txt files can be compressed.")
-        return
+        mime_type, _ = mimetypes.guess_type(input_filename)
+        if mime_type == "text/plain":
+            compress_text_file(input_filename, output_filename, word_to_index, encoding)
+        elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            compress_docx_file(input_filename, output_filename, use_zlib)
+        else:
+            compress_binary_file(input_filename, output_filename, use_zlib)
+    except Exception as e:
+        print(f"An error occurred during compression: {e}")
 
-    def load_dictionary(dictionary_file):
-        word_to_index = {}
-        try:
-            with open(dictionary_file, "r", encoding=encoding) as f:
-                for index, line in enumerate(f):
-                    word = line.strip().lower()
-                    word_to_index[word] = index
-            return word_to_index
-        except Exception as e:
-            print(f"Error loading dictionary: {e}")
-            return None
-
-    word_to_index = load_dictionary(dictionary_file)
-    if word_to_index is None:
-        return
-
+def compress_text_file(input_filename, output_filename, word_to_index, encoding="utf-8"):
     try:
         with open(input_filename, "r", encoding=encoding) as infile:
             data = infile.read()
@@ -128,33 +110,35 @@ def compress_text_file(input_filename, output_filename, dictionary_file, encodin
             outfile.write(final_compressed_data)
             print(f"Compressed file saved to '{output_filename}'.")
     except Exception as e:
-        print(f"Error during compression: {e}")
+        print(f"Error during text compression: {e}")
 
-def compress_docx_file(input_filename, output_filename):
+
+def compress_docx_file(input_filename, output_filename, use_zlib=False):
     try:
         with ZipFile(input_filename, 'r') as docx_zip:
-            # Create a temporary compressed .docx
-            compressed_data = bytearray()
-            for file_name in docx_zip.namelist():
-                with docx_zip.open(file_name) as docx_file:
-                    file_data = docx_file.read()
-                    # Compress each file using PAQ
-                    compressed_file_data = paq.compress(file_data)
-                    compressed_data.extend(compressed_file_data)
-        
-        with open(output_filename, "wb") as outfile:
-            outfile.write(compressed_data)
-            print(f"Compressed .docx file saved to '{output_filename}'.")
+            with ZipFile(output_filename, 'w') as compressed_docx_zip:
+                for file_name in docx_zip.namelist():
+                    with docx_zip.open(file_name) as docx_file:
+                        file_data = docx_file.read()
+                        if use_zlib:
+                            compressed_file_data = paq.compress(file_data)
+                        else:
+                            compressed_file_data = paq.compress(file_data)
+                        compressed_docx_zip.writestr(file_name, compressed_file_data)
+        print(f"Compressed .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx compression: {e}")
 
-def compress_binary_file(input_filename, output_filename):
+
+def compress_binary_file(input_filename, output_filename, use_zlib=False):
     try:
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        # Apply PAQ compression
-        compressed_data = paq.compress(data)
+        if use_zlib:
+            compressed_data = paq.compress(data)
+        else:
+            compressed_data = paq.compress(data)
 
         with open(output_filename, "wb") as outfile:
             outfile.write(compressed_data)
@@ -162,25 +146,21 @@ def compress_binary_file(input_filename, output_filename):
     except Exception as e:
         print(f"Error during binary compression: {e}")
 
-# Extraction Function for text, docx, and binary files
-def extract_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
-    file_extension = output_filename.split('.')[-1]
-    
-    if file_extension == 'txt':
-        # Extract .txt files
-        extract_text_file(input_filename, output_filename, dictionary_file, encoding)
-    elif file_extension == 'docx':
-        # Extract .docx files
-        extract_docx_file(input_filename, output_filename)
-    else:
-        # Extract non-txt files
-        extract_binary_file(input_filename, output_filename)
+
+def extract_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8", use_zlib=False):
+    try:
+        mime_type, _ = mimetypes.guess_type(output_filename) # Check output file type
+        if mime_type == "text/plain":
+            extract_text_file(input_filename, output_filename, dictionary_file, encoding)
+        elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            extract_docx_file(input_filename, output_filename, use_zlib)
+        else:
+            extract_binary_file(input_filename, output_filename, use_zlib)
+    except Exception as e:
+        print(f"An error occurred during extraction: {e}")
+
 
 def extract_text_file(input_filename, output_filename, dictionary_file, encoding="utf-8"):
-    if not output_filename.endswith('.txt'):
-        print("Error: Extracted file must have a .txt extension.")
-        return
-
     def load_dictionary(dictionary_file):
         index_to_word = {}
         try:
@@ -238,33 +218,35 @@ def extract_text_file(input_filename, output_filename, dictionary_file, encoding
             outfile.write(decoded_data.decode(encoding))
             print(f"Extracted file saved to '{output_filename}'.")
     except Exception as e:
-        print(f"Error during extraction: {e}")
+        print(f"Error during text extraction: {e}")
 
-def extract_docx_file(input_filename, output_filename):
+
+def extract_docx_file(input_filename, output_filename, use_zlib=False):
     try:
-        with open(input_filename, "rb") as infile:
-            compressed_data = infile.read()
-
-        # Decompress the data using PAQ
-        decompressed_data = paq.decompress(compressed_data)
-
-        if decompressed_data is None:
-            print(f"Error: Decompression failed for '{input_filename}'")
-            return
-
-        with ZipFile(output_filename, "w") as docx_zip:
-            docx_zip.writestr("word/document.xml", decompressed_data)
-            print(f"Extracted .docx file saved to '{output_filename}'.")
+        with ZipFile(input_filename, 'r') as compressed_docx_zip:
+            with ZipFile(output_filename, 'w') as docx_zip:
+                for file_name in compressed_docx_zip.namelist():
+                    with compressed_docx_zip.open(file_name) as compressed_file:
+                        compressed_data = compressed_file.read()
+                        if use_zlib:
+                            decompressed_data = paq.decompress(compressed_data)
+                        else:
+                            decompressed_data = paq.decompress(compressed_data)
+                        docx_zip.writestr(file_name, decompressed_data)
+        print(f"Extracted .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx extraction: {e}")
 
-def extract_binary_file(input_filename, output_filename):
+
+def extract_binary_file(input_filename, output_filename, use_zlib=False):
     try:
         with open(input_filename, "rb") as infile:
             compressed_data = infile.read()
 
-        # Decompress the data using PAQ
-        decompressed_data = paq.decompress(compressed_data)
+        if use_zlib:
+            decompressed_data = paq.decompress(compressed_data)
+        else:
+            decompressed_data = paq.decompress(compressed_data)
 
         if decompressed_data is None:
             print(f"Error: Decompression failed for '{input_filename}'")
@@ -276,7 +258,7 @@ def extract_binary_file(input_filename, output_filename):
     except Exception as e:
         print(f"Error during binary extraction: {e}")
 
-# Main Menu
+
 def main():
     print("Choose an option:")
     print("1. Compress a file")
@@ -286,13 +268,17 @@ def main():
     while True:
         choice = input("Enter your choice (1/2/3): ").strip()
         if choice == '1':
-            input_file = input("Enter the name of the file to compress (e.g., input.txt, input.docx, or input.bin): ").strip()
+            input_file = input("Enter the name of the file to compress: ").strip()
             output_file = input_file + ".b"
-            compress_file(input_file, output_file)
+            use_zlib_str = input("Use zlib instead of paq? (y/n): ").strip().lower()
+            use_zlib = use_zlib_str == 'y'
+            compress_file(input_file, output_file, use_zlib=use_zlib)
         elif choice == '2':
-            input_file = input("Enter the name of the file to extract (e.g., output.b or output.docx): ").strip()
+            input_file = input("Enter the name of the file to extract: ").strip()
             output_file = input_file[:-2]  # remove the ".b"
-            extract_file(input_file, output_file)
+            use_zlib_str = input("Use zlib instead of paq? (y/n): ").strip().lower()
+            use_zlib = use_zlib_str == 'y'
+            extract_file(input_file, output_file, use_zlib=use_zlib)
         elif choice == '3':
             print("Exiting...")
             break
