@@ -2,6 +2,8 @@ import os
 import struct
 import mimetypes
 import paq
+from zipfile import ZipFile
+from io import BytesIO
 
 # Symbol and space mapping (5-bit representation)
 symbol_map = {
@@ -67,7 +69,7 @@ def compress_file(input_filename, output_filename, dictionary_file="Dictionary.t
         if mime_type == "text/plain":
             compress_text_file(input_filename, output_filename, word_to_index, encoding)
         elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            compress_docx_file(input_filename, output_filename)
+            compress_docx_file(input_filename, output_filename, word_to_index)
         else:
             compress_binary_file(input_filename, output_filename)
     except Exception as e:
@@ -111,17 +113,43 @@ def compress_text_file(input_filename, output_filename, word_to_index, encoding=
         print(f"Error during text compression: {e}")
 
 
-def compress_docx_file(input_filename, output_filename):
+def compress_docx_file(input_filename, output_filename, word_to_index):
     try:
-        # Treat .docx as binary file and compress using PAQ
-        with open(input_filename, 'rb') as infile:
-            data = infile.read()
+        # Open the .docx file as a zip (it is a zip format under the hood)
+        with ZipFile(input_filename, 'r') as docx_zip:
+            # Create a new zip file to hold the compressed content
+            compressed_zip = BytesIO()
 
-        # Use PAQ compression on binary data
-        compressed_data = paq.compress(data)
+            with ZipFile(compressed_zip, 'w') as output_zip:
+                # Iterate through each file in the docx zip
+                for file_info in docx_zip.infolist():
+                    file_data = docx_zip.read(file_info.filename)
+                    # If the file is a text file (content.xml), apply dictionary compression to text
+                    if file_info.filename == "word/document.xml":
+                        text_data = file_data.decode('utf-8')  # Decode XML to text
+                        compressed_data = bytearray()
 
-        with open(output_filename, "wb") as outfile:
-            outfile.write(compressed_data)
+                        for word in text_data.split():
+                            normalized_word = word.lower()
+                            if normalized_word in word_to_index:
+                                index = word_to_index[normalized_word]
+                                compressed_data.append(0x00)  # Dictionary flag
+                                compressed_data.extend(struct.pack(">I", index))
+                            else:
+                                compressed_data.append(0x01)  # Non-dictionary word
+                                compressed_data.extend(word.encode('utf-8'))
+
+                        # Now, PAQ compress the text content
+                        compressed_data = paq.compress(bytes(compressed_data))
+                        output_zip.writestr(file_info.filename, compressed_data)
+                    else:
+                        # For non-text files, store as is (compressed using PAQ)
+                        output_zip.writestr(file_info.filename, paq.compress(file_data))
+
+            # Save the compressed docx file
+            with open(output_filename, "wb") as outfile:
+                outfile.write(compressed_zip.getvalue())
+
             print(f"Compressed .docx file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during .docx compression: {e}")
