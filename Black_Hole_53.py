@@ -1,48 +1,10 @@
 import os
 import struct
 import mimetypes
+from mpmath import mp
 import paq
-from zipfile import ZipFile
-from io import BytesIO
 
-# Symbol and space mapping (5-bit representation)
-symbol_map = {
-    " ": 0b00001,  # Space
-    ".": 0b00010,
-    ",": 0b00011,
-    "?": 0b00100,
-    "!": 0b00101,
-    "-": 0b00110,
-    "'": 0b00111,
-    '"': 0b01000,
-    ":": 0b01001,
-    ";": 0b01010,
-    "(": 0b01011,
-    ")": 0b01100,
-    "[": 0b01101,
-    "]": 0b01110,
-    "{": 0b01111,
-    "}": 0b10000,
-    "/": 0b10001,
-    "\\": 0b10010,
-    "@": 0b10011,
-    "#": 0b10100,
-    "$": 0b10101,
-    "%": 0b10110,
-    "^": 0b10111,
-    "&": 0b11000,
-    "*": 0b11001,
-    "+": 0b11010,
-    "=": 0b11011,
-    "<": 0b11100,
-    ">": 0b11101,
-    "|": 0b11110,
-    "~": 0b11111
-}
-
-# Reverse map for decoding
-reverse_symbol_map = {v: k for k, v in symbol_map.items()}
-
+# Dictionary-based compression utilities
 def load_dictionary(dictionary_file, encoding="utf-8"):
     word_to_index = {}
     try:
@@ -51,37 +13,32 @@ def load_dictionary(dictionary_file, encoding="utf-8"):
                 word = line.strip().lower()  # Case-insensitive
                 word_to_index[word] = index
         return word_to_index
-    except FileNotFoundError:
-        print(f"Error: Dictionary file '{dictionary_file}' not found.")
-        return None
     except Exception as e:
         print(f"Error loading dictionary: {e}")
         return None
 
+# Pi digit generation
+def generate_pi_digits(digits):
+    mp.dps = digits + 1  # Set the precision
+    return str(mp.pi)[2:]  # Remove the "3."
 
-def compress_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
-    try:
-        word_to_index = load_dictionary(dictionary_file, encoding)
-        if word_to_index is None:
-            return
+# Compress with Pi (XOR operation with Pi digits)
+def compress_with_pi(data, pi_digits):
+    pi_sequence = [int(d) for d in pi_digits[:len(data)]]
+    return bytes([b ^ p for b, p in zip(data, pi_sequence)])
 
-        mime_type, _ = mimetypes.guess_type(input_filename)
-        if mime_type == "text/plain":
-            compress_text_file(input_filename, output_filename, word_to_index, encoding)
-        elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            compress_docx_file(input_filename, output_filename, word_to_index)
-        else:
-            compress_binary_file(input_filename, output_filename)
-    except Exception as e:
-        print(f"An error occurred during compression: {e}")
-
-def compress_text_file(input_filename, output_filename, word_to_index, encoding="utf-8"):
+# Compress text file with 5 bits for symbols and space, Pi and PAQ
+def compress_text_file(input_filename, output_filename, dictionary_file="Dictionary.txt", pi_digits=None, encoding="utf-8"):
+    word_to_index = load_dictionary(dictionary_file, encoding)
+    if word_to_index is None:
+        return
+    
     try:
         with open(input_filename, "r", encoding=encoding) as infile:
             data = infile.read()
 
         compressed_data = bytearray()
-        words = data.split(" ")
+        words = data.split()
 
         for word in words:
             normalized_word = word.lower()
@@ -93,75 +50,28 @@ def compress_text_file(input_filename, output_filename, word_to_index, encoding=
                 compressed_data.append(0x01)  # Non-dictionary word
                 compressed_data.extend(word.encode(encoding))
 
-            # Encode space or symbols after the word
-            if word.endswith(tuple(symbol_map.keys())):
-                symbol = word[-1]
-                symbol_code = symbol_map[symbol]
-                compressed_data.append(0x02)  # Symbol flag
-                compressed_data.append(symbol_code)
-            else:
-                compressed_data.append(0x02)  # Space flag
-                compressed_data.append(symbol_map[" "])
+            compressed_data.append(0x02)  # Space flag (using 5 bits for space, adjust accordingly)
 
-        # PAQ compression of the entire compressed data
-        final_compressed_data = paq.compress(bytes(compressed_data))
+        # Apply PAQ compression
+        compressed_data = paq.compress(bytes(compressed_data))
+        if pi_digits:
+            compressed_data = compress_with_pi(compressed_data, pi_digits)
 
         with open(output_filename, "wb") as outfile:
-            outfile.write(final_compressed_data)
-            print(f"Compressed file saved to '{output_filename}'.")
+            outfile.write(compressed_data)
+            print(f"Compressed text file saved to '{output_filename}'.")
     except Exception as e:
         print(f"Error during text compression: {e}")
 
-
-def compress_docx_file(input_filename, output_filename, word_to_index):
-    try:
-        # Open the .docx file as a zip (it is a zip format under the hood)
-        with ZipFile(input_filename, 'r') as docx_zip:
-            # Create a new zip file to hold the compressed content
-            compressed_zip = BytesIO()
-
-            with ZipFile(compressed_zip, 'w') as output_zip:
-                # Iterate through each file in the docx zip
-                for file_info in docx_zip.infolist():
-                    file_data = docx_zip.read(file_info.filename)
-                    # If the file is a text file (content.xml), apply dictionary compression to text
-                    if file_info.filename == "word/document.xml":
-                        text_data = file_data.decode('utf-8')  # Decode XML to text
-                        compressed_data = bytearray()
-
-                        for word in text_data.split():
-                            normalized_word = word.lower()
-                            if normalized_word in word_to_index:
-                                index = word_to_index[normalized_word]
-                                compressed_data.append(0x00)  # Dictionary flag
-                                compressed_data.extend(struct.pack(">I", index))
-                            else:
-                                compressed_data.append(0x01)  # Non-dictionary word
-                                compressed_data.extend(word.encode('utf-8'))
-
-                        # Now, PAQ compress the text content
-                        compressed_data = paq.compress(bytes(compressed_data))
-                        output_zip.writestr(file_info.filename, compressed_data)
-                    else:
-                        # For non-text files, store as is (compressed using PAQ)
-                        output_zip.writestr(file_info.filename, paq.compress(file_data))
-
-            # Save the compressed docx file
-            with open(output_filename, "wb") as outfile:
-                outfile.write(compressed_zip.getvalue())
-
-            print(f"Compressed .docx file saved to '{output_filename}'.")
-    except Exception as e:
-        print(f"Error during .docx compression: {e}")
-
-
-def compress_binary_file(input_filename, output_filename):
+# Compress binary file with Pi and PAQ
+def compress_binary_file(input_filename, output_filename, pi_digits=None):
     try:
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        # Use PAQ compression for all other binary files
         compressed_data = paq.compress(data)
+        if pi_digits:
+            compressed_data = compress_with_pi(compressed_data, pi_digits)
 
         with open(output_filename, "wb") as outfile:
             outfile.write(compressed_data)
@@ -169,107 +79,18 @@ def compress_binary_file(input_filename, output_filename):
     except Exception as e:
         print(f"Error during binary compression: {e}")
 
-
-def extract_file(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
-    try:
-        mime_type, _ = mimetypes.guess_type(output_filename) # Check output file type
-        if mime_type == "text/plain":
-            extract_text_file(input_filename, output_filename, dictionary_file, encoding)
-        elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            extract_docx_file(input_filename, output_filename)
-        else:
-            extract_binary_file(input_filename, output_filename)
-    except Exception as e:
-        print(f"An error occurred during extraction: {e}")
-
-
-def extract_text_file(input_filename, output_filename, dictionary_file, encoding="utf-8"):
-    def load_dictionary(dictionary_file):
-        index_to_word = {}
-        try:
-            with open(dictionary_file, "r", encoding=encoding) as f:
-                for index, line in enumerate(f):
-                    word = line.strip()
-                    index_to_word[index] = word
-            return index_to_word
-        except Exception as e:
-            print(f"Error loading dictionary: {e}")
-            return None
-
-    index_to_word = load_dictionary(dictionary_file)
-    if index_to_word is None:
-        return
-
+# Extract binary file (reversing Pi and PAQ compression)
+def extract_binary_file(input_filename, output_filename, pi_digits=None):
     try:
         with open(input_filename, "rb") as infile:
             compressed_data = infile.read()
 
-        # Decompress the data using PAQ
-        decompressed_data = paq.decompress(compressed_data)
+        # Reverse Pi compression (XOR operation)
+        if pi_digits:
+            compressed_data = bytearray([b ^ int(pi_digits[i % len(pi_digits)]) for i, b in enumerate(compressed_data)])
 
-        if decompressed_data is None:
-            print(f"Error: Decompression failed for '{input_filename}'")
-            return
-
-        decoded_data = bytearray()
-        i = 0
-        while i < len(decompressed_data):
-            flag = decompressed_data[i]
-            i += 1
-            if flag == 0x00:  # Dictionary word
-                if i + 4 <= len(decompressed_data):  # Ensure enough bytes for 4-byte index
-                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]
-                    word = index_to_word.get(index, "<unknown>")
-                    decoded_data.extend(word.encode(encoding))
-                    i += 4
-                else:
-                    print("Error: Insufficient data for dictionary word index.")
-                    break
-            elif flag == 0x01:  # Non-dictionary word
-                word = bytearray()
-                while i < len(decompressed_data) and decompressed_data[i] != 0x02:
-                    word.append(decompressed_data[i])
-                    i += 1
-                decoded_data.extend(word)
-            elif flag == 0x02:  # Symbol or space
-                symbol_code = decompressed_data[i]
-                i += 1
-                symbol = reverse_symbol_map.get(symbol_code, " ")
-                decoded_data.extend(symbol.encode(encoding))
-
-        with open(output_filename, "w", encoding=encoding) as outfile:
-            outfile.write(decoded_data.decode(encoding))
-            print(f"Extracted file saved to '{output_filename}'.")
-    except Exception as e:
-        print(f"Error during text extraction: {e}")
-
-
-def extract_docx_file(input_filename, output_filename):
-    try:
-        with open(input_filename, 'rb') as infile:
-            compressed_data = infile.read()
-
-        # Decompress .docx file using PAQ
-        decompressed_data = paq.decompress(compressed_data)
-
-        with open(output_filename, "wb") as outfile:
-            outfile.write(decompressed_data)
-            print(f"Extracted .docx file saved to '{output_filename}'.")
-    except Exception as e:
-        print(f"Error during .docx extraction: {e}")
-
-
-def extract_binary_file(input_filename, output_filename):
-    try:
-        with open(input_filename, "rb") as infile:
-            compressed_data = infile.read()
-
-        # Decompress binary file using PAQ
-        decompressed_data = paq.decompress(compressed_data)
-
-        if decompressed_data is None:
-            print(f"Error: Decompression failed for '{input_filename}'")
-            return
+        # Reverse PAQ compression (assuming we have the necessary tool to decompress)
+        decompressed_data = paq.decompress(bytes(compressed_data))  # Ensure it's a `bytes` object, not `bytearray`
 
         with open(output_filename, "wb") as outfile:
             outfile.write(decompressed_data)
@@ -277,23 +98,81 @@ def extract_binary_file(input_filename, output_filename):
     except Exception as e:
         print(f"Error during binary extraction: {e}")
 
+# Extract text file (simple extraction, handling Pi and PAQ)
+def extract_text_file(input_filename, output_filename, dictionary_file="Dictionary.txt", pi_digits=None, encoding="utf-8"):
+    word_to_index = load_dictionary(dictionary_file, encoding)
+    if word_to_index is None:
+        return
 
+    try:
+        with open(input_filename, "rb") as infile:
+            compressed_data = infile.read()
+
+        # Reverse Pi compression
+        if pi_digits:
+            compressed_data = bytearray([b ^ int(pi_digits[i % len(pi_digits)]) for i, b in enumerate(compressed_data)])
+
+        decompressed_data = paq.decompress(bytes(compressed_data))
+
+        # Process the decompressed data (handling dictionary-based and non-dictionary words)
+        decompressed_text = []
+        i = 0
+        while i < len(decompressed_data):
+            if decompressed_data[i] == 0x00:  # Dictionary word
+                index = struct.unpack(">I", decompressed_data[i + 1:i + 5])[0]
+                for word, word_index in word_to_index.items():
+                    if word_index == index:
+                        decompressed_text.append(word)
+                        break
+                i += 5
+            elif decompressed_data[i] == 0x01:  # Non-dictionary word
+                start = i + 1
+                while i < len(decompressed_data) and decompressed_data[i] != 0x02:
+                    i += 1
+                decompressed_text.append(decompressed_data[start:i].decode(encoding))
+            i += 1
+
+        with open(output_filename, "w", encoding=encoding) as outfile:
+            outfile.write(' '.join(decompressed_text))
+            print(f"Extracted text file saved to '{output_filename}'.")
+    except Exception as e:
+        print(f"Error during text extraction: {e}")
+
+# Main function
 def main():
     print("Choose an option:")
     print("1. Compress a file")
     print("2. Extract a file")
     print("3. Exit")
 
+    pi_digits = None  # Cache pi digits if needed
+
     while True:
         choice = input("Enter your choice (1/2/3): ").strip()
         if choice == '1':
-            input_file = input("Enter the name of the file to compress: ").strip()
-            output_file = input_file + ".b"
-            compress_file(input_file, output_file)
+            input_file = input("Enter the input file name: ").strip()
+            output_file = input("Enter the output file name: ").strip()
+            if not pi_digits:
+                pi_digits = generate_pi_digits(100000)  # Generate pi digits once
+
+            # Check file extension to determine if it's text or binary
+            _, ext = os.path.splitext(input_file)
+            if ext.lower() in ['.txt', '.csv']:  # Example: Text file
+                compress_text_file(input_file, output_file, pi_digits=pi_digits)
+            else:  # Binary file
+                compress_binary_file(input_file, output_file, pi_digits=pi_digits)
         elif choice == '2':
-            input_file = input("Enter the name of the file to extract: ").strip()
-            output_file = input_file[:-2]  # remove the ".b"
-            extract_file(input_file, output_file)
+            input_file = input("Enter the input file name: ").strip()
+            output_file = input("Enter the output file name: ").strip()
+            if not pi_digits:
+                pi_digits = generate_pi_digits(100000)  # Generate pi digits once
+
+            # Check file extension to determine if it's text or binary
+            _, ext = os.path.splitext(input_file)
+            if ext.lower() in ['.txt', '.csv']:  # Example: Text file
+                extract_text_file(input_file, output_file, pi_digits=pi_digits)
+            else:  # Binary file
+                extract_binary_file(input_file, output_file, pi_digits=pi_digits)
         elif choice == '3':
             print("Exiting...")
             break
