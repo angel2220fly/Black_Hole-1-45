@@ -1,8 +1,8 @@
 import os
 import struct
-import mimetypes
-from mpmath import mp
 import paq
+print("Created by Jurijus Pacalovas.")
+print("Black_Hole_53")
 
 # Dictionary-based compression utilities
 def load_dictionary(dictionary_file, encoding="utf-8"):
@@ -17,17 +17,22 @@ def load_dictionary(dictionary_file, encoding="utf-8"):
         print(f"Error loading dictionary: {e}")
         return None
 
-# Pi digit generation
-def generate_pi_digits(digits):
-    mp.dps = digits + 1  # Set the precision
-    return str(mp.pi)[2:]  # Remove the "3."
+# Load Pi digits from a file
+def load_pi_digits(file_name="PI_10M.txt"):
+    try:
+        with open(file_name, "r") as file:
+            pi_digits = file.read().strip()  # Read and strip any trailing whitespace
+            return pi_digits
+    except FileNotFoundError:
+        print(f"Error: File '{file_name}' not found.")
+        return None
 
 # Compress with Pi (XOR operation with Pi digits)
 def compress_with_pi(data, pi_digits):
     pi_sequence = [int(d) for d in pi_digits[:len(data)]]
     return bytes([b ^ p for b, p in zip(data, pi_sequence)])
 
-# Compress text file with 5 bits for symbols and space, Pi and PAQ
+# Compress text file with dictionary, Pi, and PAQ
 def compress_text_file(input_filename, output_filename, dictionary_file="Dictionary.txt", pi_digits=None, encoding="utf-8"):
     word_to_index = load_dictionary(dictionary_file, encoding)
     if word_to_index is None:
@@ -50,7 +55,7 @@ def compress_text_file(input_filename, output_filename, dictionary_file="Diction
                 compressed_data.append(0x01)  # Non-dictionary word
                 compressed_data.extend(word.encode(encoding))
 
-            compressed_data.append(0x02)  # Space flag (using 5 bits for space, adjust accordingly)
+            compressed_data.append(0x02)  # Space flag
 
         # Apply PAQ compression
         compressed_data = paq.compress(bytes(compressed_data))
@@ -79,18 +84,18 @@ def compress_binary_file(input_filename, output_filename, pi_digits=None):
     except Exception as e:
         print(f"Error during binary compression: {e}")
 
-# Extract binary file (reversing Pi and PAQ compression)
+# Extract binary file
 def extract_binary_file(input_filename, output_filename, pi_digits=None):
     try:
         with open(input_filename, "rb") as infile:
             compressed_data = infile.read()
 
-        # Reverse Pi compression (XOR operation)
+        # Reverse Pi compression
         if pi_digits:
             compressed_data = bytearray([b ^ int(pi_digits[i % len(pi_digits)]) for i, b in enumerate(compressed_data)])
 
-        # Reverse PAQ compression (assuming we have the necessary tool to decompress)
-        decompressed_data = paq.decompress(bytes(compressed_data))  # Ensure it's a `bytes` object, not `bytearray`
+        # Reverse PAQ compression
+        decompressed_data = paq.decompress(bytes(compressed_data))
 
         with open(output_filename, "wb") as outfile:
             outfile.write(decompressed_data)
@@ -98,7 +103,7 @@ def extract_binary_file(input_filename, output_filename, pi_digits=None):
     except Exception as e:
         print(f"Error during binary extraction: {e}")
 
-# Extract text file (simple extraction, handling Pi and PAQ)
+# Extract text file
 def extract_text_file(input_filename, output_filename, dictionary_file="Dictionary.txt", pi_digits=None, encoding="utf-8"):
     word_to_index = load_dictionary(dictionary_file, encoding)
     if word_to_index is None:
@@ -114,7 +119,7 @@ def extract_text_file(input_filename, output_filename, dictionary_file="Dictiona
 
         decompressed_data = paq.decompress(bytes(compressed_data))
 
-        # Process the decompressed data (handling dictionary-based and non-dictionary words)
+        # Process the decompressed data
         decompressed_text = []
         i = 0
         while i < len(decompressed_data):
@@ -145,33 +150,31 @@ def main():
     print("2. Extract a file")
     print("3. Exit")
 
-    pi_digits = None  # Cache pi digits if needed
+    # Load Pi digits from the file
+    pi_digits = load_pi_digits("PI_10M.txt")
+    if not pi_digits:
+        print("Exiting program due to missing Pi file.")
+        return
 
     while True:
         choice = input("Enter your choice (1/2/3): ").strip()
         if choice == '1':
             input_file = input("Enter the input file name: ").strip()
             output_file = input("Enter the output file name: ").strip()
-            if not pi_digits:
-                pi_digits = generate_pi_digits(100000)  # Generate pi digits once
 
-            # Check file extension to determine if it's text or binary
             _, ext = os.path.splitext(input_file)
-            if ext.lower() in ['.txt', '.csv']:  # Example: Text file
+            if ext.lower() in ['.txt', '.csv']:
                 compress_text_file(input_file, output_file, pi_digits=pi_digits)
-            else:  # Binary file
+            else:
                 compress_binary_file(input_file, output_file, pi_digits=pi_digits)
         elif choice == '2':
             input_file = input("Enter the input file name: ").strip()
             output_file = input("Enter the output file name: ").strip()
-            if not pi_digits:
-                pi_digits = generate_pi_digits(100000)  # Generate pi digits once
 
-            # Check file extension to determine if it's text or binary
             _, ext = os.path.splitext(input_file)
-            if ext.lower() in ['.txt', '.csv']:  # Example: Text file
+            if ext.lower() in ['.txt', '.csv']:
                 extract_text_file(input_file, output_file, pi_digits=pi_digits)
-            else:  # Binary file
+            else:
                 extract_binary_file(input_file, output_file, pi_digits=pi_digits)
         elif choice == '3':
             print("Exiting...")
