@@ -1,6 +1,4 @@
 import os
-import struct
-import random
 import paq
 from mpmath import mp
 
@@ -78,119 +76,58 @@ def binary_to_base256(binary_string):
     return base256_values
 
 # Compress and encode using paq and binary to base 256
-def compress_with_zlib_and_encode(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
+def compress_with_zlib_and_encode(input_filename, output_filename):
     try:
-        # Load dictionary for compression
-        def load_dictionary(dictionary_file):
-            word_to_index = {}
-            try:
-                with open(dictionary_file, "r", encoding=encoding) as f:
-                    for index, line in enumerate(f):
-                        word = line.strip().lower()
-                        word_to_index[word] = index
-                return word_to_index
-            except Exception as e:
-                print(f"Error loading dictionary: {e}")
-                return None
-
-        word_to_index = load_dictionary(dictionary_file)
-        if word_to_index is None:
-            return
-
         # Open the input file and read data
-        with open(input_filename, "r", encoding=encoding) as infile:
+        with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        compressed_data = bytearray()
-        words = data.split(" ")
+        # Compress data using paq
+        compressed_data = paq.compress(data)
 
-        # Process words and apply dictionary compression
-        for word in words:
-            normalized_word = word.lower()
-            if normalized_word in word_to_index:
-                index = word_to_index[normalized_word]
-                compressed_data.append(0x00)  # Dictionary flag
-                compressed_data.extend(struct.pack(">I", index))  # 4-byte index
-            else:
-                compressed_data.append(0x01)  # Non-dictionary word
-                compressed_data.extend(word.encode(encoding))
+        # Convert binary data to base 256 (optional, may be useful for processing)
+        binary_data = ''.join(format(byte, '08b') for byte in compressed_data)
+        base256_values = binary_to_base256(binary_data)
 
-            # Encode space or symbols after the word
-            if word.endswith(tuple(symbol_map.keys())):
-                symbol = word[-1]
-                symbol_code = symbol_map[symbol]
-                compressed_data.append(0x02)  # Symbol flag
-                compressed_data.append(symbol_code)
-            else:
-                compressed_data.append(0x02)  # Space flag
-                compressed_data.append(symbol_map[" "])
+        # Reverse bits of base256 values
+        reversed_data = bytes(base256_values)
 
-        # PAQ compression
-        final_compressed_data = paq.compress(bytes(compressed_data))
+        # Generate Pi digits for encoding
+        pi_digits = generate_pi_digits(len(reversed_data))
 
-        # Write compressed data to the output file
+        # XOR encoding with Pi digits
+        encoded_data = encode_with_pi(reversed_data, pi_digits)
+
+        # Write encoded data to the output file
         with open(output_filename, "wb") as outfile:
-            outfile.write(final_compressed_data)
+            outfile.write(encoded_data)
             print(f"Compressed and encoded file saved to '{output_filename}'.")
     except Exception as e:
         print(f"An error occurred during compression: {e}")
 
 # Decode and decompress using paq and binary to base 256
-def decode_with_zlib_and_pi(input_filename, output_filename, dictionary_file="Dictionary.txt", encoding="utf-8"):
+def decode_with_zlib_and_pi(input_filename, output_filename):
     try:
-        # Load dictionary for decompression
-        def load_dictionary(dictionary_file):
-            index_to_word = {}
-            try:
-                with open(dictionary_file, "r", encoding=encoding) as f:
-                    for index, line in enumerate(f):
-                        word = line.strip()
-                        index_to_word[index] = word
-                return index_to_word
-            except Exception as e:
-                print(f"Error loading dictionary: {e}")
-                return None
-
-        index_to_word = load_dictionary(dictionary_file)
-        if index_to_word is None:
-            return
-
         # Read the encoded data
         with open(input_filename, "rb") as infile:
             encoded_data = infile.read()
 
-        # Decompress data using paq
-        decompressed_data = paq.decompress(encoded_data)
+        # Generate Pi digits for decoding
+        pi_digits = generate_pi_digits(len(encoded_data))
 
-        decoded_data = bytearray()
-        i = 0
-        while i < len(decompressed_data):
-            flag = decompressed_data[i]
-            i += 1
-            if flag == 0x00:  # Dictionary word
-                if i + 4 <= len(decompressed_data):  # Ensure 4 bytes for index
-                    index = struct.unpack(">I", decompressed_data[i:i+4])[0]  # 4-byte index
-                    word = index_to_word.get(index, "<unknown>")
-                    decoded_data.extend(word.encode(encoding))
-                    i += 4
-                else:
-                    print("Error: Insufficient data for dictionary word index.")
-                    break
-            elif flag == 0x01:  # Non-dictionary word
-                word = bytearray()
-                while i < len(decompressed_data) and decompressed_data[i] != 0x02:
-                    word.append(decompressed_data[i])
-                    i += 1
-                decoded_data.extend(word)
-            elif flag == 0x02:  # Symbol or space
-                symbol_code = decompressed_data[i]
-                i += 1
-                symbol = reverse_symbol_map.get(symbol_code, " ")
-                decoded_data.extend(symbol.encode(encoding))
+        # XOR decoding with Pi digits
+        decoded_data = encode_with_pi(encoded_data, pi_digits)
+
+        # Convert binary data back from base256 to bytes
+        binary_data = ''.join(format(byte, '08b') for byte in decoded_data)
+        base256_values = binary_to_base256(binary_data)
+
+        # Decompress data using paq
+        decompressed_data = paq.decompress(bytes(base256_values))
 
         # Write decompressed data to the output file
-        with open(output_filename, "w", encoding=encoding) as outfile:
-            outfile.write(decoded_data.decode(encoding))
+        with open(output_filename, "wb") as outfile:
+            outfile.write(decompressed_data)
             print(f"Extracted file saved to '{output_filename}'.")
     except Exception as e:
         print(f"An error occurred during extraction: {e}")
@@ -209,7 +146,7 @@ def main():
             compress_with_zlib_and_encode(input_file, output_file)
         elif choice == '2':
             input_file = input("Enter the name of the file to extract: ").strip()
-            output_file = input_file[:-2]  # Remove '.b' extension
+            output_file = input_file[:-2]
             decode_with_zlib_and_pi(input_file, output_file)
         elif choice == '3':
             print("Exiting the program.")
