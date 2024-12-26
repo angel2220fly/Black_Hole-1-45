@@ -1,5 +1,4 @@
 import os
-import mimetypes
 import paq
 from mpmath import mp
 
@@ -66,41 +65,56 @@ def encode_with_pi(data, pi_digits):
     pi_sequence = [int(d) for d in pi_digits[:len(data)]]
     return bytes([b ^ p for b, p in zip(data, pi_sequence)])
 
-# Compress and encode
-def compress_with_paq_and_encode(input_filename, output_filename):
+# Compress and encode using zlib
+def compress_with_zlib_and_encode(input_filename, output_filename):
     try:
+        # Open the input file and read data
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        data = reverse_bits_in_data(data)
+        # Compress data using zlib
         compressed_data = paq.compress(data)
+
+        # Reverse bits of compressed data
+        compressed_data = reverse_bits_in_data(compressed_data)
+
+        # Generate Pi digits for encoding
         pi_digits = generate_pi_digits(len(compressed_data))
+
+        # XOR encoding with Pi digits
         encoded_data = encode_with_pi(compressed_data, pi_digits)
         encoded_data = reverse_bits_in_data(encoded_data)
 
+        # Write encoded data to the output file
         with open(output_filename, "wb") as outfile:
             outfile.write(encoded_data)
             print(f"Compressed and encoded file saved to '{output_filename}'.")
     except Exception as e:
         print(f"An error occurred during compression: {e}")
 
-# Decode and decompress
-def decode_with_paq_and_pi(input_filename, output_filename):
+# Decode and decompress using zlib
+def decode_with_zlib_and_pi(input_filename, output_filename):
     try:
+        # Read the encoded data
         with open(input_filename, "rb") as infile:
             encoded_data = infile.read()
 
+        # Reverse bits of encoded data
         encoded_data = reverse_bits_in_data(encoded_data)
+
+        # Generate Pi digits for decoding
         pi_digits = generate_pi_digits(len(encoded_data))
+
+        # XOR decoding with Pi digits
         decoded_data = encode_with_pi(encoded_data, pi_digits)
+
+        # Decompress data using zlib
         decompressed_data = paq.decompress(decoded_data)
 
-        if decompressed_data is None:
-            print(f"Error: Decompression failed for '{input_filename}'.")
-            return
-
+        # Reverse bits of decompressed data
         decompressed_data = reverse_bits_in_data(decompressed_data)
 
+        # Write decompressed data to the output file
         with open(output_filename, "wb") as outfile:
             outfile.write(decompressed_data)
             print(f"Extracted file saved to '{output_filename}'.")
@@ -118,11 +132,11 @@ def main():
         if choice == '1':
             input_file = input("Enter the name of the file to compress: ").strip()
             output_file = input_file + ".b"
-            compress_with_paq_and_encode(input_file, output_file)
+            compress_with_zlib_and_encode(input_file, output_file)
         elif choice == '2':
             input_file = input("Enter the name of the file to extract: ").strip()
             output_file = input_file[:-2]
-            decode_with_paq_and_pi(input_file, output_file)
+            decode_with_zlib_and_pi(input_file, output_file)
         elif choice == '3':
             print("Exiting the program.")
             break
