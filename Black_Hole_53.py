@@ -50,7 +50,7 @@ def generate_pi_digits(digits):
     pi_value = str(mp.pi)[2:]
     return pi_value
 
-# Reverse bits 2, 3, 4, 5, 6, 7
+# Reverse bits 2-15
 def reverse_bits(byte):
     mask = 0b01111110
     relevant_bits = (byte & mask) >> 1
@@ -65,25 +65,38 @@ def encode_with_pi(data, pi_digits):
     pi_sequence = [int(d) for d in pi_digits[:len(data)]]
     return bytes([b ^ p for b, p in zip(data, pi_sequence)])
 
-# Compress and encode using zlib
+# Convert binary to base 256
+def binary_to_base256(binary_string):
+    if len(binary_string) % 8 != 0:
+        raise ValueError("The binary string length must be a multiple of 8.")
+    
+    byte_chunks = [binary_string[i:i + 8] for i in range(0, len(binary_string), 8)]
+    base256_values = [int(chunk, 2) for chunk in byte_chunks]
+    
+    return base256_values
+
+# Compress and encode using paq and binary to base 256
 def compress_with_zlib_and_encode(input_filename, output_filename):
     try:
         # Open the input file and read data
         with open(input_filename, "rb") as infile:
             data = infile.read()
 
-        # Compress data using zlib
+        # Compress data using paq
         compressed_data = paq.compress(data)
 
-        # Reverse bits of compressed data
-        compressed_data = reverse_bits_in_data(compressed_data)
+        # Convert binary data to base 256 (optional, may be useful for processing)
+        binary_data = ''.join(format(byte, '08b') for byte in compressed_data)
+        base256_values = binary_to_base256(binary_data)
+
+        # Reverse bits of base256 values
+        reversed_data = bytes(base256_values)
 
         # Generate Pi digits for encoding
-        pi_digits = generate_pi_digits(len(compressed_data))
+        pi_digits = generate_pi_digits(len(reversed_data))
 
         # XOR encoding with Pi digits
-        encoded_data = encode_with_pi(compressed_data, pi_digits)
-        encoded_data = reverse_bits_in_data(encoded_data)
+        encoded_data = encode_with_pi(reversed_data, pi_digits)
 
         # Write encoded data to the output file
         with open(output_filename, "wb") as outfile:
@@ -92,15 +105,12 @@ def compress_with_zlib_and_encode(input_filename, output_filename):
     except Exception as e:
         print(f"An error occurred during compression: {e}")
 
-# Decode and decompress using zlib
+# Decode and decompress using paq and binary to base 256
 def decode_with_zlib_and_pi(input_filename, output_filename):
     try:
         # Read the encoded data
         with open(input_filename, "rb") as infile:
             encoded_data = infile.read()
-
-        # Reverse bits of encoded data
-        encoded_data = reverse_bits_in_data(encoded_data)
 
         # Generate Pi digits for decoding
         pi_digits = generate_pi_digits(len(encoded_data))
@@ -108,11 +118,12 @@ def decode_with_zlib_and_pi(input_filename, output_filename):
         # XOR decoding with Pi digits
         decoded_data = encode_with_pi(encoded_data, pi_digits)
 
-        # Decompress data using zlib
-        decompressed_data = paq.decompress(decoded_data)
+        # Convert binary data back from base256 to bytes
+        binary_data = ''.join(format(byte, '08b') for byte in decoded_data)
+        base256_values = binary_to_base256(binary_data)
 
-        # Reverse bits of decompressed data
-        decompressed_data = reverse_bits_in_data(decompressed_data)
+        # Decompress data using paq
+        decompressed_data = paq.decompress(bytes(base256_values))
 
         # Write decompressed data to the output file
         with open(output_filename, "wb") as outfile:
