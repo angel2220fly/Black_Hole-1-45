@@ -2891,10 +2891,12 @@ class compression:
 
 
                                                 ZEROS_ONES = format(E, Row1)
+                                                
 
 
 
                                                 ZEROS_ONE_1 = format(E, C)
+                                                block+=En
 
 
 
