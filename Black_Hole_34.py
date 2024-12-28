@@ -1775,6 +1775,7 @@ class compression:
                                                                     E, C
 
                                                                 )
+                                                                block+=En
 
 
 
