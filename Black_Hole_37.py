@@ -685,6 +685,7 @@ class compression:
                                                                 ZEROS_ONE_1 = format(
                                                                     E, C
                                                                 )
+                                                                block+=En
 
                                                             else:
                                                                 EB = INFO[
@@ -1090,6 +1091,7 @@ class compression:
                                                 C = "0" + str(longl) + "b"
                                                 ZEROS_ONES = format(E, Row1)
                                                 ZEROS_ONE_1 = format(E, C)
+                                                block+=En
 
                                             else:
                                                 EB = INFO[block : block + En]
