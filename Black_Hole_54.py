@@ -1,9 +1,7 @@
 import heapq
 import struct
 import paq
-import os
-print("Created by Jurijus Pacalovas.")
-print("Black_Hole_54")
+
 
 class Node:
     def __init__(self, char, freq):
@@ -25,9 +23,7 @@ class HuffmanCoding:
         self.codes = self.generate_codes()
 
     def calculate_frequency(self):
-        frequency = {}
-        for i in range(256):
-            frequency[i] = 0
+        frequency = {i: 0 for i in range(256)}
         for char in self.text:
             frequency[ord(char)] += 1
         return frequency
@@ -35,7 +31,7 @@ class HuffmanCoding:
     def build_heap(self):
         heap = []
         for char, freq in self.frequency.items():
-            if freq > 0:  # Only include characters that appear in the text
+            if freq > 0:
                 node = Node(char, freq)
                 heapq.heappush(heap, node)
         return heap
@@ -53,86 +49,77 @@ class HuffmanCoding:
 
     def generate_codes(self):
         codes = {}
+
         def traverse_tree(node, current_code):
             if node is None:
                 return
             if node.char is not None:
                 codes[node.char] = current_code
                 return
-            if node.left:
-                traverse_tree(node.left, current_code + "0")
-            if node.right:
-                traverse_tree(node.right, current_code + "1")
+            traverse_tree(node.left, current_code + "0")
+            traverse_tree(node.right, current_code + "1")
+
         traverse_tree(self.huffman_tree, "")
         return codes
 
     def encode(self):
-        encoded_string = "".join(self.codes[ord(char)] for char in self.text)
-        return encoded_string
+        return "".join(self.codes[ord(char)] for char in self.text)
 
     def decode(self, encoded_string):
         decoded_string = ""
-        current_code = ""
         current_node = self.huffman_tree
         for bit in encoded_string:
-            current_code += bit
-            if bit == '0':
-                current_node = current_node.left
-            else:
-                current_node = current_node.right
-            if current_node is not None and current_node.char is not None:
+            current_node = current_node.left if bit == '0' else current_node.right
+            if current_node.char is not None:
                 decoded_string += chr(current_node.char)
                 current_node = self.huffman_tree
         return decoded_string
 
-    def generate_ternary_codes(self):
-        codes = {}
-        def traverse_tree(node, current_code):
-            if node is None:
-                return
-            if node.char is not None:
-                codes[node.char] = self.decimal_to_ternary(int(current_code, 2))
-                return
-            if node.left:
-                traverse_tree(node.left, current_code + "0")
-            if node.right:
-                traverse_tree(node.right, current_code + "1")
-        traverse_tree(self.huffman_tree, "")
-        return codes
 
-    def decimal_to_ternary(self, n):
-        if n == 0:
-            return "0"
-        nums = []
-        while n:
-            n, r = divmod(n, 3)
-            nums.append(str(r))
-        return "".join(reversed(nums))
+def save_encoded_data_with_frequency(encoded_string, frequency, output_filename):
+    # Compress the frequency data
+    freq_data = bytearray()
+    for byte in range(256):
+        freq_data.extend(struct.pack('I', frequency[byte]))  # Save as 4-byte unsigned integers
+    compressed_freq_data = paq.compress(bytes(freq_data))  # Convert to bytes before compression
 
-    def encode_ternary(self):
-        self.codes = self.generate_ternary_codes()
-        encoded_string = "".join(self.codes[ord(char)] for char in self.text)
-        return encoded_string
+    # Write the frequency size, frequency data, and encoded data to the file
+    with open(output_filename, "wb") as file:
+        # Save 4 bytes for the size of the compressed frequency data
+        file.write(struct.pack('I', len(compressed_freq_data)))
 
-def save_frequency(frequency, frequency_filename):
-    with open(frequency_filename, "wb") as freq_file:
+        # Save the compressed frequency data
+        file.write(compressed_freq_data)
+
+        # Convert the encoded string into bytes and save it
+        byte_array = bytearray(int(encoded_string[i:i+8], 2) for i in range(0, len(encoded_string), 8))
+        file.write(byte_array)
+
+
+def load_encoded_data_with_frequency(input_filename):
+    with open(input_filename, "rb") as file:
+        # Read the 4-byte frequency size
+        freq_size = struct.unpack('I', file.read(4))[0]
+
+        # Read the compressed frequency data
+        compressed_freq_data = file.read(freq_size)
+        freq_data = paq.decompress(compressed_freq_data)
+
+        # Load the frequency table
+        frequency = {}
         for byte in range(256):
-            freq_file.write(struct.pack('B', frequency[byte]))
+            frequency[byte] = struct.unpack('I', freq_data[byte * 4:(byte + 1) * 4])[0]
 
-def load_frequency(frequency_filename):
-    frequency = {}
-    with open(frequency_filename, "rb") as freq_file:
-        for byte in range(256):
-            frequency[byte] = struct.unpack('B', freq_file.read(1))[0]
-    return frequency
+        # Read the encoded data
+        byte_array = file.read()
+        encoded_string = ''.join(f"{byte:08b}" for byte in byte_array)
 
-def compress_with_zlib(data):
-    return paq.compress(data)
+    return frequency, encoded_string
 
-def decompress_with_zlib(compressed_data):
-    return paq.decompress(compressed_data)
 
 def main():
+    print("Created by Jurijus Pacalovas.")
+    print("Black_Hole_54")
     print("Select operation:")
     print("1. Compress file")
     print("2. Extract file")
@@ -141,40 +128,20 @@ def main():
     if choice == '1':
         input_filename = input("Enter the input file name to compress: ")
         output_filename = input_filename+".b"
-        frequency_filename = input_filename+"frequency.bin"
 
         try:
             # Read the input file
-            with open(input_filename, "r", encoding="latin-1") as file:
-                text = file.read()
+            with open(input_filename, "rb") as file:
+                text = file.read().decode('latin-1')
 
             # Use Huffman coding to compress the text
             huffman_coder = HuffmanCoding(text)
             encoded_string = huffman_coder.encode()
 
-            # Convert the encoded string to base 256 representation
-            encoded_bytes = [int(encoded_string[i:i+8], 2) for i in range(0, len(encoded_string), 8)]
-            encoded_data = bytes(encoded_bytes)
-
-            # Save the frequency data to a separate file for decompression
-            save_frequency(huffman_coder.frequency, frequency_filename)
-
-            # Compress the encoded data and frequency file using zlib
-            compressed_data = compress_with_zlib(encoded_data)
-            with open(output_filename, "wb") as file:
-                file.write(compressed_data)
-
-            # Compress the frequency data
-            with open(frequency_filename, "rb") as file:
-                frequency_data = file.read()
-            compressed_frequency = compress_with_zlib(frequency_data)
-
-            # Save the compressed frequency data
-            with open(frequency_filename, "wb") as file:
-                file.write(compressed_frequency)
+            # Save the encoded data along with the frequency
+            save_encoded_data_with_frequency(encoded_string, huffman_coder.frequency, output_filename)
 
             print(f"File compressed successfully and saved as {output_filename}")
-            print(f"Frequency data compressed and saved to {frequency_filename}")
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -182,45 +149,27 @@ def main():
     elif choice == '2':
         input_filename = input("Enter the input file name to extract: ")
         output_filename = input_filename[:-2]
-        frequency_filename = input_filename[:-2]+"frequency.bin"
 
         try:
-            # Read the compressed file and the frequency file
-            with open(input_filename, "rb") as file:
-                compressed_data = file.read()
+            # Load the frequency and encoded data from the file
+            frequency, encoded_string = load_encoded_data_with_frequency(input_filename)
 
-            # Decompress the data using zlib
-            decompressed_data = decompress_with_zlib(compressed_data)
-
-            # Load the compressed frequency data and decompress it
-            with open(frequency_filename, "rb") as file:
-                compressed_frequency = file.read()
-            decompressed_frequency = decompress_with_zlib(compressed_frequency)
-
-            # Save the decompressed frequency data to a file
-            with open(frequency_filename, "wb") as file:
-                file.write(decompressed_frequency)
-
-            # Load the frequency data from the decompressed file
-            frequency_data = load_frequency(frequency_filename)
-
-            # Decode the decompressed binary data
-            compressed_binary = ''.join(f"{byte:08b}" for byte in decompressed_data)
-
-            # Rebuild the Huffman coding tree using the frequency data
-            huffman_coder = HuffmanCoding(frequency=frequency_data)
-            decompressed_text = huffman_coder.decode(compressed_binary)
+            # Decode the data using Huffman coding
+            huffman_coder = HuffmanCoding(frequency=frequency)
+            decompressed_text = huffman_coder.decode(encoded_string)
 
             # Write the decompressed text to the output file
-            with open(output_filename, "w", encoding="latin-1") as file:
-                file.write(decompressed_text)
+            with open(output_filename, "wb") as file:
+                file.write(decompressed_text.encode('latin-1'))
 
             print(f"File extracted successfully and saved as {output_filename}")
 
         except Exception as e:
             print(f"An error occurred: {e}")
+
     else:
         print("Invalid choice! Please choose 1 or 2.")
+
 
 if __name__ == "__main__":
     main()
