@@ -141,7 +141,7 @@ def main():
     if choice == '1':
         input_filename = input("Enter the input file name to compress: ")
         output_filename = input_filename+".b"
-        frequency_filename = "frequency.bin"
+        frequency_filename = input_filename+"frequency.bin"
 
         try:
             # Read the input file
@@ -182,7 +182,7 @@ def main():
     elif choice == '2':
         input_filename = input("Enter the input file name to extract: ")
         output_filename = input_filename[:-2]
-        frequency_filename = "frequency.bin"
+        frequency_filename = input_filename[:-2]+"frequency.bin"
 
         try:
             # Read the compressed file and the frequency file
