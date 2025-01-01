@@ -892,7 +892,7 @@ class compression:
                                         long_l = len(take_c_or_l)
                                         # print(long_l)
                                         if INFO[block : block + 3] == "111":
-                                            block += 2
+                                            block += 3
                                             T8 = INFO[block : block + 25]
                                             TUPLE += T8
                                             block += 25
@@ -916,7 +916,7 @@ class compression:
                                             # print(binary_representation_before_long)#long after
 
                                             # print(binary_to_number_number_after)#binary represation
-                                        	block+=3
+                                       
                                         	find_c_v=4
                                         	
                     
@@ -1116,12 +1116,12 @@ class compression:
 	                                                                if CN==0:
 	                                                                	count_number=count_number+384
 	                                                                	
-	                                                                elif CN==2:
-	                                                                	count_number=count_number+256                                                           
+	                                                                elif CN==1:
+	                                                                	count_number=count_number+896                                                           
 	
 	                                                                	
-	                                                                elif CN==1:
-	                                                                	count_number=count_number+896                                                                       	                                                          
+	                                                                elif CN==2:
+	                                                                	count_number=count_number+256                                                                      	                                                          
 	                                                                elif CN==4:
 	                                                                	count_number=count_number+1152                                                                    	                                                          
 	                                                                elif CN==5:
