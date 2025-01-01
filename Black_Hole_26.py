@@ -23,8 +23,8 @@ class compression:
                                Square_of_ROOT=Key
                               
                                   
-                        if Number_of_the_file>2**67108864:
-                             Number_of_the_file==2**67108864      
+                        if Number_of_the_file>2**10
+                             Number_of_the_file==2**10   
                         
                         Number_of_the_file =((((Number_of_the_file * Square_of_ROOT) + Add_Numbers) // 3) * Multiply)
                         F=0
