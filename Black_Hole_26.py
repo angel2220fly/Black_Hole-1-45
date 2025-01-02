@@ -345,6 +345,7 @@ class compression:
                                     SQUARE_OF_ROOT=-1
 
                                     Multiply_Times=0
+                                    University=100
 
                                     while Extract1!=1:
 
@@ -360,8 +361,8 @@ class compression:
 
                                                 
 
-                                            University=int(k2)
-                                            circuit = QuantumCircuit(2**University)
+                                            University=int(University)
+                                            circuit = QuantumCircuit(University)
 
                                             QuantumCircuit(University)
 
@@ -799,6 +800,7 @@ class compression:
                                     SQUARE_OF_ROOT=-1
 
                                     Multiply_Times=0
+                                    University=100
 
                                     while Extract1!=1:
 
@@ -814,7 +816,7 @@ class compression:
 
                                                 
 
-                                            University=int(k2)
+                                            University=int(University)
                                             circuit = QuantumCircuit(2**University)
                                             
 
