@@ -360,10 +360,10 @@ class compression:
 
                                     Multiply_Times=0
                                     
-                                    University=100
-                                    Universe=100
-                                    num=100
-                                    result=100
+                                    University=0
+                                    Universe=0
+                                    num=0
+                                    result=0
 
                                     while Extract1!=1:
 
@@ -373,10 +373,15 @@ class compression:
                                             
                                             
                                             num = University
-                                            result = count_powers_of_two(num)
+                                            if University>3:
+                                                
+                                                
+                                                
+                                                result = count_powers_of_two(num)
 
-                                            Universe=result*2                                            
-
+                                                Universe=result*2
+                                            elif University<4:
+                                                Universe=12
                                             
                                             
                                             #We gets around how need qubits.
@@ -823,10 +828,10 @@ class compression:
 
                                     Multiply_Times=0
                                     
-                                    University=100
-                                    Universe=100
-                                    num=100
-                                    result=100
+                                    University=0
+                                    Universe=0
+                                    num=0
+                                    result=0
                                   
 
                                     while Extract1!=1:
@@ -835,10 +840,17 @@ class compression:
 
                                             k2+=1
                                             
-                                            num = University
-                                            result = count_powers_of_two(num)
+                                            if University>3:
+                                                
+                                                
+                                                
+                                                result = count_powers_of_two(num)
 
-                                            Universe=result*2
+                                                Universe=result*2
+                                            elif University<4:
+                                                Universe=12
+                                            
+                                            
 
 
                                             Universe=int(Universe)
