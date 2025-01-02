@@ -382,8 +382,9 @@ class compression:
                                             #We gets around how need qubits.
      
 
-                                            University=int(Universe)
-                                            circuit = QuantumCircuit(University)
+                                            Universe=int(Universe)
+                                            University=int(University)
+                                            circuit = QuantumCircuit(Universe)
 
                                             QuantumCircuit(University)
 
@@ -840,8 +841,9 @@ class compression:
                                             Universe=result*2
 
 
-                                            University=int(Universe)
-                                            circuit = QuantumCircuit(2**University)
+                                            Universe=int(Universe)
+                                            University=int(University)
+                                            circuit = QuantumCircuit(Universe)
                                             
 
                                             QuantumCircuit(University)
