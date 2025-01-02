@@ -31,6 +31,19 @@ name_input = input("c,  compress or e, extract? ")
 class compression:
 
         def cryptograpy_compression4(self):
+            def count_powers_of_two(number):
+                """
+                Counts the highest power of 2 (2^n) that divides the given number.
+                """
+                if number <= 0:
+                    return "Number must be positive."
+                
+                count = 0
+                while number % 2 == 0:
+                    number //= 2
+                    count += 1
+                
+                return count
 
                           
 
@@ -345,23 +358,30 @@ class compression:
                                     SQUARE_OF_ROOT=-1
 
                                     Multiply_Times=0
+                                    
                                     University=100
+                                    Universe=100
+                                    num=100
+                                    result=100
 
                                     while Extract1!=1:
 
                                             k1+=1
 
                                             k2+=1
+                                            
+                                            
+                                            num = int(input("Enter a number: "))
+                                            result = count_powers_of_two(num)
+
+                                            Universe=result*2                                            
 
                                             
-
-                                                 
-
                                             
+                                            #We gets around how need qubits.
+     
 
-                                                
-
-                                            University=int(University)
+                                            University=int(Universe)
                                             circuit = QuantumCircuit(University)
 
                                             QuantumCircuit(University)
@@ -800,23 +820,26 @@ class compression:
                                     SQUARE_OF_ROOT=-1
 
                                     Multiply_Times=0
+                                    
                                     University=100
+                                    Universe=100
+                                    num=100
+                                    result=100
+                                  
 
                                     while Extract1!=1:
 
                                             k1+=1
 
                                             k2+=1
-
                                             
+                                            num = int(input("Enter a number: "))
+                                            result = count_powers_of_two(num)
 
-                                                 
+                                            Universe=result*2
 
-                                            
 
-                                                
-
-                                            University=int(University)
+                                            University=int(Universe)
                                             circuit = QuantumCircuit(2**University)
                                             
 
