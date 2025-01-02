@@ -401,7 +401,7 @@ class compression:
 
                                             if k2>(2**((8*X1)+40)-1):
 
-                                                    University=0
+                                                    University=5
 
                                                     k1=-1
 
@@ -868,7 +868,7 @@ class compression:
 
                                             if k2>(2**((8*X1)+40)-1):
 
-                                                    University=0
+                                                    University=5
 
                                                     k1=-1
 
