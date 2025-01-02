@@ -31,19 +31,20 @@ name_input = input("c,  compress or e, extract? ")
 class compression:
 
         def cryptograpy_compression4(self):
-            def count_powers_of_two(number):
-                """
-                Counts the highest power of 2 (2^n) that divides the given number.
-                """
-                if number <= 0:
-                    return "Number must be positive."
-                
-                count = 0
-                while number % 2 == 0:
-                    number //= 2
-                    count += 1
-                
-                return count
+
+                def count_powers_of_two(number):
+                    """
+                    Counts the highest power of 2 (2^n) that divides the given number.
+                    """
+                    if number <= 0:
+                        return "Number must be positive."
+                    
+                    count = 0
+                    while number % 2 == 0:
+                        number //= 2
+                        count += 1
+                    
+                    return count
 
                           
 
