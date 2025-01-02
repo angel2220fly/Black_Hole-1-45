@@ -371,7 +371,7 @@ class compression:
                                             k2+=1
                                             
                                             
-                                            num = int(input("Enter a number: "))
+                                            num = University
                                             result = count_powers_of_two(num)
 
                                             Universe=result*2                                            
@@ -833,7 +833,7 @@ class compression:
 
                                             k2+=1
                                             
-                                            num = int(input("Enter a number: "))
+                                            num = University
                                             result = count_powers_of_two(num)
 
                                             Universe=result*2
