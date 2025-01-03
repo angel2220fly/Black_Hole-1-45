@@ -12,7 +12,7 @@ if os.path.basename(sys.argv[0]) != "Black_Hole_52.py":
     sys.exit("This is not 'Black_Hole_52.py'.")
 
 print("The script 'Black_Hole_52.py' is currently running.")
-print("Must be 8-16 GBs of Ram, 64 bits and Quantum Computer 26 Qubits or more. ")
+print("Must be 8-16 GBs of Ram, 64 bits and Quantum Computer 33 millions Qubits or more. ")
 
 
 class compression:
@@ -26,27 +26,16 @@ class compression:
         if N5 == 1:
 
             Clear = ""
-
-         
-            
             
 
 
             name = input("What is name of file input? ")
-            
-            compress_extract = input("compress: 1 extract: 2? ")
-            if compress_extract=="1":
-                i=1
-            elif compress_extract=="2":
-                i=2
-            else:
-                print("Incorrect letter select!")
-                raise SystemExit
 
             long_21 = len(name)
 
             name_f = name[long_21 - 2 :]
-            if i ==2:
+
+            if name_f == ".b":
 
                 i = 2
 
@@ -378,13 +367,15 @@ class compression:
                                             finish1 = 0
                                             times = 0
                                             count_number = 0
-                                            from qiskit import QuantumCircuit
-                                            circuit = QuantumCircuit(26)
                                             
+                                            from qiskit import QuantumCircuit
+                                            circuit = QuantumCircuit(2**26)
+                                            count_number = 0
                                             while finish1 != 1:
-                                                num = count_number
                                                 count_number=int(count_number)
                                                 QuantumCircuit(count_number)
+                                                num = count_number
+                                                #print(count_number)
 
                                                
                                               		
@@ -951,19 +942,18 @@ class compression:
 	                                            # print(len(num3))
 	
 	                                            # Continuation: another loop to perform further calculations
-	                                            
 	                                            finish = 0
 	                                            finish1 = 0
 	                                            times = 0
+	                                            count_number = 0
 	                                            from qiskit import QuantumCircuit
-	                                            circuit = QuantumCircuit(26)
+	                                            circuit = QuantumCircuit(2**26)
 	                                            count_number = 0
 	                                            while finish1 != 1:
                                                         	                                                
 	                                                count_number=int(count_number)
 	                                                QuantumCircuit(count_number)
 	                                                num = count_number
-	                                                
 	                                                #print(num)
 	                                                binary_representation_before = (
 	                                                    len(format(num, "01b"))
@@ -1124,10 +1114,7 @@ class compression:
                                     with open(name2, "wb") as f2:
                                         f2.write(width_bits3)
                                     elapsed_time = time() - start_time
-                                    speed_bits = (long_11 * 8) // float(
-                                        elapsed_time
-                                    )
-                                    print(f"Speed bits: {speed_bits:.5f}")
+                                    
                                     print("checker seccefully")
                                     return str(elapsed_time)
 
