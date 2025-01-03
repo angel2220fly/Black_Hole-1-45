@@ -371,8 +371,8 @@ class compression:
 
                                             k2+=1
                                             
-                                            
-                                            num = University
+                                            University=k2
+                                            num = k2
                                             if University>3:
                                                 
                                                 
@@ -843,7 +843,8 @@ class compression:
                                             if University>3:
                                                 
                                                 
-                                                
+                                                num=k2
+                                                University=k2
                                                 result = count_powers_of_two(num)
 
                                                 Universe=result*2
