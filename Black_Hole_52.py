@@ -369,7 +369,7 @@ class compression:
                                             count_number = 0
                                             
                                             from qiskit import QuantumCircuit
-                                            circuit = QuantumCircuit(2**26)
+                                            circuit = QuantumCircuit(2000)
                                             count_number = 0
                                             while finish1 != 1:
                                                 count_number=int(count_number)
@@ -947,7 +947,7 @@ class compression:
 	                                            times = 0
 	                                            count_number = 0
 	                                            from qiskit import QuantumCircuit
-	                                            circuit = QuantumCircuit(2**26)
+	                                            circuit = QuantumCircuit(2000)
 	                                            count_number = 0
 	                                            while finish1 != 1:
                                                         	                                                
